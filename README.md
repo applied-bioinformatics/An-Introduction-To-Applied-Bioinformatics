@@ -15,8 +15,8 @@ Outline
 
 1. General molecular biology
   1. Biological information
-  2. The central dogma of molecular biology
-  3. Evolution
+  2. [The central dogma of molecular biology](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/general-molecular-biology/central-dogma.ipynb)
+  3. [Evolution](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/general-molecular-biology/evolution.ipynb)
   4. The diversity of life
 2. Programming and concepts of software engineering
   1. Basics of python (pointers to other resources)
