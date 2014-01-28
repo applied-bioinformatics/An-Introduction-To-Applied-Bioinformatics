@@ -24,11 +24,11 @@ Outline
   3. Software testing
   4. Software profiling
 3. Algorithms
-  1. Pairwise alignment
+  1. [Pairwise alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/pairwise-alignment.ipynb)
   2. Is my alignment statistically significant?
   3. Database searching (BLAST)
   4. Multiple sequence alignment
-  5. Phylogeny reconstruction (UPGMA)
+  5. [Phylogeny reconstruction]((http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/phylogeny-reconstruction)) (UPGMA)
   6. Clustering and read mapping (greedy clustering, blat)
 4. Statistics
   1. Distances and distance matrices
