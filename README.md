@@ -28,7 +28,7 @@ Outline
   2. Is my alignment statistically significant?
   3. Database searching (BLAST)
   4. Multiple sequence alignment
-  5. [Phylogeny reconstruction](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/phylogeny-reconstruction) (UPGMA)
+  5. [Phylogeny reconstruction](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/phylogeny-reconstruction.ipynb) (UPGMA)
   6. Clustering and read mapping (greedy clustering, blat)
 4. Statistics
   1. Distances and distance matrices
