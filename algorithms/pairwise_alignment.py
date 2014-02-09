@@ -31,6 +31,10 @@ blosum50 = {'A': {'A': 5.0, 'C': -1.0, 'D': -2.0, 'E': -1.0, 'F': -3.0, 'G': 0.0
 'W': {'A': -3.0, 'C': -5.0, 'D': -5.0, 'E': -3.0, 'F': 1.0, 'G': -3.0, 'H': -3.0, 'I': -3.0, 'K': -3.0, 'L': -2.0, 'M': -1.0, 'N': -4.0, 'P': -4.0, 'Q': -1.0, 'R': -3.0, 'S': -4.0, 'T': -3.0, 'V': -3.0, 'W': 15.0, 'Y': 2.0},
 'Y': {'A': -2.0, 'C': -3.0, 'D': -3.0, 'E': -2.0, 'F': 4.0, 'G': -3.0, 'H': 2.0, 'I': -1.0, 'K': -2.0, 'L': -1.0, 'M': 0.0, 'N': -2.0, 'P': -3.0, 'Q': -1.0, 'R': -1.0, 'S': -2.0, 'T': -2.0, 'V': -1.0, 'W': 2.0, 'Y': 8.0}}
 
+nucleotide_substitution_matrix = {'A':{'A':1,'C':-2,'G':-2,'T':-2}, 
+                       'C':{'A':-2,'C':1,'G':-2,'T':-2}, 
+                       'G':{'A':-2,'C':-2,'G':1,'T':-2}, 
+                       'T':{'A':-2,'C':-2,'G':-2,'T':1}}
 
 def format_matrix(row_headers, col_headers, data, hide_zeros=False):
     result = []
@@ -295,7 +299,40 @@ def generate_sw_and_traceback_matrices_affine_gap(seq1, seq2, gap_open_penalty, 
     return sw_matrix, traceback_matrix
 
 
-def sw_align_affine_gap(sequence1, sequence2, gap_open_penalty, gap_extend_penalty, substitution_matrix):
+def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
+                        gap_extend_penalty=2,
+                        substitution_matrix=nt_substitution_matrix):
+    """
+        sequence1: the first unaligned sequence
+        sequence2: the second unaligned sequence
+        gap_open_penalty: penalty for opening a gap (this is substracted from 
+         previous best alignment score, so is typically positive)
+        gap_extend_penalty: penalty for opening a gap (this is substracted from 
+         previous best alignment score, so is typically positive)
+        substitution_matrix: 2D-dict-like object for looking up substitution 
+         scores
+    """
+    sw_matrix, traceback_matrix = generate_sw_and_traceback_matrices_affine_gap(sequence1,
+                                                                 sequence2,
+                                                                 gap_open_penalty,
+                                                                 gap_extend_penalty,
+                                                                 substitution_matrix)
+
+    return sw_traceback(traceback_matrix,sw_matrix,sequence1,sequence2)
+
+def sw_align_affine_gap_pr(sequence1, sequence2, gap_open_penalty=11,
+                        gap_extend_penalty=1,
+                        substitution_matrix=blosum50):
+    """
+        sequence1: the first unaligned sequence
+        sequence2: the second unaligned sequence
+        gap_open_penalty: penalty for opening a gap (this is substracted from 
+         previous best alignment score, so is typically positive)
+        gap_extend_penalty: penalty for opening a gap (this is substracted from 
+         previous best alignment score, so is typically positive)
+        substitution_matrix: 2D-dict-like object for looking up substitution 
+         scores
+    """
     sw_matrix, traceback_matrix = generate_sw_and_traceback_matrices_affine_gap(sequence1,
                                                                  sequence2,
                                                                  gap_open_penalty,
