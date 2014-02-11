@@ -9,6 +9,7 @@
 #-----------------------------------------------------------------------------
 from __future__ import division
 from random import choice
+from bipy.core.sequence import BiologicalSequence
 
 blosum50 = {'A': {'A': 5.0, 'C': -1.0, 'D': -2.0, 'E': -1.0, 'F': -3.0, 'G': 0.0, 'H': -2.0, 'I': -1.0, 'K': -1.0, 'L': -2.0, 'M': -1.0, 'N': -1.0, 'P': -1.0, 'Q': -1.0, 'R': -2.0, 'S': 1.0, 'T': 0.0, 'V': 0.0, 'W': -3.0, 'Y': -2.0},
 'C': {'A': -1.0, 'C': 13.0, 'D': -4.0, 'E': -3.0, 'F': -2.0, 'G': -3.0, 'H': -3.0, 'I': -2.0, 'K': -3.0, 'L': -2.0, 'M': -2.0, 'N': -2.0, 'P': -4.0, 'Q': -3.0, 'R': -4.0, 'S': -1.0, 'T': -1.0, 'V': -1.0, 'W': -5.0, 'Y': -3.0},
@@ -36,6 +37,13 @@ nt_substitution_matrix = {'A': {'A':  1, 'C': -2, 'G': -2, 'T': -2, 'N': 0},
                           'G': {'A': -2, 'C': -2, 'G':  1, 'T': -2, 'N': 0},
                           'T': {'A': -2, 'C': -2, 'G': -2, 'T':  1, 'N': 0},
                           'N': {'A':  0, 'C':  0, 'G':  0, 'T':  0, 'N': 0 }}
+
+
+def hamming_distance(s1, s2):
+    s1 = BiologicalSequence(s1)
+    s2 = BiologicalSequence(s2)
+    return s1.distance(s2)
+
 
 def format_matrix(row_headers, col_headers, data, hide_zeros=False):
     result = []
