@@ -22,10 +22,17 @@ Outline
   2. [The central dogma of molecular biology](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/general-molecular-biology/central-dogma.ipynb)
   3. [Evolution](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/general-molecular-biology/evolution.ipynb)
   4. The diversity of life
-2. Programming and concepts of software engineering
-  1. Basics of python (pointers to other resources)
+2. [Programming and concepts of software engineering](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/0-overview.ipynb)
+  1. Basics of python
+    1. [Variables](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/1-variables.ipynb)
+    2. [Conditionals](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/2-booleans-and-conditionals.ipynb)
+    3. [Lists and loops](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/3-lists-and-loops.ipynb)
+    4. [Functions](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/4-functions.ipynb)
+    5. [File i/o](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/5-file-io.ipynb)
+    6. [More file i/o](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/6-more-file-io.ipynb)
+    7. [Third-party modules](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/7-third-party-modules.ipynb)
   2. Python generators
-  3. Software testing
+  3. [Software testing](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/8-concepts-of-testing.ipynb)
   4. Software profiling
 3. Algorithms
   1. [Pairwise alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/pairwise-alignment.ipynb)
