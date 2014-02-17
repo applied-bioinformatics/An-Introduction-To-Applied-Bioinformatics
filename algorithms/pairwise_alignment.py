@@ -256,6 +256,54 @@ def sw_traceback(traceback_matrix,sw_matrix,seq1,seq2,gap_character='-'):
         
     return ''.join(aligned_seq1[::-1]), ''.join(aligned_seq2[::-1]), best_score
 
+def sw_multiple_traceback(traceback_matrix,sw_matrix,seq1,seq2,gap_character='-'):
+    
+    aligned_seq1 = []
+    aligned_seq2 = []
+    
+    current_row = None 
+    current_col = None
+    best_scores = []
+    for i in range(len(sw_matrix[0])):
+        for j in range(len(sw_matrix)):
+            try:
+                new_alignment = traceback_matrix[j+1][i+1] == None
+            except IndexError:
+                new_alignment = True
+            if new_alignment:
+                current_score = sw_matrix[j][i]
+                current_row = j
+                current_col = i
+                best_scores.append((current_score, current_row, current_col))
+    best_scores.sort()
+    best_scores.reverse()
+    
+    results = []
+    for current_score, current_row, current_col in best_scores[:10]:
+        while True:
+            current_value = traceback_matrix[current_row][current_col]
+        
+            if current_value == '\\':
+                aligned_seq1.append(seq1[current_col-1])
+                aligned_seq2.append(seq2[current_row-1])
+                current_row -= 1
+                current_col -= 1
+            elif current_value == '|':
+                aligned_seq1.append('-')
+                aligned_seq2.append(seq2[current_row-1])
+                current_row -= 1
+            elif current_value == '-':
+                aligned_seq1.append(seq1[current_col-1])
+                aligned_seq2.append('-')
+                current_col -= 1
+            elif current_value == None:
+                break
+            else:
+                raise ValueError, "Invalid value in traceback matrix: %s" % current_value
+        results.append((''.join(aligned_seq1[::-1]), ''.join(aligned_seq2[::-1]), current_score, current_col, current_row))
+        
+    return results
+
 
 def sw_align(sequence1, sequence2, gap_penalty, substitution_matrix):
     sw_matrix, traceback_matrix = generate_sw_and_traceback_matrices(sequence1,
@@ -346,6 +394,45 @@ def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
                                                                  substitution_matrix)
 
     return sw_traceback(traceback_matrix,sw_matrix,sequence1,sequence2)
+
+def sw_multiple_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
+                        gap_extend_penalty=2,
+                        substitution_matrix=nt_substitution_matrix):
+    """Locally align two nucleotide seqs (Smith-Waterman w affine gap scoring)
+    
+       Parameters
+       ----------
+       sequence1 : string
+           The first unaligned sequence
+       sequence2 : 
+           The second unaligned sequence
+       gap_open_penalty : int, float, optional
+           penalty for opening a gap (this is substracted from previous best
+           alignment score, so is typically positive)
+       gap_extend_penalty : int, float, optional
+           penalty for extending a gap (this is substracted from previous best
+           alignment score, so is typically positive)
+       substitution_matrix: 2D dict (or similar), optional
+           lookup for substitution scores (these values are added to the 
+           previous best alignment score)
+        
+       Returns
+       -------
+       string
+          The first aligned sequence
+       string
+          The second aligned sequence
+       float
+          The score of the alignment
+         
+    """
+    sw_matrix, traceback_matrix = generate_sw_and_traceback_matrices_affine_gap(sequence1,
+                                                                 sequence2,
+                                                                 gap_open_penalty,
+                                                                 gap_extend_penalty,
+                                                                 substitution_matrix)
+
+    return sw_multiple_traceback(traceback_matrix,sw_matrix,sequence1,sequence2)
 
 def sw_align_affine_gap_pr(sequence1, sequence2, gap_open_penalty=11,
                         gap_extend_penalty=1,
