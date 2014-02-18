@@ -180,6 +180,35 @@ def nw_align(seq1, seq2, gap_penalty, substitution_matrix):
     aligned_seq1, aligned_seq2, score = nw_traceback(traceback_matrix,nw_matrix,seq1,seq2)
     return aligned_seq1, aligned_seq2, score
 
+def nw_align_nt(seq1, seq2, gap_penalty=8, substitution_matrix=nt_substitution_matrix):
+    """Globally align two nucleotide seqs (Needleman-Wunsch w single gap scoring)
+    
+       Parameters
+       ----------
+       sequence1 : string
+           The first unaligned sequence
+       sequence2 : string
+           The second unaligned sequence
+       gap_penalty : int, float, optional
+           penalty for inserting a gap (this is substracted from previous best
+           alignment score, so is typically positive)
+       substitution_matrix: 2D dict (or similar), optional
+           lookup for substitution scores (these values are added to the 
+           previous best alignment score)
+        
+       Returns
+       -------
+       string
+          The first aligned sequence
+       string
+          The second aligned sequence
+       float
+          The score of the alignment
+         
+    """
+    return nw_align(seq1, seq2, gap_penalty, substitution_matrix)
+
+
 ##
 # Smith-Waterman alignment
 ##
@@ -254,7 +283,7 @@ def sw_traceback(traceback_matrix,sw_matrix,seq1,seq2,gap_character='-'):
         else:
             raise ValueError, "Invalid value in traceback matrix: %s" % current_value
         
-    return ''.join(aligned_seq1[::-1]), ''.join(aligned_seq2[::-1]), best_score
+    return ''.join(aligned_seq1[::-1]), ''.join(aligned_seq2[::-1]), best_score, current_col, current_row
 
 def sw_multiple_traceback(traceback_matrix,sw_matrix,seq1,seq2,gap_character='-'):
     
@@ -365,7 +394,7 @@ def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
        ----------
        sequence1 : string
            The first unaligned sequence
-       sequence2 : 
+       sequence2 : string
            The second unaligned sequence
        gap_open_penalty : int, float, optional
            penalty for opening a gap (this is substracted from previous best
@@ -385,6 +414,10 @@ def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
           The second aligned sequence
        float
           The score of the alignment
+       int
+          The start position of the alignment in sequence 1
+       int
+          The start position of the alignment in sequence 2
          
     """
     sw_matrix, traceback_matrix = generate_sw_and_traceback_matrices_affine_gap(sequence1,
@@ -398,34 +431,6 @@ def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
 def sw_multiple_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
                         gap_extend_penalty=2,
                         substitution_matrix=nt_substitution_matrix):
-    """Locally align two nucleotide seqs (Smith-Waterman w affine gap scoring)
-    
-       Parameters
-       ----------
-       sequence1 : string
-           The first unaligned sequence
-       sequence2 : 
-           The second unaligned sequence
-       gap_open_penalty : int, float, optional
-           penalty for opening a gap (this is substracted from previous best
-           alignment score, so is typically positive)
-       gap_extend_penalty : int, float, optional
-           penalty for extending a gap (this is substracted from previous best
-           alignment score, so is typically positive)
-       substitution_matrix: 2D dict (or similar), optional
-           lookup for substitution scores (these values are added to the 
-           previous best alignment score)
-        
-       Returns
-       -------
-       string
-          The first aligned sequence
-       string
-          The second aligned sequence
-       float
-          The score of the alignment
-         
-    """
     sw_matrix, traceback_matrix = generate_sw_and_traceback_matrices_affine_gap(sequence1,
                                                                  sequence2,
                                                                  gap_open_penalty,
@@ -443,7 +448,7 @@ def sw_align_affine_gap_pr(sequence1, sequence2, gap_open_penalty=11,
        ----------
        sequence1 : string
            The first unaligned sequence
-       sequence2 : 
+       sequence2 : string
            The second unaligned sequence
        gap_open_penalty : int, float, optional
            penalty for opening a gap (this is substracted from previous best
@@ -463,6 +468,10 @@ def sw_align_affine_gap_pr(sequence1, sequence2, gap_open_penalty=11,
           The second aligned sequence
        float
           The score of the alignment
+       int
+          The start position of the alignment in sequence 1
+       int
+          The start position of the alignment in sequence 2
          
     """
     sw_matrix, traceback_matrix = generate_sw_and_traceback_matrices_affine_gap(sequence1,
@@ -472,6 +481,38 @@ def sw_align_affine_gap_pr(sequence1, sequence2, gap_open_penalty=11,
                                                                  substitution_matrix)
 
     return sw_traceback(traceback_matrix,sw_matrix,sequence1,sequence2)
+
+def sw_align_nt(seq1, seq2, gap_penalty=8, substitution_matrix=nt_substitution_matrix):
+    """Locally align two nucleotide seqs (Smith-Waterman w single gap scoring)
+    
+       Parameters
+       ----------
+       sequence1 : string
+           The first unaligned sequence
+       sequence2 : 
+           The second unaligned sequence
+       gap_penalty : int, float, optional
+           penalty for inserting a gap (this is substracted from previous best
+           alignment score, so is typically positive)
+       substitution_matrix: 2D dict (or similar), optional
+           lookup for substitution scores (these values are added to the 
+           previous best alignment score)
+        
+       Returns
+       -------
+       string
+          The first aligned sequence
+       string
+          The second aligned sequence
+       float
+          The score of the alignment
+       int
+          The start position of the alignment in sequence 1
+       int
+          The start position of the alignment in sequence 2
+         
+    """
+    return sw_align(seq1, seq2, gap_penalty, substitution_matrix)
 
 ###
 # Convenience wrapper
