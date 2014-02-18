@@ -35,7 +35,7 @@ Outline
   3. [Software testing](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/8-concepts-of-testing.ipynb)
   4. Software profiling
 3. Algorithms
-  1. [Pairwise alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/pairwise-alignment.ipynb)
+  1. [Pairwise alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/pairwise-alignment.ipynb) ([exercise](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/alignment-exercise.ipynb))
   2. [Database searching and determining the statistical significance of an alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/database-searching.ipynb)
   3. Multiple sequence alignment
   4. [Phylogeny reconstruction](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/phylogeny-reconstruction.ipynb) (UPGMA)
