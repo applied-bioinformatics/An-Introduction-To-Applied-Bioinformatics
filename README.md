@@ -37,7 +37,7 @@ Outline
 3. Algorithms
   1. [Pairwise alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/pairwise-alignment.ipynb) ([exercise](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/alignment-exercises.ipynb))
   2. [Database searching and determining the statistical significance of an alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/database-searching.ipynb)
-  3. Multiple sequence alignment
+  3. [Multiple sequence alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/multiple-sequence-alignment.ipynb)
   4. [Phylogeny reconstruction](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/phylogeny-reconstruction.ipynb) (UPGMA)
   5. Clustering and read mapping (greedy clustering, blat)
 4. Statistics
