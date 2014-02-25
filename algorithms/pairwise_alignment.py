@@ -60,9 +60,9 @@ def format_matrix(row_headers, col_headers, data, hide_zeros=False):
                 if v == 0:
                     display_row.append('')
                 else:
-                    display_row.append(v)
+                    display_row.append('%1.2f' % v)
         else:
-            display_row = row
+            display_row = ['%1.2f' % v for v in row]
         result.append(line_format % tuple([b2] + display_row))
     
     return '\n'.join(result)
