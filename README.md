@@ -29,7 +29,7 @@ Outline
     3. [Lists and loops](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/3-lists-and-loops.ipynb)
     4. [Functions](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/4-functions.ipynb)
     5. [File i/o](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/5-file-io.ipynb)
-    6. [More file i/o](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/6-more-file-io.ipynb)
+    6. [Python Standard Library](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/6-python-standard-library.ipynb)
     7. [Third-party modules](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/7-third-party-modules.ipynb)
   2. Python generators
   3. [Software testing](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/8-concepts-of-testing.ipynb)
