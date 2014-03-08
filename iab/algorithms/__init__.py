@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
 #-----------------------------------------------------------------------------
-# Copyright (c) 2014, Greg Caporaso.
-#
-# Distributed under the terms of the Modified BSD License.
-#
-# The full license is in the file COPYING.txt, distributed with this software.
+# This work is licensed under the Creative Commons
+# Attribution-NonCommercial-ShareAlike 4.0 International License. To view a
+# copy of this license, visit
+# http://creativecommons.org/licenses/by-nc-sa/4.0/.
 #-----------------------------------------------------------------------------
 from __future__ import division
 from random import choice
