@@ -386,7 +386,7 @@ def generate_sw_and_traceback_matrices_affine_gap(seq1, seq2, gap_open_penalty, 
 
 def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
                         gap_extend_penalty=2,
-                        substitution_matrix=nt_substitution_matrix):
+                        substitution_matrix=None):
     """Locally align two nucleotide seqs (Smith-Waterman w affine gap scoring)
     
        Parameters
@@ -403,7 +403,7 @@ def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
            alignment score, so is typically positive)
        substitution_matrix: 2D dict (or similar), optional
            lookup for substitution scores (these values are added to the 
-           previous best alignment score)
+           previous best alignment score); default is nt_substitution_matrix
         
        Returns
        -------
@@ -417,8 +417,22 @@ def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
           The start position of the alignment in sequence 1
        int
           The start position of the alignment in sequence 2
-         
+    
+       Examples
+       --------
+       >>> from iab.algorithms import sw_align_affine_gap_nt
+       >>> s1 = "GCGTGCCTAAGGTATGCAAG"
+       >>> s2 = "ACGTGCCTAGGTACGCAAG"
+       >>> a1, a2, score, a1_start, a2_start = sw_align_affine_gap_nt(s1, s2)
+       >>> print a1
+       CGTGCCTAAGGTATGCAAG
+       >>> print a2
+       CGTGCCT-AGGTACGCAAG
+       
     """
+    if substitution_matrix is None:
+        substitution_matrix = nt_substitution_matrix
+        
     sw_matrix, traceback_matrix = generate_sw_and_traceback_matrices_affine_gap(sequence1,
                                                                  sequence2,
                                                                  gap_open_penalty,
