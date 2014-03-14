@@ -792,14 +792,16 @@ def iterative_msa_and_tree(query_sequences, num_iterations,
                            substitution_matrix=nt_substitution_matrix, 
                            guide_tree_fn=guide_tree_from_query_sequences,
                            msa_distance_fn=compute_aligned_sequence_distances,
-                           guide_tree=None, display_aln=True, display_tree=True):
-    if num_iterations:
-        raise ValueError, "A maximum of five iterations is allowed. You requested %d." % num_iterations
+                           guide_tree=None, display_aln=False, display_tree=False):
+    if num_iterations > 5:
+        raise ValueError("A maximum of five iterations is allowed. You requested %d." % num_iterations)
     previous_iter_tree = None
-    display_iter = False
     for i in range(num_iterations):
-        if display_aln and display_tree and i == (num_iterations - 1):
+        if i == (num_iterations - 1):
+            # only display the last iteration
             display_iter = True
+        else:
+            display_iter = False
         previous_iter_msa, previous_iter_tree = progressive_msa_and_tree(query_sequences, 
             gap_open_penalty=gap_open_penalty, gap_extend_penalty=gap_extend_penalty, 
             substitution_matrix=substitution_matrix, msa_distance_fn=msa_distance_fn,
