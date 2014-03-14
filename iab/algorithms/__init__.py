@@ -593,7 +593,7 @@ def guide_tree_from_query_sequences(query_sequences,
     guide_lm = average(guide_dm.condensed_form())
     guide_tree = to_tree(guide_lm)
     if display_tree:
-        guide_d = dendrogram(guide_lm, labels=guide_dm.sample_ids, orientation='right', 
+        guide_d = dendrogram(guide_lm, labels=guide_dm.ids, orientation='right', 
                link_color_func=lambda x: 'black')
     return guide_tree
 
@@ -783,7 +783,7 @@ def progressive_msa_and_tree(query_sequences, gap_open_penalty=8, gap_extend_pen
     tree = to_tree(lm)
     if display_tree:
         print "\nOutput tree:"
-        d = dendrogram(lm, labels=dm.sample_ids, orientation='right', 
+        d = dendrogram(lm, labels=dm.ids, orientation='right', 
                    link_color_func=lambda x: 'black', leaf_font_size=24)
     return msa, tree
 
