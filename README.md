@@ -16,6 +16,7 @@ Currently, the **best example of where I'm hoping to go with these materials** i
 
 Outline
 -------
+0. [Getting started]((http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/getting-started/0-overview.ipynb))
 
 1. General molecular biology
   1. Biological information
