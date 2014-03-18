@@ -10,26 +10,26 @@ from __future__ import division
 from random import choice
 from bipy.core.sequence import BiologicalSequence
 
-blosum50 = {'A': {'A': 5.0, 'C': -1.0, 'D': -2.0, 'E': -1.0, 'F': -3.0, 'G': 0.0, 'H': -2.0, 'I': -1.0, 'K': -1.0, 'L': -2.0, 'M': -1.0, 'N': -1.0, 'P': -1.0, 'Q': -1.0, 'R': -2.0, 'S': 1.0, 'T': 0.0, 'V': 0.0, 'W': -3.0, 'Y': -2.0},
-'C': {'A': -1.0, 'C': 13.0, 'D': -4.0, 'E': -3.0, 'F': -2.0, 'G': -3.0, 'H': -3.0, 'I': -2.0, 'K': -3.0, 'L': -2.0, 'M': -2.0, 'N': -2.0, 'P': -4.0, 'Q': -3.0, 'R': -4.0, 'S': -1.0, 'T': -1.0, 'V': -1.0, 'W': -5.0, 'Y': -3.0},
-'D': {'A': -2.0, 'C': -4.0, 'D': 8.0, 'E': 2.0, 'F': -5.0, 'G': -1.0, 'H': -1.0, 'I': -4.0, 'K': -1.0, 'L': -4.0, 'M': -4.0, 'N': 2.0, 'P': -1.0, 'Q': 0.0, 'R': -2.0, 'S': 0.0, 'T': -1.0, 'V': -4.0, 'W': -5.0, 'Y': -3.0},
-'E': {'A': -1.0, 'C': -3.0, 'D': 2.0, 'E': 6.0, 'F': -3.0, 'G': -3.0, 'H': 0.0, 'I': -4.0, 'K': 1.0, 'L': -3.0, 'M': -2.0, 'N': 0.0, 'P': -1.0, 'Q': 2.0, 'R': 0.0, 'S': -1.0, 'T': -1.0, 'V': -3.0, 'W': -3.0, 'Y': -2.0},
-'F': {'A': -3.0, 'C': -2.0, 'D': -5.0, 'E': -3.0, 'F': 8.0, 'G': -4.0, 'H': -1.0, 'I': 0.0, 'K': -4.0, 'L': 1.0, 'M': 0.0, 'N': -4.0, 'P': -4.0, 'Q': -4.0, 'R': -3.0, 'S': -3.0, 'T': -2.0, 'V': -1.0, 'W': 1.0, 'Y': 4.0},
-'G': {'A': 0.0, 'C': -3.0, 'D': -1.0, 'E': -3.0, 'F': -4.0, 'G': 8.0, 'H': -2.0, 'I': -4.0, 'K': -2.0, 'L': -4.0, 'M': -3.0, 'N': 0.0, 'P': -2.0, 'Q': -2.0, 'R': -3.0, 'S': 0.0, 'T': -2.0, 'V': -4.0, 'W': -3.0, 'Y': -3.0},
-'H': {'A': -2.0, 'C': -3.0, 'D': -1.0, 'E': 0.0, 'F': -1.0, 'G': -2.0, 'H': 10.0, 'I': -4.0, 'K': 0.0, 'L': -3.0, 'M': -1.0, 'N': 1.0, 'P': -2.0, 'Q': 1.0, 'R': 0.0, 'S': -1.0, 'T': -2.0, 'V': -4.0, 'W': -3.0, 'Y': 2.0},
-'I': {'A': -1.0, 'C': -2.0, 'D': -4.0, 'E': -4.0, 'F': 0.0, 'G': -4.0, 'H': -4.0, 'I': 5.0, 'K': -3.0, 'L': 2.0, 'M': 2.0, 'N': -3.0, 'P': -3.0, 'Q': -3.0, 'R': -4.0, 'S': -3.0, 'T': -1.0, 'V': 4.0, 'W': -3.0, 'Y': -1.0},
-'K': {'A': -1.0, 'C': -3.0, 'D': -1.0, 'E': 1.0, 'F': -4.0, 'G': -2.0, 'H': 0.0, 'I': -3.0, 'K': 6.0, 'L': -3.0, 'M': -2.0, 'N': 0.0, 'P': -1.0, 'Q': 2.0, 'R': 3.0, 'S': 0.0, 'T': -1.0, 'V': -3.0, 'W': -3.0, 'Y': -2.0},
-'L': {'A': -2.0, 'C': -2.0, 'D': -4.0, 'E': -3.0, 'F': 1.0, 'G': -4.0, 'H': -3.0, 'I': 2.0, 'K': -3.0, 'L': 5.0, 'M': 3.0, 'N': -4.0, 'P': -4.0, 'Q': -2.0, 'R': -3.0, 'S': -3.0, 'T': -1.0, 'V': 1.0, 'W': -2.0, 'Y': -1.0},
-'M': {'A': -1.0, 'C': -2.0, 'D': -4.0, 'E': -2.0, 'F': 0.0, 'G': -3.0, 'H': -1.0, 'I': 2.0, 'K': -2.0, 'L': 3.0, 'M': 7.0, 'N': -2.0, 'P': -3.0, 'Q': 0.0, 'R': -2.0, 'S': -2.0, 'T': -1.0, 'V': 1.0, 'W': -1.0, 'Y': 0.0},
-'N': {'A': -1.0, 'C': -2.0, 'D': 2.0, 'E': 0.0, 'F': -4.0, 'G': 0.0, 'H': 1.0, 'I': -3.0, 'K': 0.0, 'L': -4.0, 'M': -2.0, 'N': 7.0, 'P': -2.0, 'Q': 0.0, 'R': -1.0, 'S': 1.0, 'T': 0.0, 'V': -3.0, 'W': -4.0, 'Y': -2.0},
-'P': {'A': -1.0, 'C': -4.0, 'D': -1.0, 'E': -1.0, 'F': -4.0, 'G': -2.0, 'H': -2.0, 'I': -3.0, 'K': -1.0, 'L': -4.0, 'M': -3.0, 'N': -2.0, 'P': 10.0, 'Q': -1.0, 'R': -3.0, 'S': -1.0, 'T': -1.0, 'V': -3.0, 'W': -4.0, 'Y': -3.0},
-'Q': {'A': -1.0, 'C': -3.0, 'D': 0.0, 'E': 2.0, 'F': -4.0, 'G': -2.0, 'H': 1.0, 'I': -3.0, 'K': 2.0, 'L': -2.0, 'M': 0.0, 'N': 0.0, 'P': -1.0, 'Q': 7.0, 'R': 1.0, 'S': 0.0, 'T': -1.0, 'V': -3.0, 'W': -1.0, 'Y': -1.0},
-'R': {'A': -2.0, 'C': -4.0, 'D': -2.0, 'E': 0.0, 'F': -3.0, 'G': -3.0, 'H': 0.0, 'I': -4.0, 'K': 3.0, 'L': -3.0, 'M': -2.0, 'N': -1.0, 'P': -3.0, 'Q': 1.0, 'R': 7.0, 'S': -1.0, 'T': -1.0, 'V': -3.0, 'W': -3.0, 'Y': -1.0},
-'S': {'A': 1.0, 'C': -1.0, 'D': 0.0, 'E': -1.0, 'F': -3.0, 'G': 0.0, 'H': -1.0, 'I': -3.0, 'K': 0.0, 'L': -3.0, 'M': -2.0, 'N': 1.0, 'P': -1.0, 'Q': 0.0, 'R': -1.0, 'S': 5.0, 'T': 2.0, 'V': -2.0, 'W': -4.0, 'Y': -2.0},
-'T': {'A': 0.0, 'C': -1.0, 'D': -1.0, 'E': -1.0, 'F': -2.0, 'G': -2.0, 'H': -2.0, 'I': -1.0, 'K': -1.0, 'L': -1.0, 'M': -1.0, 'N': 0.0, 'P': -1.0, 'Q': -1.0, 'R': -1.0, 'S': 2.0, 'T': 5.0, 'V': 0.0, 'W': -3.0, 'Y': -2.0},
-'V': {'A': 0.0, 'C': -1.0, 'D': -4.0, 'E': -3.0, 'F': -1.0, 'G': -4.0, 'H': -4.0, 'I': 4.0, 'K': -3.0, 'L': 1.0, 'M': 1.0, 'N': -3.0, 'P': -3.0, 'Q': -3.0, 'R': -3.0, 'S': -2.0, 'T': 0.0, 'V': 5.0, 'W': -3.0, 'Y': -1.0},
-'W': {'A': -3.0, 'C': -5.0, 'D': -5.0, 'E': -3.0, 'F': 1.0, 'G': -3.0, 'H': -3.0, 'I': -3.0, 'K': -3.0, 'L': -2.0, 'M': -1.0, 'N': -4.0, 'P': -4.0, 'Q': -1.0, 'R': -3.0, 'S': -4.0, 'T': -3.0, 'V': -3.0, 'W': 15.0, 'Y': 2.0},
-'Y': {'A': -2.0, 'C': -3.0, 'D': -3.0, 'E': -2.0, 'F': 4.0, 'G': -3.0, 'H': 2.0, 'I': -1.0, 'K': -2.0, 'L': -1.0, 'M': 0.0, 'N': -2.0, 'P': -3.0, 'Q': -1.0, 'R': -1.0, 'S': -2.0, 'T': -2.0, 'V': -1.0, 'W': 2.0, 'Y': 8.0}}
+blosum50 = {'A': {'A': 5, 'C': -1, 'D': -2, 'E': -1, 'F': -3, 'G': 0, 'H': -2, 'I': -1, 'K': -1, 'L': -2, 'M': -1, 'N': -1, 'P': -1, 'Q': -1, 'R': -2, 'S': 1, 'T': 0, 'V': 0, 'W': -3, 'Y': -2},
+'C': {'A': -1, 'C': 13, 'D': -4, 'E': -3, 'F': -2, 'G': -3, 'H': -3, 'I': -2, 'K': -3, 'L': -2, 'M': -2, 'N': -2, 'P': -4, 'Q': -3, 'R': -4, 'S': -1, 'T': -1, 'V': -1, 'W': -5, 'Y': -3},
+'D': {'A': -2, 'C': -4, 'D': 8, 'E': 2, 'F': -5, 'G': -1, 'H': -1, 'I': -4, 'K': -1, 'L': -4, 'M': -4, 'N': 2, 'P': -1, 'Q': 0, 'R': -2, 'S': 0, 'T': -1, 'V': -4, 'W': -5, 'Y': -3},
+'E': {'A': -1, 'C': -3, 'D': 2, 'E': 6, 'F': -3, 'G': -3, 'H': 0, 'I': -4, 'K': 1, 'L': -3, 'M': -2, 'N': 0, 'P': -1, 'Q': 2, 'R': 0, 'S': -1, 'T': -1, 'V': -3, 'W': -3, 'Y': -2},
+'F': {'A': -3, 'C': -2, 'D': -5, 'E': -3, 'F': 8, 'G': -4, 'H': -1, 'I': 0, 'K': -4, 'L': 1, 'M': 0, 'N': -4, 'P': -4, 'Q': -4, 'R': -3, 'S': -3, 'T': -2, 'V': -1, 'W': 1, 'Y': 4},
+'G': {'A': 0, 'C': -3, 'D': -1, 'E': -3, 'F': -4, 'G': 8, 'H': -2, 'I': -4, 'K': -2, 'L': -4, 'M': -3, 'N': 0, 'P': -2, 'Q': -2, 'R': -3, 'S': 0, 'T': -2, 'V': -4, 'W': -3, 'Y': -3},
+'H': {'A': -2, 'C': -3, 'D': -1, 'E': 0, 'F': -1, 'G': -2, 'H': 10, 'I': -4, 'K': 0, 'L': -3, 'M': -1, 'N': 1, 'P': -2, 'Q': 1, 'R': 0, 'S': -1, 'T': -2, 'V': -4, 'W': -3, 'Y': 2},
+'I': {'A': -1, 'C': -2, 'D': -4, 'E': -4, 'F': 0, 'G': -4, 'H': -4, 'I': 5, 'K': -3, 'L': 2, 'M': 2, 'N': -3, 'P': -3, 'Q': -3, 'R': -4, 'S': -3, 'T': -1, 'V': 4, 'W': -3, 'Y': -1},
+'K': {'A': -1, 'C': -3, 'D': -1, 'E': 1, 'F': -4, 'G': -2, 'H': 0, 'I': -3, 'K': 6, 'L': -3, 'M': -2, 'N': 0, 'P': -1, 'Q': 2, 'R': 3, 'S': 0, 'T': -1, 'V': -3, 'W': -3, 'Y': -2},
+'L': {'A': -2, 'C': -2, 'D': -4, 'E': -3, 'F': 1, 'G': -4, 'H': -3, 'I': 2, 'K': -3, 'L': 5, 'M': 3, 'N': -4, 'P': -4, 'Q': -2, 'R': -3, 'S': -3, 'T': -1, 'V': 1, 'W': -2, 'Y': -1},
+'M': {'A': -1, 'C': -2, 'D': -4, 'E': -2, 'F': 0, 'G': -3, 'H': -1, 'I': 2, 'K': -2, 'L': 3, 'M': 7, 'N': -2, 'P': -3, 'Q': 0, 'R': -2, 'S': -2, 'T': -1, 'V': 1, 'W': -1, 'Y': 0},
+'N': {'A': -1, 'C': -2, 'D': 2, 'E': 0, 'F': -4, 'G': 0, 'H': 1, 'I': -3, 'K': 0, 'L': -4, 'M': -2, 'N': 7, 'P': -2, 'Q': 0, 'R': -1, 'S': 1, 'T': 0, 'V': -3, 'W': -4, 'Y': -2},
+'P': {'A': -1, 'C': -4, 'D': -1, 'E': -1, 'F': -4, 'G': -2, 'H': -2, 'I': -3, 'K': -1, 'L': -4, 'M': -3, 'N': -2, 'P': 10, 'Q': -1, 'R': -3, 'S': -1, 'T': -1, 'V': -3, 'W': -4, 'Y': -3},
+'Q': {'A': -1, 'C': -3, 'D': 0, 'E': 2, 'F': -4, 'G': -2, 'H': 1, 'I': -3, 'K': 2, 'L': -2, 'M': 0, 'N': 0, 'P': -1, 'Q': 7, 'R': 1, 'S': 0, 'T': -1, 'V': -3, 'W': -1, 'Y': -1},
+'R': {'A': -2, 'C': -4, 'D': -2, 'E': 0, 'F': -3, 'G': -3, 'H': 0, 'I': -4, 'K': 3, 'L': -3, 'M': -2, 'N': -1, 'P': -3, 'Q': 1, 'R': 7, 'S': -1, 'T': -1, 'V': -3, 'W': -3, 'Y': -1},
+'S': {'A': 1, 'C': -1, 'D': 0, 'E': -1, 'F': -3, 'G': 0, 'H': -1, 'I': -3, 'K': 0, 'L': -3, 'M': -2, 'N': 1, 'P': -1, 'Q': 0, 'R': -1, 'S': 5, 'T': 2, 'V': -2, 'W': -4, 'Y': -2},
+'T': {'A': 0, 'C': -1, 'D': -1, 'E': -1, 'F': -2, 'G': -2, 'H': -2, 'I': -1, 'K': -1, 'L': -1, 'M': -1, 'N': 0, 'P': -1, 'Q': -1, 'R': -1, 'S': 2, 'T': 5, 'V': 0, 'W': -3, 'Y': -2},
+'V': {'A': 0, 'C': -1, 'D': -4, 'E': -3, 'F': -1, 'G': -4, 'H': -4, 'I': 4, 'K': -3, 'L': 1, 'M': 1, 'N': -3, 'P': -3, 'Q': -3, 'R': -3, 'S': -2, 'T': 0, 'V': 5, 'W': -3, 'Y': -1},
+'W': {'A': -3, 'C': -5, 'D': -5, 'E': -3, 'F': 1, 'G': -3, 'H': -3, 'I': -3, 'K': -3, 'L': -2, 'M': -1, 'N': -4, 'P': -4, 'Q': -1, 'R': -3, 'S': -4, 'T': -3, 'V': -3, 'W': 15, 'Y': 2},
+'Y': {'A': -2, 'C': -3, 'D': -3, 'E': -2, 'F': 4, 'G': -3, 'H': 2, 'I': -1, 'K': -2, 'L': -1, 'M': 0, 'N': -2, 'P': -3, 'Q': -1, 'R': -1, 'S': -2, 'T': -2, 'V': -1, 'W': 2, 'Y': 8}}
 
 nt_substitution_matrix = {'A': {'A':  1, 'C': -2, 'G': -2, 'T': -2, 'N': 0},
                           'C': {'A': -2, 'C':  1, 'G': -2, 'T': -2, 'N': 0},
@@ -44,9 +44,10 @@ def hamming_distance(s1, s2):
     return s1.distance(s2)
 
 
-def format_matrix(row_headers, col_headers, data, hide_zeros=False):
+def format_matrix(row_headers, col_headers, data, hide_zeros=False, cell_width=3):
     result = []
-    line_format = "%6s" * (len(row_headers) + 1)
+    cell_format = "%" + str(cell_width) + "s"
+    line_format = cell_format * (len(row_headers) + 1)
     
     # print a header row 
     result.append(line_format % tuple([' '] + list(row_headers)))
@@ -59,20 +60,20 @@ def format_matrix(row_headers, col_headers, data, hide_zeros=False):
                 if v == 0:
                     display_row.append('')
                 else:
-                    display_row.append('%1.2f' % v)
+                    display_row.append(v)
         else:
-            display_row = ['%1.2f' % v for v in row]
+            display_row = row
         result.append(line_format % tuple([b2] + display_row))
     
     return '\n'.join(result)
 
-
-def format_dynamic_programming_matrix(seq1,seq2,matrix):
+def format_dynamic_programming_matrix(seq1, seq2, matrix, cell_width=4):
     """ define a function for formatting dynamic programming matrices
     """
     lines = []
 
-    line_format = "%6s" * (len(seq1) + 2)
+    cell_format = "%" + str(cell_width) + "s"
+    line_format = cell_format * (len(seq1) + 2)
     # print seq1 (start the line with two empty strings)
     lines.append(line_format % tuple([' ',' '] + map(str,list(seq1))))
 
@@ -383,6 +384,14 @@ def generate_sw_and_traceback_matrices_affine_gap(seq1, seq2, gap_open_penalty, 
         traceback_matrix.append(current_traceback_matrix_row)
     return sw_matrix, traceback_matrix
 
+def sw_align_affine_gap(sequence1, sequence2, gap_open_penalty, gap_extend_penalty, substitution_matrix):
+    sw_matrix, traceback_matrix = generate_sw_and_traceback_matrices_affine_gap(sequence1,
+                                                                 sequence2,
+                                                                 gap_open_penalty,
+                                                                 gap_extend_penalty,
+                                                                 substitution_matrix)
+
+    return sw_traceback(traceback_matrix,sw_matrix,sequence1,sequence2)
 
 def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
                         gap_extend_penalty=2,
@@ -433,7 +442,7 @@ def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
     if substitution_matrix is None:
         substitution_matrix = nt_substitution_matrix
         
-    sw_matrix, traceback_matrix = generate_sw_and_traceback_matrices_affine_gap(sequence1,
+    sw_matrix, traceback_matrix = sw_align_affine_gap(sequence1,
                                                                  sequence2,
                                                                  gap_open_penalty,
                                                                  gap_extend_penalty,
@@ -487,7 +496,7 @@ def sw_align_affine_gap_pr(sequence1, sequence2, gap_open_penalty=11,
           The start position of the alignment in sequence 2
          
     """
-    sw_matrix, traceback_matrix = generate_sw_and_traceback_matrices_affine_gap(sequence1,
+    sw_matrix, traceback_matrix = sw_align_affine_gap(sequence1,
                                                                  sequence2,
                                                                  gap_open_penalty,
                                                                  gap_extend_penalty,
