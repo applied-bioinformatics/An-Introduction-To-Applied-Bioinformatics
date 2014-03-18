@@ -16,14 +16,19 @@ Currently, the **best example of where I'm hoping to go with these materials** i
 
 Outline
 -------
-0. [Getting started]((http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/getting-started/0-overview.ipynb))
-
+0. [Getting started](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/getting-started/0-overview.ipynb)
 1. General molecular biology
   1. Biological information
   2. [The central dogma of molecular biology](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/general-molecular-biology/central-dogma.ipynb)
   3. [Evolution](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/general-molecular-biology/evolution.ipynb)
   4. The diversity of life
-2. [Programming and concepts of software engineering](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/0-overview.ipynb)
+2. [Algorithms](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/0-overview.ipynb)
+  1. [Pairwise alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/1-pairwise-alignment.ipynb) ([exercise](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/alignment-exercises.ipynb))
+  2. [Database searching and determining the statistical significance of an alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/2-database-searching.ipynb)
+  3. [Phylogeny reconstruction: distances, distances matrices and hierarchical clustering with UPGMA](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/3-phylogeny-reconstruction.ipynb)
+  4. [Multiple sequence alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/4-multiple-sequence-alignment.ipynb) ([exercise](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/msa-assignment.ipynb))
+  5. Clustering and read mapping (greedy clustering, blat)
+3. [Programming and concepts of software engineering](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/0-overview.ipynb)
   1. Basics of python
     1. [Variables](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/1-variables.ipynb)
     2. [Conditionals](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/2-booleans-and-conditionals.ipynb)
@@ -35,12 +40,6 @@ Outline
   2. Python generators
   3. [Software testing](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/8-concepts-of-testing.ipynb)
   4. Software profiling
-3. [Algorithms](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/0-overview.ipynb)
-  1. [Pairwise alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/1-pairwise-alignment.ipynb) ([exercise](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/alignment-exercises.ipynb))
-  2. [Database searching and determining the statistical significance of an alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/2-database-searching.ipynb)
-  3. [Phylogeny reconstruction: distances, distances matrices and hierarchical clustering with UPGMA](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/3-phylogeny-reconstruction.ipynb)
-  4. [Multiple sequence alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/4-multiple-sequence-alignment.ipynb) ([exercise](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/msa-assignment.ipynb))
-  5. Clustering and read mapping (greedy clustering, blat)
 4. Statistics
   1. Distances and distance matrices
   2. Ordination 
