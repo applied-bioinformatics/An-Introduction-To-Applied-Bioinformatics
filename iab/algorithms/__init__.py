@@ -539,7 +539,7 @@ def align(sequence1, sequence2, gap_penalty, substitution_matrix, local):
 
 from scipy.cluster.hierarchy import average, dendrogram, to_tree
 
-from bipy.core.distance import SymmetricDistanceMatrix
+from skbio.core.distance import SymmetricDistanceMatrix
 
 from iab.algorithms import nt_substitution_matrix, hamming_distance
 
