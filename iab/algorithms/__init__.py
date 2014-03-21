@@ -394,8 +394,7 @@ def sw_align_affine_gap(sequence1, sequence2, gap_open_penalty, gap_extend_penal
     return sw_traceback(traceback_matrix,sw_matrix,sequence1,sequence2)
 
 def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
-                        gap_extend_penalty=2,
-                        substitution_matrix=None):
+                        gap_extend_penalty=2, substitution_matrix=None):
     """Locally align two nucleotide seqs (Smith-Waterman w affine gap scoring)
     
        Parameters
@@ -442,13 +441,8 @@ def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
     if substitution_matrix is None:
         substitution_matrix = nt_substitution_matrix
         
-    sw_matrix, traceback_matrix = sw_align_affine_gap(sequence1,
-                                                                 sequence2,
-                                                                 gap_open_penalty,
-                                                                 gap_extend_penalty,
-                                                                 substitution_matrix)
-
-    return sw_traceback(traceback_matrix,sw_matrix,sequence1,sequence2)
+    return sw_align_affine_gap(sequence1, sequence2, gap_open_penalty,
+                               gap_extend_penalty, substitution_matrix)
 
 def sw_multiple_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
                         gap_extend_penalty=2,
@@ -496,13 +490,8 @@ def sw_align_affine_gap_pr(sequence1, sequence2, gap_open_penalty=11,
           The start position of the alignment in sequence 2
          
     """
-    sw_matrix, traceback_matrix = sw_align_affine_gap(sequence1,
-                                                                 sequence2,
-                                                                 gap_open_penalty,
-                                                                 gap_extend_penalty,
-                                                                 substitution_matrix)
-
-    return sw_traceback(traceback_matrix,sw_matrix,sequence1,sequence2)
+    return sw_align_affine_gap(sequence1, sequence2, gap_open_penalty,
+                               gap_extend_penalty, substitution_matrix)
 
 def sw_align_nt(seq1, seq2, gap_penalty=8, substitution_matrix=nt_substitution_matrix):
     """Locally align two nucleotide seqs (Smith-Waterman w single gap scoring)
