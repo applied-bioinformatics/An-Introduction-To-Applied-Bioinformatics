@@ -41,6 +41,10 @@ nt_substitution_matrix = {'A': {'A':  1, 'C': -2, 'G': -2, 'T': -2, 'N': 0},
                           'N': {'A':  0, 'C':  0, 'G':  0, 'T':  0, 'N': 0 }}
 
 
+###
+# pairwise alignment notebook
+###
+
 def hamming_distance(s1, s2):
     s1 = BiologicalSequence(s1)
     s2 = BiologicalSequence(s2)
@@ -545,17 +549,15 @@ def sw_align_nt(seq1, seq2, gap_penalty=8, substitution_matrix=nt_substitution_m
     """
     return sw_align(seq1, seq2, gap_penalty, substitution_matrix)
 
-###
-# Convenience wrapper
-###
-
-
 def align(sequence1, sequence2, gap_penalty, substitution_matrix, local):
     if local:
         return sw_align(sequence1, sequence2, gap_penalty, substitution_matrix)
     else:
         return nw_align(sequence1, sequence2, gap_penalty, substitution_matrix)
 
+##
+# DB searching notebook
+##
 
 def local_alignment_search(query, reference_db, aligner=sw_align_affine_gap_nt):
     best_score = 0.0
@@ -635,6 +637,8 @@ def fraction_better_or_equivalent_alignments(query_sequence,
             count_better += 1
     
     return count_better / (n + 1)
+
+## MSA notebook
 
 def get_k_words(s, k, overlapping=True):
     result = []
