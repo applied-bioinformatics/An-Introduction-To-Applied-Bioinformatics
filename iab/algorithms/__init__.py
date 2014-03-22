@@ -87,6 +87,23 @@ def format_dynamic_programming_matrix(seq1, seq2, matrix, cell_width=4):
     
     return '\n'.join(lines)
 
+def format_dynamic_programming_matrix_subset(seq1,seq2,matrix, cell_width=6, num_positions=10):
+    """ return first num_positions x num_positions of dynamic programming matrix
+    """
+    lines = []
+
+    cell_format = "%" + str(cell_width) + "s"
+    line_format = cell_format * (len(seq1[:num_positions]) + 1)
+    # print seq1 (start the line with two empty strings)
+    lines.append(line_format % tuple([' '] + map(str,list(seq1[:num_positions]))))
+
+    # iterate over the rows and print each (starting with the
+    # corresponding base in sequence2)
+    for row, base in zip(matrix[:num_positions],' ' + seq2[:num_positions]):
+        lines.append(line_format % tuple([base] + map(str,row[:num_positions])))
+    
+    return '\n'.join(lines)
+
 
 def generate_score_matrix(seq1,seq2,substitution_matrix):
     # Initialize a matrix to use for storing the scores
