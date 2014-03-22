@@ -7,8 +7,11 @@
 # http://creativecommons.org/licenses/by-nc-sa/4.0/.
 #-----------------------------------------------------------------------------
 from __future__ import division
-from random import choice
+from random import choice, random, shuffle
+
+from scipy.cluster.hierarchy import average, dendrogram, to_tree
 from skbio.core.sequence import BiologicalSequence
+from skbio.core.distance import SymmetricDistanceMatrix
 
 blosum50 = {'A': {'A': 5, 'C': -1, 'D': -2, 'E': -1, 'F': -3, 'G': 0, 'H': -2, 'I': -1, 'K': -1, 'L': -2, 'M': -1, 'N': -1, 'P': -1, 'Q': -1, 'R': -2, 'S': 1, 'T': 0, 'V': 0, 'W': -3, 'Y': -2},
 'C': {'A': -1, 'C': 13, 'D': -4, 'E': -3, 'F': -2, 'G': -3, 'H': -3, 'I': -2, 'K': -3, 'L': -2, 'M': -2, 'N': -2, 'P': -4, 'Q': -3, 'R': -4, 'S': -1, 'T': -1, 'V': -1, 'W': -5, 'Y': -3},
@@ -537,11 +540,84 @@ def align(sequence1, sequence2, gap_penalty, substitution_matrix, local):
         return nw_align(sequence1, sequence2, gap_penalty, substitution_matrix)
 
 
-from scipy.cluster.hierarchy import average, dendrogram, to_tree
+def local_alignment_search(query, reference_db, aligner=sw_align_affine_gap_nt):
+    best_score = 0.0
+    best_match = None
+    best_a1 = None
+    best_a2 = None
+    for seq_id, seq in reference_db:
+        a1, a2, score, s1, s2 = aligner(query, seq)
+        if score > best_score:
+            best_score = score
+            best_match = seq_id
+            best_a1 = a1
+            best_a2 = a2
+    return best_a1, best_a2, best_score, best_match
 
-from skbio.core.distance import SymmetricDistanceMatrix
+def approximated_local_alignment_search_random(query, reference_db, p=0.10):
+    best_score = 0.0
+    best_match = None
+    best_a1 = None
+    best_a2 = None
+    for seq_id, seq in reference_db:
+        if random() < p:
+            a1, a2, score, s1, s2 = sw_align_affine_gap_nt(query, seq)
+            if score > best_score:
+                best_score = score
+                best_match = seq_id
+                best_a1 = a1
+                best_a2 = a2
+    return best_a1, best_a2, best_score, best_match
 
-from iab.algorithms import nt_substitution_matrix, hamming_distance
+def gc_content(seq):
+    return (seq.count('G') + seq.count('C')) / len(seq)
+
+def approximated_local_alignment_search_gc(query, reference_db, p=0.05):
+    query_gc = gc_content(query)
+    best_score = 0.0
+    best_match = None
+    best_a1 = None
+    best_a2 = None
+    for seq_id, seq in reference_db:
+        ref_gc = gc_content(seq)
+        if ref_gc - p < query_gc < ref_gc + p:
+            a1, a2, score, s1, s2 = sw_align_affine_gap_nt(query, seq)
+            if score > best_score:
+                best_score = score
+                best_match = seq_id
+                best_a1 = a1
+                best_a2 = a2
+    return best_a1, best_a2, best_score, best_match
+
+def generate_random_score_distribution(query_sequence,
+                                       subject_sequence,
+                                       n=99,
+                                       aligner=sw_align_affine_gap_nt):
+    result = []
+    random_sequence = list(query_sequence)
+    for i in range(n):
+        shuffle(random_sequence)
+        a1, a2, score, s1, s2 =\
+         aligner(random_sequence,subject_sequence)
+        result.append(score)
+    return result
+
+def fraction_better_or_equivalent_alignments(query_sequence,
+                                             subject_sequence,
+                                             n = 99,
+                                             aligner=sw_align_affine_gap_nt):
+    random_scores = generate_random_score_distribution(query_sequence,
+                                                       subject_sequence,
+                                                       n,
+                                                       aligner=aligner)
+    a1, a2, score, s1, s2 = aligner(query_sequence, subject_sequence)
+    
+    count_better = 0
+    for e in random_scores:
+        if e >= score:
+            count_better += 1
+    
+    return count_better / (n + 1)
 
 def get_k_words(s, k, overlapping=True):
     result = []
