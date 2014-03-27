@@ -27,7 +27,7 @@ Outline
   2. [Database searching and determining the statistical significance of an alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/2-database-searching.ipynb)
   3. [Phylogeny reconstruction: distances, distances matrices and hierarchical clustering with UPGMA](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/3-phylogeny-reconstruction.ipynb)
   4. [Multiple sequence alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/4-multiple-sequence-alignment.ipynb) ([exercise](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/msa-assignment.ipynb))
-  5. Read mapping and clustering
+  5. [Read mapping and clustering](http://nbviewer.ipython.org/urls/raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/algorithms/5-sequence-mapping-and-clustering.ipynb?create=1)
 3. [Programming and concepts of software engineering](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/0-overview.ipynb)
   1. Basics of python
     1. [Variables](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/programming-and-se/1-variables.ipynb)
