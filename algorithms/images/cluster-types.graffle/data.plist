@@ -60,7 +60,7 @@
 	<array>
 		<dict>
 			<key>Bounds</key>
-			<string>{{243, 215.5}, {143, 143}}</string>
+			<string>{{243, 213.52127075195312}, {143, 143}}</string>
 			<key>Class</key>
 			<string>ShapedGraphic</string>
 			<key>ID</key>
@@ -70,7 +70,7 @@
 			<key>ManualSizeImage</key>
 			<string>YES</string>
 			<key>Offset</key>
-			<string>{0.23333333325606806, 0.24444444436349985}</string>
+			<string>{0.24444444436349985, 0.24444444436349985}</string>
 			<key>Shape</key>
 			<string>Circle</string>
 			<key>Style</key>
@@ -85,7 +85,7 @@
 					<key>ImageSizing</key>
 					<integer>0</integer>
 					<key>Offset</key>
-					<string>{0.23333333325606806, 0.24444444436349985}</string>
+					<string>{0.24444444436349985, 0.24444444436349985}</string>
 				</dict>
 				<key>shadow</key>
 				<dict>
@@ -994,7 +994,7 @@ distance}</string>
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2014-04-08 02:11:18 +0000</string>
+	<string>2014-04-08 02:19:33 +0000</string>
 	<key>Modifier</key>
 	<string>Greg Caporaso</string>
 	<key>NotesVisible</key>
@@ -1085,7 +1085,7 @@ distance}</string>
 			</dict>
 		</array>
 		<key>Frame</key>
-		<string>{{230, 4}, {1395, 1130}}</string>
+		<string>{{122, 33}, {1395, 1130}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -1099,7 +1099,7 @@ distance}</string>
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{-26, 44}, {630, 495.5}}</string>
+		<string>{{-26, 78.75}, {630, 495.5}}</string>
 		<key>Zoom</key>
 		<real>2</real>
 		<key>ZoomValues</key>
