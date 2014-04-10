@@ -13,6 +13,6 @@ before_install:
 install:
   - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip numpy scipy matplotlib nose
   - source activate env_name
-  - pip install .
+  - pip install --allow-all-external --allow-unverified scikit-bio --process-dependency-links .
 script:
   - nosetests --with-doctest
