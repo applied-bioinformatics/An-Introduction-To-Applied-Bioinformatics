@@ -16,6 +16,7 @@ Currently, the **best example of where I'm hoping to go with these materials** i
 
 Outline
 -------
+
 0. [Getting started](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/getting-started/0-overview.ipynb)
 1. [Fundamentals](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/0-overview.ipynb)
   1. [Pairwise alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/1-pairwise-alignment.ipynb) ([exercise](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/pairwise-alignment-exercises.ipynb))
@@ -28,8 +29,50 @@ Outline
   2. Interrogating genomes
 3. Wrapping up
 
+How to read the book
+--------------------
+
+There are two ways to read *An Introduction To Applied Bioinformatics*:
+
+* The *recommended* way to read the book is to download and run the IPython notebooks interactively. You can do this by cloning the GitHub repository, installing the package and its dependencies, and running the notebooks interactively. Instructions for doing this are provided below in the **Installation** section.
+
+* The *easiest* way to read the book is to view the static notebooks online using [nbviewer](http://nbviewer.ipython.org/). You can access the notebooks on nbviewer from the links in the **Outline** section above.
+
+If you're new to using IPython or the IPython Notebook, you can find more information at the [IPython website](http://www.ipython.org/), [IPython Notebook website](http://ipython.org/notebook), and the [IPython Notebook example gallery](https://github.com/ipython/ipython/wiki/A-gallery-of-interesting-IPython-Notebooks).
+
+Installation
+------------
+
+If you're going to read the book interactively (recommended), you'll need to clone this repository, install some dependencies, and launch the IPython Notebook. For example, the following commands should work for Linux and Mac OS X users:
+
+    git clone https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.git
+    cd An-Introduction-To-Applied-Bioinformatics
+    pip install .
+
+If you're using a newer version of pip and scikit-bio fails to install, you may need to modify the pip command to be:
+
+    pip install --allow-all-external --allow-unverified scikit-bio --process-dependency-links .
+
+Finally, launch the IPython Notebook and browse to one of the notebook directories to read a chapter:
+
+    ipython notebook
+
+That's it!
+
+If you'd like to install the book's dependencies manually (or some other way than using pip), here's what you'll need:
+
+- [Python](http://www.python.org/) 2.7
+- [numpy](http://www.numpy.org/) >= 1.7
+- [scipy](http://www.scipy.org/) >= 0.13.0
+- [matplotlib](http://www.matplotlib.org/) >= 1.1.0
+- [IPython](http://www.ipython.org/)
+- [tornado](http://www.tornadoweb.org/en/stable/)
+- [pyzmq](http://zeromq.github.io/pyzmq/)
+- [jinja2](http://jinja.pocoo.org/)
+- [scikit-bio](http://scikit-bio.org/) (latest GitHub version)
+
 More information
------------------
+----------------
 
 These materials are primarily being developed by [Greg Caporaso](http://caporasolab.us/people/greg-caporaso/) (GitHub: [@gregcaporaso](https://github.com/gregcaporaso)) at [Northern Arizona University](http://www.nau.edu). You can find information on the courses I teach on [my teaching website](http://www.caporasolab.us/teaching) and information on my research and lab on [my lab website](http://www.caporasolab.us).
 
