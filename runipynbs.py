@@ -38,7 +38,7 @@ def main():
                 with open(nbpath) as nbfile:
                     notebook = read(nbfile, 'json')
 
-                runner = NotebookRunner(notebook)
+                runner = NotebookRunner(notebook, mpl_inline=True)
 
                 try:
                     runner.run_notebook()
