@@ -43,7 +43,7 @@ If you're new to using IPython or the IPython Notebook, you can find more inform
 Installation
 ------------
 
-If you're going to read the book interactively (recommended), you'll need to clone this repository, install some dependencies, and launch the IPython Notebook from one of the notebook directories. For example, the following commands should work for Linux and Mac OS X users:
+If you're going to read the book interactively (recommended), you'll need to clone this repository, install some dependencies, and launch the IPython Notebook. For example, the following commands should work for Linux and Mac OS X users:
 
     git clone https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.git
     cd An-Introduction-To-Applied-Bioinformatics
@@ -53,15 +53,13 @@ If you're using a newer version of pip and scikit-bio fails to install, you may 
 
     pip install --allow-all-external --allow-unverified scikit-bio --process-dependency-links .
 
-Finally, launch the IPython Notebook from one of the notebook directories:
+Finally, launch the IPython Notebook and browse to one of the notebook directories to read a chapter:
 
-    cd algorithms
     ipython notebook
 
 That's it!
 
-If you'd like to install the book's dependencies manually (or some other way
-than using pip), here's what you'll need:
+If you'd like to install the book's dependencies manually (or some other way than using pip), here's what you'll need:
 
 - [Python](http://www.python.org/) 2.7
 - [numpy](http://www.numpy.org/) >= 1.7
