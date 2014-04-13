@@ -15,4 +15,5 @@ install:
   - source activate env_name
   - pip install --allow-all-external --allow-unverified scikit-bio --process-dependency-links .
 script:
-  - nosetests --with-doctest
+  # Running through all notebooks takes awhile, so bail if the unit tests fail.
+  - nosetests --with-doctest && python runipynbs.py
