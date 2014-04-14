@@ -43,7 +43,8 @@ setup(name='An-Introduction-To-Applied-Bioinformatics',
           'An-Introduction-To-Applied-Bioinformatics',
       packages=find_packages(),
       install_requires=['scikit-bio == 0.0.0-dev', 'ipython', 'tornado',
-                        'pyzmq', 'jinja2', 'nose', 'runipy'],
+                        'pyzmq', 'jinja2', 'nose', 'runipy', 'biom-format',
+                        'pyqi'],
       dependency_links=[
           'https://github.com/biocore/scikit-bio/archive/master.zip#egg='
           'scikit-bio-0.0.0-dev'
