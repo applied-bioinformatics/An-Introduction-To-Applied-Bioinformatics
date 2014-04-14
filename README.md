@@ -25,7 +25,7 @@ Outline
   4. [Multiple sequence alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/4-multiple-sequence-alignment.ipynb) ([exercise](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/msa-assignment.ipynb))
   5. [Read mapping and clustering](http://nbviewer.ipython.org/urls/raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/algorithms/5-sequence-mapping-and-clustering.ipynb?create=1)
 2. Applications
-  1. Studying biological diversity
+  1. [Studying biological diversity](http://nbviewer.ipython.org/urls/raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/applications/1-biological-diversity.ipynb)
   2. Interrogating genomes
 3. Wrapping up
 
