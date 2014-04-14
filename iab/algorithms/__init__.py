@@ -11,7 +11,7 @@ from random import choice, random, shuffle
 
 from scipy.cluster.hierarchy import average, dendrogram, to_tree
 from skbio.core.sequence import BiologicalSequence
-from skbio.core.distance import DistanceMatrix
+from skbio.core.distance import DistanceMatrix, SymmetricDistanceMatrix
 
 blosum50 = {'A': {'A': 5, 'C': -1, 'D': -2, 'E': -1, 'F': -3, 'G': 0, 'H': -2, 'I': -1, 'K': -1, 'L': -2, 'M': -1, 'N': -1, 'P': -1, 'Q': -1, 'R': -2, 'S': 1, 'T': 0, 'V': 0, 'W': -3, 'Y': -2},
 'C': {'A': -1, 'C': 13, 'D': -4, 'E': -3, 'F': -2, 'G': -3, 'H': -3, 'I': -2, 'K': -3, 'L': -2, 'M': -2, 'N': -2, 'P': -4, 'Q': -3, 'R': -4, 'S': -1, 'T': -1, 'V': -1, 'W': -5, 'Y': -3},
@@ -684,7 +684,7 @@ def guide_tree_from_query_sequences(query_sequences,
             row.append(kmer_distance(seq1, seq2, k=3))
         guide_dm.append(row)
     
-    guide_dm = DistanceMatrix(guide_dm, seq_ids)
+    guide_dm = SymmetricDistanceMatrix(guide_dm, seq_ids)
     guide_lm = average(guide_dm.condensed_form())
     guide_tree = to_tree(guide_lm)
     if display_tree:
@@ -860,7 +860,7 @@ def compute_aligned_sequence_distances(seqs, distance_fn=hamming_distance):
         for id2, seq2 in seqs:
             row.append(hamming_distance(seq1, seq2))
         dm.append(row)
-    return DistanceMatrix(dm, ids)
+    return SymmetricDistanceMatrix(dm, ids)
 
 def progressive_msa_and_tree(query_sequences, gap_open_penalty=8, gap_extend_penalty=1, 
                              substitution_matrix=nt_substitution_matrix,
