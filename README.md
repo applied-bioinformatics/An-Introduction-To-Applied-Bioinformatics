@@ -70,6 +70,8 @@ If you'd like to install the book's dependencies manually (or some other way tha
 - [pyzmq](http://zeromq.github.io/pyzmq/)
 - [jinja2](http://jinja.pocoo.org/)
 - [scikit-bio](http://scikit-bio.org/) (latest GitHub version)
+- [biom-format](http://www.biom-format.org)
+- [pyqi](http://biocore.github.io/pyqi/doc/index.html)
 
 More information
 ----------------
