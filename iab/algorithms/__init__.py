@@ -860,7 +860,7 @@ def compute_aligned_sequence_distances(seqs, distance_fn=hamming_distance):
         for id2, seq2 in seqs:
             row.append(hamming_distance(seq1, seq2))
         dm.append(row)
-    return DistanceMatrix(dm, ids)
+    return SymmetricDistanceMatrix(dm, ids)
 
 def progressive_msa_and_tree(query_sequences, gap_open_penalty=8, gap_extend_penalty=1, 
                              substitution_matrix=nt_substitution_matrix,
