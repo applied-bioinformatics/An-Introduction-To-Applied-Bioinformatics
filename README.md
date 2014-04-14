@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.png?branch=master)](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics)
+
 An Introduction To Applied Bioinformatics
 =========================================
 
