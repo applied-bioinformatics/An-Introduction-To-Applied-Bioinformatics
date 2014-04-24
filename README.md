@@ -57,7 +57,7 @@ If you're using a newer version of pip and scikit-bio fails to install, you may 
 
 Finally, launch the IPython Notebook to get started (be sure that you're in the ``An-Introduction-To-Applied-Bioinformatics`` directory when you run this command):
 
-    ipython notebook Index.ipynb
+    ipython notebook --pylab inline Index.ipynb
 
 That's it!
 
