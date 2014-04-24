@@ -55,9 +55,9 @@ If you're using a newer version of pip and scikit-bio fails to install, you may 
 
     pip install --allow-all-external --allow-unverified scikit-bio --process-dependency-links .
 
-Finally, launch the IPython Notebook to get started:
+Finally, launch the IPython Notebook to get started (be sure that you're in the ``An-Introduction-To-Applied-Bioinformatics`` directory when you run this command):
 
-    ipython notebook
+    ipython notebook Index.ipynb
 
 That's it!
 
