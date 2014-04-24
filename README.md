@@ -7,7 +7,7 @@ An Introduction To Applied Bioinformatics
 
 Bioinformatics, as I see it, is the application of the tools of computer science (things like programming languages, algorithms, and databases) to address biological problems (for example, inferring the evolutionary relationship between a group of organisms based on fragments of their genomes, or understanding if or how the community of microorganisms that live in my gut changes if I modify my diet). Bioinformatics is a rapidly growing field, largely in response to the vast increase in the quantity of data that biologists now grapple with. Students from varied disciplines (e.g., biology, computer science, statistics, and biochemistry) and stages of their educational careers (undergraduate, graduate, or postdoctoral) are becoming interested in bioinformatics.
 
-I teach bioinformatics at the undergraduate and graduate levels at Northern Arizona University. This repository contains some of the materials that I've developed in these courses, and represents an initial attempt to organize these materials in a standalone way. In some cases, I'm just linking out to other materials for now. 
+I teach bioinformatics at the undergraduate and graduate levels at Northern Arizona University. This repository contains some of the materials that I've developed in these courses, and represents an initial attempt to organize these materials in a standalone way. In some cases, I'm just linking out to other materials for now.
 
 Disclaimer
 ----------
@@ -19,17 +19,17 @@ Currently, the **best example of where I'm hoping to go with these materials** i
 Outline
 -------
 
-0. [Getting started](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/getting-started/0-overview.ipynb)
-1. [Fundamentals](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/0-overview.ipynb)
-  1. [Pairwise alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/1-pairwise-alignment.ipynb) ([exercise](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/pairwise-alignment-exercises.ipynb))
-  2. [Database searching and determining the statistical significance of an alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/2-database-searching.ipynb)
-  3. [Phylogeny reconstruction: distances, distances matrices and hierarchical clustering with UPGMA](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/3-phylogeny-reconstruction.ipynb)
-  4. [Multiple sequence alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/4-multiple-sequence-alignment.ipynb) ([exercise](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/msa-assignment.ipynb))
-  5. [Read mapping and clustering](http://nbviewer.ipython.org/urls/raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/algorithms/5-sequence-mapping-and-clustering.ipynb?create=1)
+To browse the book, [start here](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/).
+
+0. Getting started
+1. Fundamentals
+  1. Pairwise alignment (contains an exercise)
+  2. Database searching and determining the statistical significance of an alignment
+  3. Phylogeny reconstruction: distances, distances matrices and hierarchical clustering with UPGMA
+  4. Multiple sequence alignment (contains an exercise)
+  5. Read mapping and clustering
 2. Applications
-  1. [Studying biological diversity](http://nbviewer.ipython.org/urls/raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/applications/1-biological-diversity.ipynb)
-  2. Interrogating genomes
-3. Wrapping up
+  1. Studying biological diversity
 
 How to read the book
 --------------------
@@ -38,7 +38,7 @@ There are two ways to read *An Introduction To Applied Bioinformatics*:
 
 * The *recommended* way to read the book is to download and run the IPython notebooks interactively. You can do this by cloning the GitHub repository, installing the package and its dependencies, and running the notebooks interactively. Instructions for doing this are provided below in the **Installation** section.
 
-* The *easiest* way to read the book is to view the static notebooks online using [nbviewer](http://nbviewer.ipython.org/). You can access the notebooks on nbviewer from the links in the **Outline** section above.
+* The *easiest* way to read the book is to view the static notebooks online using [nbviewer](http://nbviewer.ipython.org/). You should [start here](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/).
 
 If you're new to using IPython or the IPython Notebook, you can find more information at the [IPython website](http://www.ipython.org/), [IPython Notebook website](http://ipython.org/notebook), and the [IPython Notebook example gallery](https://github.com/ipython/ipython/wiki/A-gallery-of-interesting-IPython-Notebooks).
 
@@ -55,7 +55,7 @@ If you're using a newer version of pip and scikit-bio fails to install, you may 
 
     pip install --allow-all-external --allow-unverified scikit-bio --process-dependency-links .
 
-Finally, launch the IPython Notebook and browse to one of the notebook directories to read a chapter:
+Finally, launch the IPython Notebook to get started:
 
     ipython notebook
 
@@ -78,7 +78,7 @@ If you'd like to install the book's dependencies manually (or some other way tha
 More information
 ----------------
 
-These materials are primarily being developed by [Greg Caporaso](http://caporasolab.us/people/greg-caporaso/) (GitHub: [@gregcaporaso](https://github.com/gregcaporaso)) at [Northern Arizona University](http://www.nau.edu). You can find information on the courses I teach on [my teaching website](http://www.caporasolab.us/teaching) and information on my research and lab on [my lab website](http://www.caporasolab.us).
+These materials are primarily being developed by [Greg Caporaso](http://caporasolab.us/people/greg-caporaso/) (GitHub: [@gregcaporaso](https://github.com/gregcaporaso)) in the [Caporaso Lab](http://www.caporasolab.us) at [Northern Arizona University](http://www.nau.edu). You can find information on the courses I teach on [my teaching website](http://www.caporasolab.us/teaching) and information on my research and lab on [my lab website](http://www.caporasolab.us).
 
 See the repository's [contributors page](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/graphs/contributors) for information on who has contributed to the project.
 
