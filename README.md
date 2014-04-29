@@ -67,7 +67,8 @@ If you'd like to install the book's dependencies manually (or some other way tha
 - [numpy](http://www.numpy.org/) >= 1.7
 - [scipy](http://www.scipy.org/) >= 0.13.0
 - [matplotlib](http://www.matplotlib.org/) >= 1.1.0
-- [IPython](http://www.ipython.org/)
+- [pandas](http://pandas.pydata.org/) >= 0.13.1
+- [IPython](http://www.ipython.org/) >= 2.0.0
 - [tornado](http://www.tornadoweb.org/en/stable/)
 - [pyzmq](http://zeromq.github.io/pyzmq/)
 - [jinja2](http://jinja.pocoo.org/)
