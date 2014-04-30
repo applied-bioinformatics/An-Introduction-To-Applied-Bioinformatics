@@ -14,6 +14,8 @@ Disclaimer
 
 This project is in very early development stage. It's not ready for prime-time by any means, but I fall firmly into the "publish early, publish often" mindset, hence its public availability. I am very interested in feedback in the form of email (gregcaporaso@gmail.com) or [pull requests](https://help.github.com/articles/using-pull-requests).
 
+The code in the ``iab`` module is not sufficiently tested, documented, or optimized for production use. As code reaches those quality standards it will be ported to [scikit-bio](http://www.scikit-bio.org). I do not recommend using the code in the ``iab`` module outside of these notebooks. 
+
 Currently, the **best example of where I'm hoping to go with these materials** is the [multiple sequence alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/4-multiple-sequence-alignment.ipynb) chapter.
 
 Outline
@@ -67,7 +69,8 @@ If you'd like to install the book's dependencies manually (or some other way tha
 - [numpy](http://www.numpy.org/) >= 1.7
 - [scipy](http://www.scipy.org/) >= 0.13.0
 - [matplotlib](http://www.matplotlib.org/) >= 1.1.0
-- [IPython](http://www.ipython.org/)
+- [pandas](http://pandas.pydata.org/) >= 0.13.1
+- [IPython](http://www.ipython.org/) >= 2.0.0
 - [tornado](http://www.tornadoweb.org/en/stable/)
 - [pyzmq](http://zeromq.github.io/pyzmq/)
 - [jinja2](http://jinja.pocoo.org/)
