@@ -85,6 +85,12 @@ These materials are primarily being developed by [Greg Caporaso](http://caporaso
 
 See the repository's [contributors page](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/graphs/contributors) for information on who has contributed to the project.
 
+Acknowledgements
+----------------
+Development of *An Introduction to Applied Bioinformatics* was supported in part by [Arizona's Technology and Research Initiative Fund](http://nau.edu/Research/Funding/Technology-Research-Initiative-Fund/). The style of the project was inspired by [Bayesian Methods for Hackers](http://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/).
+
+I want to thank the [IPython Developers](https://github.com/ipython/ipython/graphs/contributors) for all of their work on the [IPython Notebook](http://www.ipython.org/notebook), as well as the [QIIME developers](https://github.com/biocore/qiime/graphs/contributors) and [scikit-bio developers](https://github.com/biocore/scikit-bio/graphs/contributors) for the countless discussions over the years that helped me develop my understanding of the material presented here. This project wouldn't be possible without all of you, and I look forward to many more years of productive, fun and exciting work together!
+
 License
 -------
 
