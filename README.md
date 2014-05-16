@@ -77,6 +77,7 @@ If you'd like to install the book's dependencies manually (or some other way tha
 - [scikit-bio](http://scikit-bio.org/) (latest GitHub version)
 - [biom-format](http://www.biom-format.org)
 - [pyqi](http://biocore.github.io/pyqi/doc/index.html)
+- [future](http://python-future.org/)
 
 More information
 ----------------
