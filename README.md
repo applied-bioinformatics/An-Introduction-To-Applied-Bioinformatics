@@ -51,6 +51,7 @@ If you're going to read the book interactively (recommended), you'll need to clo
 
     git clone https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.git
     cd An-Introduction-To-Applied-Bioinformatics
+    pip install numpy
     pip install .
 
 Finally, launch the IPython Notebook to get started (be sure that you're in the ``An-Introduction-To-Applied-Bioinformatics`` directory when you run this command):
