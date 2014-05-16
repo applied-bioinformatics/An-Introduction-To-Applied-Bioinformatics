@@ -28,7 +28,8 @@ classes = """
 """
 classifiers = [s.strip() for s in classes.split('\n') if s]
 
-description = "An Introduction To Applied Bioinformatics"
+description = "An Introduction To Applied Bioinformatics (IAB): "
+              "Interactive lessions in bioinformatics"
 
 setup(name='An-Introduction-To-Applied-Bioinformatics',
       version=__version__,
@@ -39,12 +40,11 @@ setup(name='An-Introduction-To-Applied-Bioinformatics',
       author_email='gregcaporaso@gmail.com',
       maintainer='Greg Caporaso',
       maintainer_email='gregcaporaso@gmail.com',
-      url='https://github.com/gregcaporaso/'
-          'An-Introduction-To-Applied-Bioinformatics',
+      url='http://caporasolab.us/An-Introduction-To-Applied-Bioinformatics',
       packages=find_packages(),
       install_requires=['scikit-bio == 0.0.0-dev', 'ipython', 'tornado',
-                        'pyzmq', 'jinja2', 'nose', 'runipy', 'biom-format',
-                        'pyqi', 'pandas', 'future'],
+                        'pyzmq', 'jinja2', 'nose', 'runipy',
+                        'biom-format < 2.0.0', 'pyqi', 'pandas', 'future'],
       dependency_links=[
           'https://github.com/biocore/scikit-bio/archive/master.zip#egg='
           'scikit-bio-0.0.0-dev'
