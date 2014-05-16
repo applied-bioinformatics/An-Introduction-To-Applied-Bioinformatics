@@ -28,8 +28,8 @@ classes = """
 """
 classifiers = [s.strip() for s in classes.split('\n') if s]
 
-description = "An Introduction To Applied Bioinformatics (IAB): "
-              "Interactive lessions in bioinformatics"
+description = ("An Introduction To Applied Bioinformatics (IAB): "
+               "Interactive lessions in bioinformatics.")
 
 setup(name='An-Introduction-To-Applied-Bioinformatics',
       version=__version__,
