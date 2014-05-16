@@ -53,10 +53,6 @@ If you're going to read the book interactively (recommended), you'll need to clo
     cd An-Introduction-To-Applied-Bioinformatics
     pip install .
 
-If you're using a newer version of pip and scikit-bio fails to install, you may need to modify the pip command to be:
-
-    pip install --allow-all-external --allow-unverified scikit-bio --process-dependency-links .
-
 Finally, launch the IPython Notebook to get started (be sure that you're in the ``An-Introduction-To-Applied-Bioinformatics`` directory when you run this command):
 
     ipython notebook --pylab inline Index.ipynb
@@ -74,7 +70,7 @@ If you'd like to install the book's dependencies manually (or some other way tha
 - [tornado](http://www.tornadoweb.org/en/stable/)
 - [pyzmq](http://zeromq.github.io/pyzmq/)
 - [jinja2](http://jinja.pocoo.org/)
-- [scikit-bio](http://scikit-bio.org/) (latest GitHub version)
+- [scikit-bio](http://scikit-bio.org/) == 0.1.1
 - [biom-format](http://www.biom-format.org) < 2.0.0 (temporarily, soon to be 2.0.0)
 - [pyqi](http://biocore.github.io/pyqi/doc/index.html)
 - [future](http://python-future.org/)

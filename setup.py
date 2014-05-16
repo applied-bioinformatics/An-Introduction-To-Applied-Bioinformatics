@@ -42,11 +42,7 @@ setup(name='An-Introduction-To-Applied-Bioinformatics',
       maintainer_email='gregcaporaso@gmail.com',
       url='http://caporasolab.us/An-Introduction-To-Applied-Bioinformatics',
       packages=find_packages(),
-      install_requires=['scikit-bio == 0.0.0-dev', 'ipython', 'tornado',
+      install_requires=['scikit-bio == 0.1.1', 'ipython', 'tornado',
                         'pyzmq', 'jinja2', 'nose', 'runipy',
                         'biom-format < 2.0.0', 'pyqi', 'pandas', 'future'],
-      dependency_links=[
-          'https://github.com/biocore/scikit-bio/archive/master.zip#egg='
-          'scikit-bio-0.0.0-dev'
-      ],
       classifiers=classifiers)
