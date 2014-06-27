@@ -7,7 +7,7 @@ An Introduction To Applied Bioinformatics
 
 Bioinformatics, as I see it, is the application of the tools of computer science (things like programming languages, algorithms, and databases) to address biological problems (for example, inferring the evolutionary relationship between a group of organisms based on fragments of their genomes, or understanding if or how the community of microorganisms that live in my gut changes if I modify my diet). Bioinformatics is a rapidly growing field, largely in response to the vast increase in the quantity of data that biologists now grapple with. Students from varied disciplines (e.g., biology, computer science, statistics, and biochemistry) and stages of their educational careers (undergraduate, graduate, or postdoctoral) are becoming interested in bioinformatics.
 
-I teach bioinformatics at the undergraduate and graduate levels at Northern Arizona University. This repository contains some of the materials that I've developed in these courses, and represents an initial attempt to organize these materials in a standalone way. In some cases, I'm just linking out to other materials for now.
+I teach bioinformatics at the undergraduate and graduate levels at Northern Arizona University. This repository contains some of the materials that I've developed in these courses, and represents an initial attempt to organize these materials in a standalone way. If you'd like to read a little more about the project, see my [blog post](http://microbe.net/2014/05/01/teaching-bioinformatics-using-ipython-notebooks/) on [microbe.net](http://microbe.net).
 
 Disclaimer
 ----------
@@ -71,10 +71,12 @@ If you'd like to install the book's dependencies manually (or some other way tha
 - [tornado](http://www.tornadoweb.org/en/stable/)
 - [pyzmq](http://zeromq.github.io/pyzmq/)
 - [jinja2](http://jinja.pocoo.org/)
-- [scikit-bio](http://scikit-bio.org/) == 0.1.1
+- [scikit-bio](http://scikit-bio.org/) == 0.1.4
 - [biom-format](http://www.biom-format.org) < 2.0.0 (temporarily, soon to be 2.0.0)
 - [pyqi](http://biocore.github.io/pyqi/doc/index.html)
 - [future](http://python-future.org/)
+
+Note that even if you have all of the above dependencies installed, you should still run ``pip install .`` as there is a small, required codebase included with the book (the ``iab`` module).
 
 More information
 ----------------
