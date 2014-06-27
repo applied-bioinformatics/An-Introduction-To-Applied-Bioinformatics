@@ -9,6 +9,7 @@
 from __future__ import division
 from random import choice, random, shuffle
 
+import numpy as np
 from scipy.cluster.hierarchy import average, dendrogram, to_tree
 from skbio.core.sequence import BiologicalSequence
 from skbio.core.distance import DistanceMatrix
@@ -41,7 +42,7 @@ nt_substitution_matrix = {'A': {'A':  1, 'C': -2, 'G': -2, 'T': -2, 'N': 0},
                           'T': {'A': -2, 'C': -2, 'G': -2, 'T':  1, 'N': 0},
                           'N': {'A':  0, 'C':  0, 'G':  0, 'T':  0, 'N': 0 }}
 
-
+traceback_decoding = {1: '\\', 2:'|', 3: '-', -1: 'E', 0: '*'}
 ###
 # pairwise alignment notebook
 ###
@@ -75,7 +76,7 @@ def format_matrix(row_headers, col_headers, data, hide_zeros=False, cell_width=3
 
     return '\n'.join(result)
 
-def format_dynamic_programming_matrix(seq1, seq2, matrix, cell_width=4):
+def format_dynamic_programming_matrix(seq1, seq2, matrix, cell_width=6):
     """ define a function for formatting dynamic programming matrices
     """
     lines = []
@@ -91,6 +92,16 @@ def format_dynamic_programming_matrix(seq1, seq2, matrix, cell_width=4):
         lines.append(line_format % tuple([base] + map(str,row)))
 
     return '\n'.join(lines)
+
+def format_traceback_matrix(seq1, seq2, matrix, cell_width=6):
+    translated_m = np.chararray(matrix.shape)
+    for i in range(matrix.shape[0]):
+        for j in range(matrix.shape[1]):
+            translated_m[i, j] = traceback_decoding[matrix[i, j]]
+
+    return format_dynamic_programming_matrix(seq1, seq2, translated_m,
+                                             cell_width)
+
 
 def format_dynamic_programming_matrix_subset(seq1,seq2,matrix, cell_width=6, num_positions=10):
     """ return first num_positions x num_positions of dynamic programming matrix
