@@ -71,10 +71,12 @@ If you'd like to install the book's dependencies manually (or some other way tha
 - [tornado](http://www.tornadoweb.org/en/stable/)
 - [pyzmq](http://zeromq.github.io/pyzmq/)
 - [jinja2](http://jinja.pocoo.org/)
-- [scikit-bio](http://scikit-bio.org/) == 0.1.1
+- [scikit-bio](http://scikit-bio.org/) == 0.1.4
 - [biom-format](http://www.biom-format.org) < 2.0.0 (temporarily, soon to be 2.0.0)
 - [pyqi](http://biocore.github.io/pyqi/doc/index.html)
 - [future](http://python-future.org/)
+
+Note that even if you have all of the above dependencies installed, you should still run ``pip install .`` as there is a small, required codebase included with the book (the ``iab`` module).
 
 More information
 ----------------
