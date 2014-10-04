@@ -44,5 +44,6 @@ setup(name='An-Introduction-To-Applied-Bioinformatics',
       packages=find_packages(),
       install_requires=['scikit-bio == 0.1.4', 'ipython', 'tornado',
                         'pyzmq', 'jinja2', 'nose', 'runipy',
-                        'biom-format < 2.0.0', 'pyqi', 'pandas', 'future'],
+                        'biom-format < 2.0.0', 'pyqi', 'pandas',
+                        'future==0.13.1'],
       classifiers=classifiers)
