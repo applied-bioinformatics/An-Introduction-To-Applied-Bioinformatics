@@ -11,9 +11,9 @@ from random import choice, random, shuffle
 
 import numpy as np
 from scipy.cluster.hierarchy import average, dendrogram, to_tree
-from skbio.core.sequence import BiologicalSequence
-from skbio.core.distance import DistanceMatrix
-from skbio.core.alignment import local_pairwise_align_ssw
+from skbio.sequence import BiologicalSequence
+from skbio.stats.distance import DistanceMatrix
+from skbio.alignment import local_pairwise_align_ssw
 
 blosum50 = {'A': {'A': 5, 'C': -1, 'D': -2, 'E': -1, 'F': -3, 'G': 0, 'H': -2, 'I': -1, 'K': -1, 'L': -2, 'M': -1, 'N': -1, 'P': -1, 'Q': -1, 'R': -2, 'S': 1, 'T': 0, 'V': 0, 'W': -3, 'Y': -2},
 'C': {'A': -1, 'C': 13, 'D': -4, 'E': -3, 'F': -2, 'G': -3, 'H': -3, 'I': -2, 'K': -3, 'L': -2, 'M': -2, 'N': -2, 'P': -4, 'Q': -3, 'R': -4, 'S': -1, 'T': -1, 'V': -1, 'W': -5, 'Y': -3},
