@@ -49,10 +49,8 @@ Installation
 
 If you're going to read the book interactively (recommended), you'll need to clone this repository, install some dependencies, and launch the IPython Notebook. For example, the following commands should work for Linux and Mac OS X users:
 
-    git clone https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.git
-    cd An-Introduction-To-Applied-Bioinformatics
     pip install numpy
-    pip install .
+    pip install https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/master.zip
 
 Finally, launch the IPython Notebook to get started (be sure that you're in the ``An-Introduction-To-Applied-Bioinformatics`` directory when you run this command):
 
