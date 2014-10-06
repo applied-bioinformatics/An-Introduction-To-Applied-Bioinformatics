@@ -13,7 +13,7 @@ import numpy as np
 from scipy.cluster.hierarchy import average, dendrogram, to_tree
 from skbio.sequence import BiologicalSequence
 from skbio.stats.distance import DistanceMatrix
-from skbio.alignment import local_pairwise_align_ssw
+from skbio.alignment import local_pairwise_align_ssw, Alignment
 
 blosum50 = {'A': {'A': 5, 'C': -1, 'D': -2, 'E': -1, 'F': -3, 'G': 0, 'H': -2, 'I': -1, 'K': -1, 'L': -2, 'M': -1, 'N': -1, 'P': -1, 'Q': -1, 'R': -2, 'S': 1, 'T': 0, 'V': 0, 'W': -3, 'Y': -2},
 'C': {'A': -1, 'C': 13, 'D': -4, 'E': -3, 'F': -2, 'G': -3, 'H': -3, 'I': -2, 'K': -3, 'L': -2, 'M': -2, 'N': -2, 'P': -4, 'Q': -3, 'R': -4, 'S': -1, 'T': -1, 'V': -1, 'W': -5, 'Y': -3},
@@ -81,6 +81,10 @@ def format_dynamic_programming_matrix(seq1, seq2, matrix, cell_width=6):
     """
     lines = []
 
+    if isinstance(seq1, Alignment):
+        seq1 = str(seq1[0])
+    if isinstance(seq2, Alignment):
+        seq2 = str(seq2[0])
     cell_format = "%" + str(cell_width) + "s"
     line_format = cell_format * (len(seq1) + 2)
     # print seq1 (start the line with two empty strings)
@@ -94,6 +98,10 @@ def format_dynamic_programming_matrix(seq1, seq2, matrix, cell_width=6):
     return '\n'.join(lines)
 
 def format_traceback_matrix(seq1, seq2, matrix, cell_width=6):
+    if isinstance(seq1, Alignment):
+        seq1 = str(seq1[0])
+    if isinstance(seq2, Alignment):
+        seq2 = str(seq2[0])
     translated_m = np.chararray(matrix.shape)
     for i in range(matrix.shape[0]):
         for j in range(matrix.shape[1]):
@@ -107,7 +115,10 @@ def format_dynamic_programming_matrix_subset(seq1,seq2,matrix, cell_width=6, num
     """ return first num_positions x num_positions of dynamic programming matrix
     """
     lines = []
-
+    if isinstance(seq1, Alignment):
+        seq1 = str(seq1[0])
+    if isinstance(seq2, Alignment):
+        seq2 = str(seq2[0])
     cell_format = "%" + str(cell_width) + "s"
     line_format = cell_format * (len(seq1[:num_positions]) + 1)
     # print seq1 (start the line with two empty strings)
