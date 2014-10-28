@@ -42,7 +42,7 @@ setup(name='An-Introduction-To-Applied-Bioinformatics',
       maintainer_email='gregcaporaso@gmail.com',
       url='http://caporasolab.us/An-Introduction-To-Applied-Bioinformatics',
       packages=find_packages(),
-      install_requires=['scikit-bio == 0.2.0', 'ipython[all]', 'runipy',
+      install_requires=['scikit-bio == 0.2.1', 'ipython[all]', 'runipy',
                         'biom-format < 2.0.0', 'pyqi', 'pandas',
                         'future<=0.13.1'],
       classifiers=classifiers)
