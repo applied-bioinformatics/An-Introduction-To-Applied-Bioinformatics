@@ -43,5 +43,6 @@ setup(name='An-Introduction-To-Applied-Bioinformatics',
       url='http://caporasolab.us/An-Introduction-To-Applied-Bioinformatics',
       packages=find_packages(),
       install_requires=['scikit-bio == 0.2.2', 'ipython[all]', 'runipy',
-                        'biom-format < 2.0.0'],
+                        'biom-format < 2.0.0', 'seaborn >= 0.5.1, < 0.6.0',
+                        'qiime-default-reference >= 0.1.1, < 0.2.0'],
       classifiers=classifiers)
