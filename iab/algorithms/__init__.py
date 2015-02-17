@@ -594,7 +594,7 @@ def local_alignment_search(query, reference_db, aligner=local_pairwise_align_ssw
             best_score = score
             best_match = seq_id
             best_a1 = str(alignment[0])
-            best_a2 = str(alignment[0])
+            best_a2 = str(alignment[1])
     return best_a1, best_a2, best_score, best_match
 
 def approximated_local_alignment_search_random(
@@ -611,21 +611,22 @@ def approximated_local_alignment_search_random(
                 best_score = score
                 best_match = seq_id
                 best_a1 = str(alignment[0])
-                best_a2 = str(alignment[0])
+                best_a2 = str(alignment[1])
     return best_a1, best_a2, best_score, best_match
 
 def gc_content(seq):
     return (seq.count('G') + seq.count('C')) / len(seq)
 
 def approximated_local_alignment_search_gc(
-        query, reference_db, p=0.05, aligner=local_pairwise_align_ssw):
+        query, reference_db, reference_db_gc_contents, p=0.05,
+        aligner=local_pairwise_align_ssw):
     query_gc = gc_content(query)
     best_score = 0.0
     best_match = None
     best_a1 = None
     best_a2 = None
     for seq_id, seq in reference_db:
-        ref_gc = gc_content(seq)
+        ref_gc = reference_db_gc_contents[seq_id]
         if ref_gc - p < query_gc < ref_gc + p:
             alignment = aligner(query, seq)
             score = alignment.score()
@@ -633,7 +634,7 @@ def approximated_local_alignment_search_gc(
                 best_score = score
                 best_match = seq_id
                 best_a1 = str(alignment[0])
-                best_a2 = str(alignment[0])
+                best_a2 = str(alignment[1])
     return best_a1, best_a2, best_score, best_match
 
 def generate_random_score_distribution(query_sequence,
