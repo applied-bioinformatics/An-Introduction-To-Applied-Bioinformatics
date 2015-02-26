@@ -13,7 +13,8 @@ import numpy as np
 from scipy.cluster.hierarchy import average, dendrogram, to_tree
 from skbio.sequence import BiologicalSequence
 from skbio.stats.distance import DistanceMatrix
-from skbio.alignment import local_pairwise_align_ssw, Alignment
+from skbio.alignment import local_pairwise_align_ssw, global_pairwise_align_nucleotide, Alignment
+from skbio import TreeNode
 
 blosum50 = {'A': {'A': 5, 'C': -1, 'D': -2, 'E': -1, 'F': -3, 'G': 0, 'H': -2, 'I': -1, 'K': -1, 'L': -2, 'M': -1, 'N': -1, 'P': -1, 'Q': -1, 'R': -2, 'S': 1, 'T': 0, 'V': 0, 'W': -3, 'Y': -2},
 'C': {'A': -1, 'C': 13, 'D': -4, 'E': -3, 'F': -2, 'G': -3, 'H': -3, 'I': -2, 'K': -3, 'L': -2, 'M': -2, 'N': -2, 'P': -4, 'Q': -3, 'R': -4, 'S': -1, 'T': -1, 'V': -1, 'W': -5, 'Y': -3},
@@ -668,51 +669,49 @@ def fraction_better_or_equivalent_alignments(query_sequence,
 
 ## MSA notebook
 
-def get_k_words(s, k, overlapping=True):
-    result = []
-    len_s = len(s)
-    if overlapping:
-        step = 1
-    else:
-        step = k
-    for i in range(0,len_s,step):
-        if i+k > len_s:
-            # if there are no more k-mers left
-            break
-        else:
-            result.append(s[i:i+k])
-    return result
+def kmer_distance(sequence1, sequence2, k=3, overlapping=True):
+    """Compute the kmer distance between a pair of sequences
 
-def fraction_unique_words(words1, words2):
-    words1_set = set(words1)
-    words2_set = set(words2)
-    all_words = words1_set | words2_set
-    shared_words = words1_set & words2_set
-    number_unique = len(all_words) - len(shared_words)
-    result = number_unique / len(all_words)
-    return result
+    Parameters
+    ----------
+    sequence1 : BiologicalSequence
+    sequence2 : BiologicalSequence
+    k : int, optional
+        The word length.
+    overlapping : bool, optional
+        Defines whether the k-words should be overlapping or not
+        overlapping.
 
-def kmer_distance(seq1, seq2, k):
-    seq1_k_words = get_k_words(seq1, k)
-    seq2_k_words = get_k_words(seq2, k)
-    return fraction_unique_words(seq1_k_words, seq2_k_words)
+    Returns
+    -------
+    float
+        Fraction of the set of k-mers from both sequence1 and
+        sequence2 that are unique to either sequence1 or
+        sequence2.
 
-def three_mer_distance(seq1, seq2):
-    return kmer_distance(seq1, seq2, k=3)
+    Raises
+    ------
+    ValueError
+        If k < 1.
 
-def guide_tree_from_query_sequences(query_sequences,
-                                    distance_fn=three_mer_distance,
-                                    display_tree = False):
-    guide_dm = []
-    seq_ids = []
-    for seq_id1, seq1 in query_sequences:
-        seq_ids.append(seq_id1)
-        row = []
-        for seq_id2, seq2 in query_sequences:
-            row.append(kmer_distance(seq1, seq2, k=3))
-        guide_dm.append(row)
+    Notes
+    -----
+    k-mer counts are not incorporated in this distance metric.
 
-    guide_dm = DistanceMatrix(guide_dm, seq_ids)
+    """
+    sequence1_kmers = set(sequence1.k_words(k, overlapping))
+    sequence2_kmers = set(sequence2.k_words(k, overlapping))
+    all_kmers = sequence1_kmers | sequence2_kmers
+    shared_kmers = sequence1_kmers & sequence2_kmers
+    number_unique = len(all_kmers) - len(shared_kmers)
+    fraction_unique = number_unique / len(all_kmers)
+    return fraction_unique
+
+def guide_tree_from_sequences(sequences,
+                              distance_fn=kmer_distance,
+                              display_tree = False):
+
+    guide_dm = sequences.distances(distance_fn)
     guide_lm = average(guide_dm.condensed_form())
     guide_tree = to_tree(guide_lm)
     if display_tree:
@@ -720,215 +719,69 @@ def guide_tree_from_query_sequences(query_sequences,
                link_color_func=lambda x: 'black')
     return guide_tree
 
-def msa_generate_nw_and_traceback_matrices(aln1,aln2,gap_open_penalty,
-                                           gap_extend_penalty,substitution_matrix):
-    gap_open_penalty = float(gap_open_penalty)
-    gap_extend_penalty = float(gap_extend_penalty)
-    # Initialize a matrix to use for scoring the alignment and for tracing
-    # back the best alignment
-    nw_matrix = [[0, -1 * gap_open_penalty]]
-    for i in range(2,len(aln1[0])+1):
-        nw_matrix[0].append(nw_matrix[0][-1] - gap_extend_penalty)
-    traceback_matrix = [[None] + ['-' for i in range(0,len(aln1[0]))]]
-    # Iterate over the amino acids in sequence two (which will correspond
-    # to the vertical sequence in the matrix)
-    # Note that i corresponds to column numbers, as in the 'Biological Sequence
-    # Analysis' example
-    for i in range(1,len(aln2[0])+1):
-        # Initialize the current row of the matrix
-        if i == 1:
-            current_row = [nw_matrix[i-1][0] - gap_open_penalty]
-        else:
-            current_row = [nw_matrix[i-1][0] - gap_extend_penalty]
-        current_traceback_matrix_row = ['|']
-        # Iterate over the amino acids in sequence one (which will
-        # correspond to the horizontal sequence in the matrix)
-        # Note that j corresponds to row numbers, as in the 'Biological Sequence
-        # Analysis' example from class
-        for j in range(1,len(aln1[0])+1):
-            # computing the subsitution score is different when aligning alignments
-            substitution_score = 0
-            aln2_aas = [seq[i-1] for seq in aln2]
-            aln1_aas = [seq[j-1] for seq in aln1]
-            for aa2 in aln2_aas:
-                for aa1 in aln1_aas:
-                    if aa1 == "-" or aa2 == "-":
-                        substitution_score += 0
-                    else:
-                        substitution_score += substitution_matrix[aa1][aa2]
-            substitution_score /= (len(aln1) * len(aln2))
-
-            # everything else is the same as for pairwise nw
-            diag_score = (nw_matrix[i-1][j-1] + substitution_score,'\\')
-
-            # affine gaps
-            # up_score = (nw_matrix[i-1][j] - gap_penalty,'|')
-            if traceback_matrix[i-1][j] == '|':
-                # gap extend, because the cell above was also a gap
-                up_score = (nw_matrix[i-1][j] - gap_extend_penalty,'|')
-            else:
-                # gap open, because the cell above was not a gap
-                up_score = (nw_matrix[i-1][j] - gap_open_penalty,'|')
-
-            #left_score = (current_row[-1] - gap_penalty,'-')
-            if current_traceback_matrix_row[-1] == '-':
-                # gap extend, because the cell to the left was also a gap
-                left_score = (current_row[-1] - gap_extend_penalty,'-')
-            else:
-                # gap open, because the cell to the left was not a gap
-                left_score = (current_row[-1] - gap_open_penalty,'-')
-
-            best_score = max(diag_score,up_score,left_score)
-            current_row.append(best_score[0])
-            current_traceback_matrix_row.append(best_score[1])
-        # append the current row to the matrix
-        nw_matrix.append(current_row)
-        traceback_matrix.append(current_traceback_matrix_row)
-    return nw_matrix, traceback_matrix
-
-def msa_nw_traceback(traceback_matrix,nw_matrix,aln1,aln2,gap_character='-'):
-
-    # initialize the result alignments
-    len_aln1 = len(aln1)
-    aligned_seqs1 = []
-    for e in range(len_aln1):
-        aligned_seqs1.append([])
-
-    len_aln2 = len(aln2)
-    aligned_seqs2 = []
-    for e in range(len_aln2):
-        aligned_seqs2.append([])
-
-    current_row = len(traceback_matrix) - 1
-    current_col = len(traceback_matrix[0]) - 1
-
-    best_score = nw_matrix[current_row][current_col]
-
-    while True:
-        current_value = traceback_matrix[current_row][current_col]
-
-        if current_value == '\\':
-            for i in range(len_aln1):
-                aligned_seqs1[i].append(aln1[i][current_col-1])
-            for i in range(len_aln2):
-                aligned_seqs2[i].append(aln2[i][current_row-1])
-            current_row -= 1
-            current_col -= 1
-        elif current_value == '|':
-            for i in range(len_aln1):
-                aligned_seqs1[i].append('-')
-            for i in range(len_aln2):
-                aligned_seqs2[i].append(aln2[i][current_row-1])
-            current_row -= 1
-        elif current_value == '-':
-            for i in range(len_aln1):
-                aligned_seqs1[i].append(aln1[i][current_col-1])
-            for i in range(len_aln2):
-                aligned_seqs2[i].append('-')
-            current_col -= 1
-        elif current_value == None:
-            break
-        else:
-            raise ValueError, "Invalid value in traceback matrix: %s" % current_value
-
-    for i in range(len_aln1):
-        aligned_seqs1[i] = ''.join(aligned_seqs1[i][::-1])
-    for i in range(len_aln2):
-        aligned_seqs2[i] = ''.join(aligned_seqs2[i][::-1])
-
-    return aligned_seqs1, aligned_seqs2, best_score
-
-def msa_nw_align(aln1, aln2, gap_open_penalty=8, gap_extend_penalty=1, substitution_matrix=nt_substitution_matrix):
-    """ Perform Needleman-Wunsch alignment of seq1 and seq2
-    """
-    nw_matrix, traceback_matrix = msa_generate_nw_and_traceback_matrices(
-                                    aln1, aln2, gap_open_penalty, gap_extend_penalty, substitution_matrix)
-    aligned_seq1, aligned_seq2, score = msa_nw_traceback(traceback_matrix,nw_matrix,aln1,aln2)
-    return aligned_seq1, aligned_seq2, score
-
-def progressive_msa(query_sequences, guide_tree=None, gap_open_penalty=8, gap_extend_penalty=1,
-                    substitution_matrix=nt_substitution_matrix):
-    if guide_tree == None:
-        # create a guide tree if one was not provided
-        guide_tree = guide_tree_from_query_sequences(query_sequences,display_tree=False)
-
-    left = guide_tree.get_left()
-    if left.is_leaf():
-        left_id = left.get_id()
-        left_aln = [query_sequences[left_id]]
+def progressive_msa(sequences, guide_tree, pairwise_aligner=global_pairwise_align_nucleotide):
+    # we need a parallel implementation of this functionality, and a Cython/C global aligner that can handle
+    # alignment of alignments. If done right, it could have a big impact on the field. Contact
+    # gregcaporaso@gmail.com if you have any interest in working on this.
+    c1, c2 = guide_tree.children
+    if c1.is_tip():
+        c1_aln = sequences[c1.name]
     else:
-        left_aln, _ = progressive_msa(query_sequences, left,
-                                   gap_open_penalty, gap_extend_penalty, substitution_matrix)
+        c1_aln = progressive_msa(sequences, c1, pairwise_aligner)
 
-    right = guide_tree.get_right()
-    if right.is_leaf():
-        right_id = right.get_id()
-        right_aln = [query_sequences[right_id]]
+    if c2.is_tip():
+        c2_aln = sequences[c2.name]
     else:
-        right_aln, _ = progressive_msa(query_sequences, right,
-                                    gap_open_penalty, gap_extend_penalty, substitution_matrix)
+        c2_aln = progressive_msa(sequences, c2, pairwise_aligner)
 
-    aln1_ids = [s[0] for s in left_aln]
-    aln1_seqs = [s[1] for s in left_aln]
-    aln2_ids = [s[0] for s in right_aln]
-    aln2_seqs = [s[1] for s in right_aln]
-    aln1, aln2, score = msa_nw_align([s[1] for s in left_aln],
-                                 [s[1] for s in right_aln],
-                                 gap_open_penalty, gap_extend_penalty, substitution_matrix)
-    msa = zip(aln1_ids, aln1) + zip(aln2_ids, aln2)
-    msa.sort()
-    return msa, guide_tree
+    return pairwise_aligner(c1_aln, c2_aln)
 
-def compute_aligned_sequence_distances(seqs, distance_fn=hamming_distance):
-    dm = []
-    ids = []
-    for id1, seq1 in seqs:
-        ids.append(id1)
-        row = []
-        for id2, seq2 in seqs:
-            row.append(hamming_distance(seq1, seq2))
-        dm.append(row)
-    return DistanceMatrix(dm, ids)
+def progressive_msa_and_tree(sequences,
+                             pairwise_aligner=global_pairwise_align_nucleotide,
+                             sequence_distance_fn=kmer_distance,
+                             guide_tree=None,
+                             display_aln=False,
+                             display_tree=False):
+    if guide_tree is None:
+        guide_dm = sequences.distances(sequence_distance_fn)
+        guide_lm = average(guide_dm.condensed_form())
+        guide_tree = TreeNode.from_linkage_matrix(guide_lm, guide_dm.ids)
 
-def progressive_msa_and_tree(query_sequences, gap_open_penalty=8, gap_extend_penalty=1,
-                             substitution_matrix=nt_substitution_matrix,
-                             msa_distance_fn=compute_aligned_sequence_distances,
-                             guide_tree=None, display_aln=False, display_tree=False):
-    msa, guide_tree = progressive_msa(query_sequences, guide_tree,
-                                      gap_open_penalty, gap_extend_penalty, substitution_matrix)
+    msa = progressive_msa(sequences, guide_tree)
     if display_aln:
-        print "Multiple sequence alignment:\n"
-        for seq_id, seq in msa:
-            print seq, "(%s)" % seq_id
+        print(msa)
 
-    dm = msa_distance_fn(msa)
-    lm = average(dm.condensed_form())
-    tree = to_tree(lm)
+    msa_dm = msa.distances()
+    msa_lm = average(msa_dm.condensed_form())
+    msa_tree = TreeNode.from_linkage_matrix(msa_lm, msa_dm.ids)
     if display_tree:
-        print "\nOutput tree:"
-        d = dendrogram(lm, labels=dm.ids, orientation='right',
+        print("\nOutput tree:")
+        d = dendrogram(msa_lm, labels=msa_dm.ids, orientation='right',
                    link_color_func=lambda x: 'black', leaf_font_size=24)
-    return msa, tree
+    return msa, msa_tree
 
-def iterative_msa_and_tree(query_sequences, num_iterations,
-                           gap_open_penalty=8, gap_extend_penalty=1,
-                           substitution_matrix=nt_substitution_matrix,
-                           guide_tree_fn=guide_tree_from_query_sequences,
-                           msa_distance_fn=compute_aligned_sequence_distances,
-                           guide_tree=None, display_aln=False, display_tree=False):
+def iterative_msa_and_tree(sequences,
+                           num_iterations,
+                           pairwise_aligner=global_pairwise_align_nucleotide,
+                           sequence_distance_fn=kmer_distance,
+                           display_aln=False,
+                           display_tree=False):
     if num_iterations > 5:
-        raise ValueError("A maximum of five iterations is allowed. You requested %d." % num_iterations)
+        raise ValueError("A maximum of five iterations is allowed."
+                         "You requested %d." % num_iterations)
     previous_iter_tree = None
     for i in range(num_iterations):
         if i == (num_iterations - 1):
             # only display the last iteration
-            display_iter = True
+            display = True
         else:
-            display_iter = False
-        previous_iter_msa, previous_iter_tree = progressive_msa_and_tree(query_sequences,
-            gap_open_penalty=gap_open_penalty, gap_extend_penalty=gap_extend_penalty,
-            substitution_matrix=substitution_matrix, msa_distance_fn=msa_distance_fn,
-            guide_tree=previous_iter_tree, display_aln=display_aln and display_iter,
-            display_tree=display_tree and display_iter)
+            display = False
+        previous_iter_msa, previous_iter_tree = \
+            progressive_msa_and_tree(sequences,
+             pairwise_aligner=pairwise_aligner,
+             sequence_distance_fn=sequence_distance_fn,
+             guide_tree=previous_iter_tree,
+             display_aln=display_aln and display,
+             display_tree=display_tree and display)
 
     return previous_iter_msa, previous_iter_tree
