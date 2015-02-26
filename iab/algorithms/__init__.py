@@ -13,7 +13,7 @@ import numpy as np
 from scipy.cluster.hierarchy import average, dendrogram, to_tree
 from skbio.sequence import BiologicalSequence
 from skbio.stats.distance import DistanceMatrix
-from skbio.alignment import local_pairwise_align_ssw, global_pairwise_align_nucleotide, Alignment
+from skbio.alignment import local_pairwise_align_ssw, Alignment
 from skbio import TreeNode
 
 blosum50 = {'A': {'A': 5, 'C': -1, 'D': -2, 'E': -1, 'F': -3, 'G': 0, 'H': -2, 'I': -1, 'K': -1, 'L': -2, 'M': -1, 'N': -1, 'P': -1, 'Q': -1, 'R': -2, 'S': 1, 'T': 0, 'V': 0, 'W': -3, 'Y': -2},
@@ -719,10 +719,26 @@ def guide_tree_from_sequences(sequences,
                link_color_func=lambda x: 'black')
     return guide_tree
 
-def progressive_msa(sequences, guide_tree, pairwise_aligner=global_pairwise_align_nucleotide):
-    # we need a parallel implementation of this functionality, and a Cython/C global aligner that can handle
-    # alignment of alignments. If done right, it could have a big impact on the field. Contact
-    # gregcaporaso@gmail.com if you have any interest in working on this.
+def progressive_msa(sequences, guide_tree, pairwise_aligner):
+    """ Perform progressive msa of sequences
+
+    Parameters
+    ----------
+    sequences : skbio.SequenceCollection
+        The sequences to be aligned.
+    guide_tree : skbio.TreeNode
+        The tree that should be used to guide the alignment process.
+    pairwise_aligner : function
+        Function that should be used to perform the pairwise alignments,
+        for example skbio.Alignment.global_pairwise_align_nucleotide. Must
+        support skbio.BiologicalSequence objects or skbio.Alignment objects
+        as input.
+
+    Returns
+    -------
+    skbio.Alignment
+
+    """
     c1, c2 = guide_tree.children
     if c1.is_tip():
         c1_aln = sequences[c1.name]
@@ -737,17 +753,45 @@ def progressive_msa(sequences, guide_tree, pairwise_aligner=global_pairwise_alig
     return pairwise_aligner(c1_aln, c2_aln)
 
 def progressive_msa_and_tree(sequences,
-                             pairwise_aligner=global_pairwise_align_nucleotide,
+                             pairwise_aligner,
                              sequence_distance_fn=kmer_distance,
                              guide_tree=None,
                              display_aln=False,
                              display_tree=False):
+    """ Perform progressive msa of sequences and build a UPGMA tree
+    Parameters
+    ----------
+    sequences : skbio.SequenceCollection
+        The sequences to be aligned.
+    pairwise_aligner : function
+        Function that should be used to perform the pairwise alignments,
+        for example skbio.Alignment.global_pairwise_align_nucleotide. Must
+        support skbio.BiologicalSequence objects or skbio.Alignment objects
+        as input.
+    sequence_distance_fn : function
+        Function that returns and skbio.DistanceMatrix given an
+        skbio.SequenceCollection. This will be used to build a guide tree if
+        one is not provided.
+    guide_tree : skbio.TreeNode, optional
+        The tree that should be used to guide the alignment process.
+    display_aln : bool, optional
+        Print the alignment before returning.
+    display_tree : bool, optional
+        Print the tree before returning.
+
+    Returns
+    -------
+    skbio.alignment
+    skbio.TreeNode
+
+    """
     if guide_tree is None:
         guide_dm = sequences.distances(sequence_distance_fn)
         guide_lm = average(guide_dm.condensed_form())
         guide_tree = TreeNode.from_linkage_matrix(guide_lm, guide_dm.ids)
 
-    msa = progressive_msa(sequences, guide_tree)
+    msa = progressive_msa(sequences, guide_tree,
+                          pairwise_aligner=pairwise_aligner)
     if display_aln:
         print(msa)
 
@@ -762,10 +806,37 @@ def progressive_msa_and_tree(sequences,
 
 def iterative_msa_and_tree(sequences,
                            num_iterations,
-                           pairwise_aligner=global_pairwise_align_nucleotide,
+                           pairwise_aligner,
                            sequence_distance_fn=kmer_distance,
                            display_aln=False,
                            display_tree=False):
+    """ Perform progressive msa of sequences and build a UPGMA tree
+    Parameters
+    ----------
+    sequences : skbio.SequenceCollection
+       The sequences to be aligned.
+    num_iterations : int
+       The number of iterations of progressive multiple sequence alignment to
+       perform. Must be greater than zero and less than five.
+    pairwise_aligner : function
+       Function that should be used to perform the pairwise alignments,
+       for example skbio.Alignment.global_pairwise_align_nucleotide. Must
+       support skbio.BiologicalSequence objects or skbio.Alignment objects
+       as input.
+    sequence_distance_fn : function
+       Function that returns and skbio.DistanceMatrix given an
+       skbio.SequenceCollection. This will be used to build a guide tree.
+    display_aln : bool, optional
+       Print the alignment before returning.
+    display_tree : bool, optional
+       Print the tree before returning.
+
+    Returns
+    -------
+    skbio.alignment
+    skbio.TreeNode
+
+   """
     if num_iterations > 5:
         raise ValueError("A maximum of five iterations is allowed."
                          "You requested %d." % num_iterations)
