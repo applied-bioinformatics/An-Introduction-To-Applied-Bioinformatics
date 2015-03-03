@@ -710,7 +710,23 @@ def kmer_distance(sequence1, sequence2, k=3, overlapping=True):
 def guide_tree_from_sequences(sequences,
                               distance_fn=kmer_distance,
                               display_tree = False):
+    """ Build a UPGMA tree by applying distance_fn to sequences
 
+    Parameters
+    ----------
+    sequences : skbio.SequenceCollection
+      The sequences to be represented in the resulting guide tree.
+    sequence_distance_fn : function
+      Function that returns and skbio.DistanceMatrix given an
+      skbio.SequenceCollection.
+    display_tree : bool, optional
+      Print the tree before returning.
+
+    Returns
+    -------
+    skbio.TreeNode
+
+    """
     guide_dm = sequences.distances(distance_fn)
     guide_lm = average(guide_dm.condensed_form())
     guide_tree = to_tree(guide_lm)
@@ -730,7 +746,7 @@ def progressive_msa(sequences, guide_tree, pairwise_aligner):
         The tree that should be used to guide the alignment process.
     pairwise_aligner : function
         Function that should be used to perform the pairwise alignments,
-        for example skbio.Alignment.global_pairwise_align_nucleotide. Must
+        for example skbio.alignment.global_pairwise_align_nucleotide. Must
         support skbio.BiologicalSequence objects or skbio.Alignment objects
         as input.
 
