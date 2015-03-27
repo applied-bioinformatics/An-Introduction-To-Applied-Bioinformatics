@@ -16,12 +16,12 @@ Disclaimer
 
 The code in the iab module is **not sufficiently tested, documented, or optimized for production use**. As code reaches those quality standards it will be ported to [scikit-bio](http://www.scikit-bio.org). I do not recommend using the code in the iab module outside of these notebooks. In other words, don't `import iab` outside of the notebooks - if you want access to the functionality in your own code, you should `import skbio`.
 
-Currently, the **best example of where I'm hoping to go with these materials** is the [multiple sequence alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/4-multiple-sequence-alignment.ipynb) chapter.
+Currently, the **best example of where I'm hoping to go with these materials** is the [multiple sequence alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/0.1.0/fundamentals/multiple-sequence-alignment.ipynb) chapter.
 
 Outline
 -------
 
-To browse the book, [start here](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/Index.ipynb).
+To browse the book, [start here](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/0.1.0/Index.ipynb).
 
 0. Getting started
 1. Fundamentals
