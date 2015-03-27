@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.png?branch=master)](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics)
+[![Build Status](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.png?branch=master)](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics) [![DOI](https://zenodo.org/badge/11339/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.svg)](http://dx.doi.org/10.5281/zenodo.16419)
 
 An Introduction To Applied Bioinformatics
 =========================================
