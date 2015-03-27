@@ -33,28 +33,33 @@ To browse the book, [start here](http://nbviewer.ipython.org/github/gregcaporaso
 2. Applications
   1. Studying biological diversity
 
-How to read the book
---------------------
+How to use *An Introduction To Applied Bioinformatics*
+------------------------------------------------------
 
-There are two ways to read *An Introduction To Applied Bioinformatics*:
+There are two ways to use *An Introduction To Applied Bioinformatics*:
 
-* The *recommended* way to read the book is to download and run the IPython notebooks interactively. You can do this by cloning the GitHub repository, installing the package and its dependencies, and running the notebooks interactively. Instructions for doing this are provided below in the **Installation** section.
+* The *recommended* way is to install it and work with it interactively. See the instructions below.
 
-* The *easiest* way to read the book is to view the static notebooks online using [nbviewer](http://nbviewer.ipython.org/). You should [start here](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/Index.ipynb).
+* The *easiest* way is to view the static notebooks online using [nbviewer](http://nbviewer.ipython.org/). You should:
+ * [start here to view the latest release version](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/0.1.0/Index.ipynb), or
+ * [start here to view the development version](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/Index.ipynb) (which will have the latest content, but will be less polished and possibly buggy).
 
 If you're new to using IPython or the IPython Notebook, you can find more information at the [IPython website](http://www.ipython.org/), [IPython Notebook website](http://ipython.org/notebook), and the [IPython Notebook example gallery](https://github.com/ipython/ipython/wiki/A-gallery-of-interesting-IPython-Notebooks).
 
 Installation
 ------------
 
-If you're going to read the book interactively (recommended), you'll need to clone this repository, install some dependencies, and launch the IPython Notebook. For example, the following commands should work for Linux and Mac OS X users:
+If you're going to read *An Introduction to Applied Bioinformatics* interactively (recommended), you'll need to install it. The following commands should work for Linux and Mac OS X users:
 
     pip install numpy
-    pip install https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/master.zip
+    wget https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/0.1.0.tar.gz
+    tar -xzf 0.1.0.tar.gz
+    cd An-Introduction-To-Applied-Bioinformatics-0.1.0
+    pip install .
 
-Finally, launch the IPython Notebook to get started (be sure that you're in the ``An-Introduction-To-Applied-Bioinformatics`` directory when you run this command):
+Then, launch the IPython Notebook to get started (be sure that you're in the ``An-Introduction-To-Applied-Bioinformatics`` directory when you run this command):
 
-    ipython notebook --pylab inline Index.ipynb
+    ipython notebook Index.ipynb
 
 That's it!
 
