@@ -2,7 +2,7 @@
 # from https://github.com/biocore/scikit-bio/blob/master/.travis.yml
 language: python
 python:
-  - "2.7"
+  - "3.4"
 before_install:
   - wget http://repo.continuum.io/miniconda/Miniconda-2.2.2-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
