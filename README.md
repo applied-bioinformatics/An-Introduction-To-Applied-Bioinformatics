@@ -72,7 +72,10 @@ See the repository's [contributors page](https://github.com/gregcaporaso/An-Intr
 
 Acknowledgements
 ----------------
-Development of *An Introduction to Applied Bioinformatics* was supported in part by [Arizona's Technology and Research Initiative Fund](http://nau.edu/Research/Funding/Technology-Research-Initiative-Fund/). The style of the project was inspired by [Bayesian Methods for Hackers](http://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/).
+
+<div style="float: right; margin-left: 30px;"><a href="http://www.sloan.org"><img title="Logo by @gregcaporaso." style="float: right;margin-left: 30px;" src="http://www.sloan.org/fileadmin/media/images/logos/SloanLogo-primary-black.png" align=right></a></div>
+
+*An Introduction to Applied Bioinformatics* is funded in part by the [Alfred P. Sloan Foundation](www.sloan.org). Initial prototyping was funded by [Arizona's Technology and Research Initiative Fund](http://nau.edu/Research/Funding/Technology-Research-Initiative-Fund/). The style of the project was inspired by [Bayesian Methods for Hackers](http://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/).
 
 I want to thank the [IPython Developers](https://github.com/ipython/ipython/graphs/contributors) for all of their work on the [IPython Notebook](http://www.ipython.org/notebook), as well as the [QIIME developers](https://github.com/biocore/qiime/graphs/contributors) and [scikit-bio developers](https://github.com/biocore/scikit-bio/graphs/contributors) for the countless discussions over the years that helped me develop my understanding of the material presented here. This project wouldn't be possible without all of you, and I look forward to many more years of productive, fun and exciting work together!
 
