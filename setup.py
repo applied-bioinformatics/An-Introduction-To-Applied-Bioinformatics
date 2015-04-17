@@ -48,5 +48,5 @@ setup(name='An-Introduction-To-Applied-Bioinformatics',
                         'seaborn >= 0.5.1, < 0.6.0',
                         'qiime-default-reference >= 0.1.1, < 0.2.0',
                         'pandas >= 0.15.0, < 0.16.0',
-                        'markdown2 >= 2.3.0],
+                        'markdown2 >= 2.3.0'],
       classifiers=classifiers)
