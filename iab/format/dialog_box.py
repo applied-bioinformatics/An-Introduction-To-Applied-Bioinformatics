@@ -2,7 +2,7 @@ import markdown2
 from IPython.display import HTML
 
 
-def make_box(section_text='', header_background='none',
+def make_box(section_text='', header_background_color='none',
              header_text='', header_text_color='none',
              icon='', section_background_color='none',
              section_text_color='none', style=''):
@@ -17,7 +17,7 @@ def make_box(section_text='', header_background='none',
     section_text : str
         The text that will be displayed in the main section of the dialog
         box
-    header_background : str
+    header_background_color : str
         The color of the header background.
     header_text : str
         The text to be displayed in the header.
@@ -44,7 +44,7 @@ def make_box(section_text='', header_background='none',
     --------
     >>> from iab.format.dialog_box import make_box
     >>> make_box('foo',
-                 header_background='#000',
+                 header_background_color='#000',
                  header_text='Developer Note',
                  header_text_color='#76EE00',
                  icon="<i style='font-weight:bold'class='fa fa-terminal'></i>",
@@ -82,7 +82,7 @@ def make_box(section_text='', header_background='none',
     }
 
     .messageBox.%(style)s header {
-        background-color:%(header_background)s;
+        background-color:%(header_background_color)s;
         color:%(header_text_color)s;
     }
 
@@ -107,7 +107,7 @@ def make_box(section_text='', header_background='none',
 
     </div>
     """ % {"style": style,
-           "header_background": header_background,
+           "header_background_color": header_background_color,
            "header_text_color": header_text_color,
            "section_background_color": section_background_color,
            "section_text_color": section_text_color,
@@ -118,7 +118,7 @@ def make_box(section_text='', header_background='none',
 
 def link(section_text):
     return make_box(section_text=section_text,
-                    header_background='dodgerblue',
+                    header_background_color='dodgerblue',
                     header_text='Additional Resources',
                     header_text_color='#fff',
                     icon='<i class="fa fa-link"></i>',
@@ -129,7 +129,7 @@ def link(section_text):
 
 def warning(section_text):
     return make_box(section_text=section_text,
-                    header_background='#FFCC00',
+                    header_background_color='#FFCC00',
                     header_text='Warning!',
                     header_text_color='darkred',
                     icon='<i class="fa fa-exclamation-triangle"></i>',
@@ -140,7 +140,7 @@ def warning(section_text):
 
 def additional_info(section_text):
     return make_box(section_text=section_text,
-                    header_background='#590059',
+                    header_background_color='#590059',
                     header_text='Additional Information',
                     header_text_color='#fff',
                     icon='<i class="fa fa-info-circle"></i></i>',
@@ -151,7 +151,7 @@ def additional_info(section_text):
 
 def developer_note(section_text):
     return make_box(section_text=section_text,
-                    header_background='#000',
+                    header_background_color='#000',
                     header_text='Developer Note',
                     header_text_color='#76EE00',
                     icon="""<i style="font-weight:bold"
