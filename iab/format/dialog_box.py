@@ -43,14 +43,15 @@ def make_box(section_text='', header_background_color='none',
     Examples
     --------
     >>> from iab.format.dialog_box import make_box
-    >>> make_box('foo',
-                 header_background_color='#000',
-                 header_text='Developer Note',
-                 header_text_color='#76EE00',
-                 icon="<i style='font-weight:bold'class='fa fa-terminal'></i>",
-                 section_background_color='#e5e5e5',
-                 section_text_color='#000',
-                 style='developer_note')
+    >>> make_box('foo',\
+                 header_background_color='#000',\
+                 header_text='Developer Note',\
+                 header_text_color='#76EE00',\
+                 icon="<i style='font-weight:bold'class\
+                 ='fa fa-terminal'></i>",\
+                 section_background_color='#e5e5e5',\
+                 section_text_color='#000',\
+                 style='developer_note')\
     <IPython.core.display.HTML object>
 
     .. shownumpydoc
