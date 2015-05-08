@@ -54,7 +54,6 @@ def make_box(section_text='', header_background_color='none',
                  style='developer_note')
     <IPython.core.display.HTML object>
 
-    .. shownumpydoc
 
     """
     return HTML("""
