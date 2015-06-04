@@ -215,7 +215,7 @@ def nw_traceback(traceback_matrix,nw_matrix,seq1,seq2,gap_character='-'):
         elif current_value == None:
             break
         else:
-            raise ValueError, "Invalid value in traceback matrix: %s" % current_value
+            raise ValueError("Invalid value in traceback matrix: %s" % current_value)
 
     return ''.join(aligned_seq1[::-1]), ''.join(aligned_seq2[::-1]), best_score
 
@@ -329,7 +329,7 @@ def sw_traceback(traceback_matrix,sw_matrix,seq1,seq2,gap_character='-'):
         elif current_value == None:
             break
         else:
-            raise ValueError, "Invalid value in traceback matrix: %s" % current_value
+            raise ValueError("Invalid value in traceback matrix: %s" % current_value)
 
     return ''.join(aligned_seq1[::-1]), ''.join(aligned_seq2[::-1]), best_score, current_col, current_row
 
@@ -376,7 +376,7 @@ def sw_multiple_traceback(traceback_matrix,sw_matrix,seq1,seq2,gap_character='-'
             elif current_value == None:
                 break
             else:
-                raise ValueError, "Invalid value in traceback matrix: %s" % current_value
+                raise ValueError("Invalid value in traceback matrix: %s" % current_value)
         results.append((''.join(aligned_seq1[::-1]), ''.join(aligned_seq2[::-1]), current_score, current_col, current_row))
 
     return results
@@ -424,7 +424,8 @@ def generate_sw_and_traceback_matrices_affine_gap(seq1, seq2, gap_open_penalty, 
             else:
                 # gap open, because the cell to the left was not a gap
                 left_score = (current_row[-1] - gap_open_penalty,'-')
-            best_score = max(diag_score,up_score,left_score,new_alignment_score)
+            scores = [diag_score,up_score,left_score,new_alignment_score]
+            best_score = max(scores, key=lambda x: x[0])
             current_row.append(best_score[0])
             current_traceback_matrix_row.append(best_score[1])
         # append the current row to the matrix
@@ -480,9 +481,9 @@ def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
        >>> s1 = "GCGTGCCTAAGGTATGCAAG"
        >>> s2 = "ACGTGCCTAGGTACGCAAG"
        >>> a1, a2, score, a1_start, a2_start = sw_align_affine_gap_nt(s1, s2)
-       >>> print a1
+       >>> print(a1)
        CGTGCCTAAGGTATGCAAG
-       >>> print a2
+       >>> print(a2)
        CGTGCCT-AGGTACGCAAG
 
     """
