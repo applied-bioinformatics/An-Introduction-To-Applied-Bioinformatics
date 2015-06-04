@@ -1,9 +1,8 @@
-[![Build Status](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.png?branch=master)](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics) [![DOI](https://zenodo.org/badge/11339/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.svg)](http://dx.doi.org/10.5281/zenodo.16419)
-[![Join the chat at https://gitter.im/gregcaporaso/An-Introduction-To-Applied-Bioinformatics](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gregcaporaso/An-Introduction-To-Applied-Bioinformatics?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 An Introduction To Applied Bioinformatics
 =========================================
 
+[![Build Status](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.png?branch=master)](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics) [![DOI](https://zenodo.org/badge/11339/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.svg)](http://dx.doi.org/10.5281/zenodo.16419)
+[![Join the chat at https://gitter.im/gregcaporaso/An-Introduction-To-Applied-Bioinformatics](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gregcaporaso/An-Introduction-To-Applied-Bioinformatics?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 <div style="float: right; margin-left: 30px;"><img title="Logo by @gregcaporaso." style="float: right;margin-left: 30px;" src="https://raw.github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/images/logo.png" align=right height=300/></div>
 
