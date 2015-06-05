@@ -7,7 +7,7 @@
 # http://creativecommons.org/licenses/by-nc-sa/4.0/.
 # -----------------------------------------------------------------------------
 from __future__ import division
-from StringIO import StringIO
+from io import StringIO
 
 import pandas as pd
 from skbio import DistanceMatrix

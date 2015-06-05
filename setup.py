@@ -22,7 +22,7 @@ classes = """
     Operating System :: POSIX
     Operating System :: Unix
     Programming Language :: Python
-    Programming Language :: Python :: 2.7
+    Programming Language :: Python :: 3.4
     Topic :: Scientific/Engineering
     Topic :: Scientific/Engineering :: Bio-Informatics
 """
@@ -45,7 +45,7 @@ setup(name='An-Introduction-To-Applied-Bioinformatics',
       install_requires=['scikit-bio >= 0.2.3, < 0.3.0',
                         'ipython[all] >= 3.0.0, < 4.0.0',
                         'runipy', 'seaborn >= 0.5.1, < 0.6.0',
-                        'qiime-default-reference >= 0.1.1, < 0.2.0',
+                        'qiime-default-reference >= 0.1.3, < 0.2.0',
                         'pandas >= 0.15.0, < 0.16.0',
                         'markdown2 >= 2.3.0',
                         'networkx >= 1.9.1, < 2.0.0'],

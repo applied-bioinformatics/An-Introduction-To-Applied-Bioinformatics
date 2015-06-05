@@ -89,12 +89,20 @@ def format_dynamic_programming_matrix(seq1, seq2, matrix, cell_width=6):
     cell_format = "%" + str(cell_width) + "s"
     line_format = cell_format * (len(seq1) + 2)
     # print seq1 (start the line with two empty strings)
-    lines.append(line_format % tuple([' ',' '] + map(str,list(seq1))))
+    lines.append(line_format % tuple([' ',' '] + [str(s) for s in list(seq1)]))
 
     # iterate over the rows and print each (starting with the
     # corresponding base in sequence2)
     for row, base in zip(matrix,' ' + seq2):
-        lines.append(line_format % tuple([base] + map(str,row)))
+        row_list = [base]
+        for s in row:
+            if isinstance(s, np.float):
+                s = str(s)
+            else:
+                s = s.decode('ascii')
+            row_list.append(s)
+        line = line_format % tuple(row_list)
+        lines.append(line)
 
     return '\n'.join(lines)
 
@@ -177,7 +185,7 @@ def generate_nw_and_traceback_matrices(seq1,seq2,gap_penalty,substitution_matrix
             diag_score = (nw_matrix[i-1][j-1] + substitution_score,'\\')
             up_score = (nw_matrix[i-1][j] - gap_penalty,'|')
             left_score = (current_row[-1] - gap_penalty,'-')
-            best_score = max(diag_score,up_score,left_score)
+            best_score = max_score_tuple(diag_score, up_score, left_score)
             current_row.append(best_score[0])
             current_traceback_matrix_row.append(best_score[1])
         # append the current row to the matrix
@@ -215,7 +223,7 @@ def nw_traceback(traceback_matrix,nw_matrix,seq1,seq2,gap_character='-'):
         elif current_value == None:
             break
         else:
-            raise ValueError, "Invalid value in traceback matrix: %s" % current_value
+            raise ValueError("Invalid value in traceback matrix: %s" % current_value)
 
     return ''.join(aligned_seq1[::-1]), ''.join(aligned_seq2[::-1]), best_score
 
@@ -285,7 +293,8 @@ def generate_sw_and_traceback_matrices(seq1,seq2,gap_penalty,substitution_matrix
             diag_score = (sw_matrix[i-1][j-1] + substitution_score,'\\')
             up_score = (sw_matrix[i-1][j] - gap_penalty,'|')
             left_score = (current_row[-1] - gap_penalty,'-')
-            best_score = max(diag_score,up_score,left_score,new_alignment_score)
+            best_score = max_score_tuple(diag_score, up_score, left_score,
+                                         new_alignment_score)
             current_row.append(best_score[0])
             current_traceback_matrix_row.append(best_score[1])
         # append the current row to the matrix
@@ -329,7 +338,7 @@ def sw_traceback(traceback_matrix,sw_matrix,seq1,seq2,gap_character='-'):
         elif current_value == None:
             break
         else:
-            raise ValueError, "Invalid value in traceback matrix: %s" % current_value
+            raise ValueError("Invalid value in traceback matrix: %s" % current_value)
 
     return ''.join(aligned_seq1[::-1]), ''.join(aligned_seq2[::-1]), best_score, current_col, current_row
 
@@ -376,7 +385,7 @@ def sw_multiple_traceback(traceback_matrix,sw_matrix,seq1,seq2,gap_character='-'
             elif current_value == None:
                 break
             else:
-                raise ValueError, "Invalid value in traceback matrix: %s" % current_value
+                raise ValueError("Invalid value in traceback matrix: %s" % current_value)
         results.append((''.join(aligned_seq1[::-1]), ''.join(aligned_seq2[::-1]), current_score, current_col, current_row))
 
     return results
@@ -424,13 +433,17 @@ def generate_sw_and_traceback_matrices_affine_gap(seq1, seq2, gap_open_penalty, 
             else:
                 # gap open, because the cell to the left was not a gap
                 left_score = (current_row[-1] - gap_open_penalty,'-')
-            best_score = max(diag_score,up_score,left_score,new_alignment_score)
+            best_score = max_score_tuple(diag_score, up_score, left_score,
+                                         new_alignment_score)
             current_row.append(best_score[0])
             current_traceback_matrix_row.append(best_score[1])
         # append the current row to the matrix
         sw_matrix.append(current_row)
         traceback_matrix.append(current_traceback_matrix_row)
     return sw_matrix, traceback_matrix
+
+def max_score_tuple(*scores):
+    return max(scores, key=lambda x: x[0])
 
 def sw_align_affine_gap(sequence1, sequence2, gap_open_penalty, gap_extend_penalty, substitution_matrix):
     sw_matrix, traceback_matrix = generate_sw_and_traceback_matrices_affine_gap(sequence1,
@@ -480,9 +493,9 @@ def sw_align_affine_gap_nt(sequence1, sequence2, gap_open_penalty=5,
        >>> s1 = "GCGTGCCTAAGGTATGCAAG"
        >>> s2 = "ACGTGCCTAGGTACGCAAG"
        >>> a1, a2, score, a1_start, a2_start = sw_align_affine_gap_nt(s1, s2)
-       >>> print a1
+       >>> print(a1)
        CGTGCCTAAGGTATGCAAG
-       >>> print a2
+       >>> print(a2)
        CGTGCCT-AGGTACGCAAG
 
     """
