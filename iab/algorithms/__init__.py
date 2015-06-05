@@ -89,12 +89,20 @@ def format_dynamic_programming_matrix(seq1, seq2, matrix, cell_width=6):
     cell_format = "%" + str(cell_width) + "s"
     line_format = cell_format * (len(seq1) + 2)
     # print seq1 (start the line with two empty strings)
-    lines.append(line_format % tuple([' ',' '] + map(str,list(seq1))))
+    lines.append(line_format % tuple([' ',' '] + [str(s) for s in list(seq1)]))
 
     # iterate over the rows and print each (starting with the
     # corresponding base in sequence2)
     for row, base in zip(matrix,' ' + seq2):
-        lines.append(line_format % tuple([base] + map(str,row)))
+        row_list = [base]
+        for s in row:
+            if isinstance(s, np.float):
+                s = str(s)
+            else:
+                s = s.decode('ascii')
+            row_list.append(s)
+        line = line_format % tuple(row_list)
+        lines.append(line)
 
     return '\n'.join(lines)
 
