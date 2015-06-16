@@ -1,7 +1,7 @@
 
 **NOTE**: This chapter is very basic at this stage, and needs work on text and content. It is slated for expansion. In the meantime, if you're looking for extra information on this topic I recommend [Chapter 27 of *Evolution*](http://evolution-textbook.org/content/free/contents/ch27.html) (free), and [*Inferring Phylogeny* by Felsenstein](http://www.amazon.com/Inferring-Phylogenies-Joseph-Felsenstein/dp/0878931775/ref=sr_1_1?s=books&ie=UTF8&qid=1397401191&sr=1-1&keywords=inferring+phylogenies). You can add suggestions for content, note issues, and follow progress on it updates, in [issue #25](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/25).
 
-# Phylogenetic reconstruction
+# Phylogenetic reconstruction <link src='adb2e7'/> 
 
 What: 
 
@@ -19,7 +19,7 @@ By comparing traits of extant organisms. In our case, traits are columns in a mu
 
 UPGMA is a heirarchical clustering algorithm. It is widely used, though it's application in phylogenetics is usually restricted to building preliminary trees to "guide" the process of multiple sequence alignment, as it makes some assumptions that don't work well for inferring relationships between organsims. We're going to start with it here however for a few reasons. First, the underlying math is very basic, so we don't need to assume anything about your background. Second, there are some other applications of UPGMA that we'll explore later, including grouping samples based on their species compositions. In general, my strategy with teaching this material is to start by giving you a basic introdution into how a process works so you can visualize and do it. From there, we can get more complex.
 
-## Some terminology
+## Some terminology <link src='7bde92'/> 
 
 Here's the goal (well, *a* goal, but this is the basic idea):
 
@@ -65,7 +65,7 @@ Because of the massive number of possible trees for any reasonable number of seq
 2. Scale to trees for many OTUs (how well they scale depends on the method, and there is a lot of variability)
 3. Often provide a single tree, so do not include information on how likely other tree topologies are (we’ll talk about methods, such as bootstrapping, to address this). 
 
-## Distances and distance matrices
+## Distances and distance matrices <link src='c11a4e'/> 
 
 Computing a UPGMA tree for a group of sequences relies on first computing *distances* between each pair of those sequences. A *distance*, in this sense, is a technical term. It's a measure of dissimilarity between two items, `x` and `y`, which meets a few criteria:
 
@@ -145,7 +145,7 @@ One feature that this gets us is nicer printing.
 
 The conditions of a distance matrix listed above lead to a few specific features: the distance matrix is symmetric (if you flip the upper triangle over the diagonal, the values are the same as those in the lower triangle), the distance matrix is *hollow* (the diagonal is all zeros), and there are no negative values. 
 
-## Computing the distance between pairs of sequences.
+## Computing the distance between pairs of sequences. <link src='9d757a'/> 
 
 Most often, distances between pairs of sequences are derived from a multiple sequence alignment. These differ from the pairwise alignments that we’ve looked at thus far, but use the same underlying algorithms (and we'll be coming back to this in the next chapeter).
 
@@ -178,7 +178,7 @@ Once we have these distances, we can cluster the sequences based on their simili
 >>> print(master_dm)
 ```
 
-## Hierarchical clustering with UPGMA
+## Hierarchical clustering with UPGMA <link src='73d028'/> 
 
 Unweighted Pair-Group Method with Arithmetic mean
 
@@ -335,7 +335,7 @@ Step 3.4: At this stage, there is only one distance below the diagonal in our di
 >>>                link_color_func=lambda x: 'black')
 ```
 
-## Acknowledgements
+## Acknowledgements <link src='99ad11'/> 
 
 The material in this section was compiled while consulting the following sources:
 

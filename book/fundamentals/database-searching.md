@@ -1,5 +1,5 @@
 
-# Finding the best local alignment in a database
+# Finding the best local alignment in a database <link src='d22e6b'/> 
 
 The next idea we'll explore is database searching. In this context, what that means is that **we have some *query* sequence, and we want to know which *reference* sequence in a database it is most similar to**. This could be achieved in a few ways. It could be implemented with local alignment by representing the database as one long sequnence (if we build some functionality to support that into the algorithm), or with local or global alignment (depending on your application) by running our align function many times to search one *query* sequence against many *reference* sequences in the database. 
 
@@ -111,7 +111,7 @@ In the next cell, I took a shorter exact match from `query1`. What is the effect
 >>> print("Runtime: %1.4f sec" % (stop_time - start_time))
 ```
 
-## Using heuristics to reduce runtime for database searches
+## Using heuristics to reduce runtime for database searches <link src='0f9232'/> 
 
 **As illustrated above, runtimes for performing pairwise alignments can be prohibitive for database searching.** The Smith-Waterman implementation we're using here, [SSW](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0082138), is very fast. As we covered in the prvious chapter, if we were to create an even faster implementation, that provide some initial help (it'd reduce our runtime by some factor $f$) but ultimately, we're still going to have a problem regardless of how big $f$ is, because **the runtime of the algorithm scales quadratically with sequence lengths**. Experiment with different values of $f$ to see how it changes the curve below. 
 
@@ -249,7 +249,7 @@ So this is looking a little better. It doesn't get our runtime quite as low, but
 
 **TODO**: Port k-mer composition comparison code from [multiple sequence alignment notebook](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/4-multiple-sequence-alignment.ipynb) to look at a third heuristic.
 
-## Is my alignment "good"? Determining whether an alignment is statistically significant.
+## Is my alignment "good"? Determining whether an alignment is statistically significant. <link src='87c92f'/> 
 
 You may have noticed that the score you get back for an alignment isn't extremely informative. It's dependent on the query and reference sequence lengths (and possibly composition, depending on your substitution matrix). An important question then is: **is my alignment score good?**
 

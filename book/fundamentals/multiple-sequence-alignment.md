@@ -1,5 +1,5 @@
 
-# Generalized dynamic programming for multiple sequence alignment
+# Generalized dynamic programming for multiple sequence alignment <link src='737114'/> 
 
 It's possible to generalize Smith-Waterman and Needleman-Wunsch, the dynamic programming algorithms that we explored for pairwise sequence aligment, to identify the optimal alignment of more than two sequences. Remember that our scoring scheme for pairwise alignment with Smith-Waterman looked like the following:
 
@@ -94,7 +94,7 @@ We clearly have a problem here, and that is that **the runtime for multiple sequ
 
 As we explored with database searching, we need to figure out how to align fewer sequences. This is where *progressive alignment* comes in.
 
-# Progressive alignment
+# Progressive alignment <link src='aa5e0a'/> 
 
 <div style="float: right; margin-left: 30px;"><img title="Image by @gregcaporaso." style="float: right; margin-left: 30px;" src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/fundamentals/images/confusion.png" align=right width=330/></div>
 
@@ -129,7 +129,7 @@ And finally, we can compute the alignment at the root node of the tree, by align
 
 **The alignment at the root node is our multiple sequence alignment.**
 
-## Building the guide tree
+## Building the guide tree <link src='2d97eb'/> 
 
 Let's address the first of our outstanding questions. **I mentioned above that *we need an alignment to build a good tree*. The key word here is *good*. We can build a very rough tree - one that we would never want to present as representing the actual relationships between the sequences in question - without first aligning the sequences.** Remember that building a UPGMA tree requires only a distance matrix, so if we can find a non-alignment-dependent way to compute distances between the sequences, we can build a rough UPGMA tree from them.
 
@@ -234,7 +234,7 @@ We can next use some functionality from SciPy to cluster the sequences with UPGM
 
 We now have a guide tree, so we can move on to the next step of progressive alignment.
 
-## Generalization of Needleman-Wunsch (with affine gap scoring) for progressive multiple sequence alignment
+## Generalization of Needleman-Wunsch (with affine gap scoring) for progressive multiple sequence alignment <link src='e6484e'/> 
 
 Next, we'll address our second burning question: aligning alignments. As illustrated above, there are basically three different types of pairwise alignment we need to support for progressive multiple sequenence alignment with Needleman-Wunsch. These are:
 
@@ -323,7 +323,7 @@ And then align that alignment against our previous alignment:
 >>> print(aln3)
 ```
 
-## Putting it all together: progressive multiple sequence alignment
+## Putting it all together: progressive multiple sequence alignment <link src='082f33'/> 
 
 We can now combine all of these steps to take a set of query sequences, build a guide tree, perform progressive multiple sequence alignment, and return the guide tree (as a SciPy linkage matrix) and the alignment. 
 
@@ -383,7 +383,7 @@ And we can wrap this all up in a single convenience function:
 >>> msa, tree = progressive_msa_and_tree(query_sequences, pairwise_aligner=global_pairwise_align_nucleotide, display_tree=True, display_aln=True)
 ```
 
-# Progressive alignment versus iterative alignment
+# Progressive alignment versus iterative alignment <link src='7319bd'/> 
 
 In an iterative alignment, the output tree from the above progressive alignment is used as a guide tree, and the full process repeated. This is performed to reduce errors that result from a low-quality guide tree. 
 

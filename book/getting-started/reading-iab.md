@@ -1,5 +1,5 @@
 
-# Reading *An Introduction to Applied Bioinformatics*
+# Reading *An Introduction to Applied Bioinformatics* <link src='74cadb'/> 
 
 **Bioinformatics, as I see it, is the application of the tools of computer science (things like programming languages, algorithms, and databases) to address biological problems (for example, inferring the evolutionary relationship between a group of organisms based on fragments of their genomes, or understanding if or how the community of microorganisms that live in my gut changes if I modify my diet).** Bioinformatics is a rapidly growing field, largely in response to the vast increase in the quantity of data that biologists now grapple with. Students from varied disciplines (e.g., biology, computer science, statistics, and biochemistry) and stages of their educational careers (undergraduate, graduate, or postdoctoral) are becoming interested in bioinformatics.
 
@@ -19,7 +19,7 @@ We are in the process of developing a **project status page** that will detail t
 
 I hope you find IAB useful, and that you enjoy reading it!
 
-## Who should read IAB?
+## Who should read IAB? <link src='976b11'/> 
 
 IAB is written for scientists, software developers, and students interested in understanding and applying bioinformatics methods, and ultimately in developing their own bioinformatics analysis pipelines or softare. 
 
@@ -27,7 +27,7 @@ IAB was initially developed for an undergraduate course cross-listed in computer
 
 In the *Getting started with...* sections below I provide some suggestions for other texts that will help you to get started.
 
-## How to read IAB
+## How to read IAB <link src='de1bc2'/> 
 
 There are two ways to read *An Introduction To Applied Bioinformatics*:
 
@@ -38,11 +38,11 @@ There are two ways to read *An Introduction To Applied Bioinformatics*:
  
 IAB is split into four different sections: *Getting started*, *Fundamentals*, *Applications*, and *Wrapping up*. You should start reading IAB by working through the *Getting started* and *Fundamentals* chapters in order. You should then read the *Applications* chapters and *Wrapping up* in any order, based on your own interest.
 
-## Installation
+## Installation <link src='96d24f'/> 
 
 The [project website](http://caporasolab.us/An-Introduction-To-Applied-Bioinformatics/) has instructions installing and running *An Introduction To Applied Bioinformatics*.
 
-## Using the IPython Notebook
+## Using the IPython Notebook <link src='fdf5dd'/> 
 
 IAB is built using the IPython Notebook, an interactive HTML-based computing environment. The main source for information about the IPython Notebook is the [IPython Notebook website](http://ipython.org/notebook). You can find information there on how to use the IPython Notebook, and also on how to set up and run and IPython Notebook server (for example, if you'd like to make one available to your students).
 
@@ -73,7 +73,7 @@ We'll inspect a lot of source code in IAB as we explore bioinformatics algorithm
 
 The documentation for scikit-bio is also very extensive (though the package itself is still in early development). You can view the documentation for the `Alignment` object, for example, [here](http://scikit-bio.org/docs/0.2.3/generated/skbio.alignment.Alignment.html). These documents will be invaluable for learning how to use the objects.
 
-## Getting started with Biology
+## Getting started with Biology <link src='cf88ac'/> 
 
 If you're new to biology, these are some books and resources that will help you get started.
 
@@ -85,7 +85,7 @@ If you're new to biology, these are some books and resources that will help you 
 
 * The [NIH Bookshelf](http://www.ncbi.nlm.nih.gov/books/) A lot of free biology texts, some obviously better than others.
 
-## Getting started with Computer Science and programming
+## Getting started with Computer Science and programming <link src='6ad7e1'/> 
 
 If you're new to Computer Science and programming, these are some books and resources that will help you get started.
 
@@ -97,15 +97,15 @@ If you're new to Computer Science and programming, these are some books and reso
 
 * [Learn Python the Hard Way](http://learnpythonthehardway.org/) by Zed Shaw. *Another good python introduction. This one is very focused on exercises and is great for practicing python. My students have complained that it doesn't provide enough background information (i.e., `what` you're doing and `why` it works) and for that reason I recommend using this in conjunction with `Practical Programming`. Beware that the two don't follow each other exactly. One strategy that some students use is to work through these exercises in order and use `Practical Programming` as a reference.*
 
-## Need help?
+## Need help? <link src='da2930'/> 
 
 If you're having issues getting *An Introduction to Applied Bioinformatics* running on your computer, or you have corrections or suggestions on the content, you should get in touch through the [IAB issue tracker](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues). This will generally be much faster than e-mailing the author directly, as there are multiple people who monitor the issue tracker. It also helps us manage our technical support load if we can consolidate all requests and responses in one place.
 
-## Contributing to IAB
+## Contributing to IAB <link src='b1c06a'/> 
 
 If you're interested in contributing content or features to IAB, I'd love to hear from you. You should start by reviewing [CONTRIBUTING.md](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/CONTRIBUTING.md) which provides guidelines on how to get involved.
 
-## About the author
+## About the author <link src='fedd13'/> 
 
 My name is Greg Caporaso. I'm the primary author of *An Introduction to Applied Bioinformatics*, but there are [other contributors](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/graphs/contributors) and I hope that list will grow. 
 

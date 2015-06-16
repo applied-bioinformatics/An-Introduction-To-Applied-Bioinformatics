@@ -1,7 +1,7 @@
 
-# Studying Biological Diversity
+# Studying Biological Diversity <link src='2bb2cf'/> 
 
-## Getting started: the sample by observation count/frequency table
+## Getting started: the sample by observation count/frequency table <link src='23ef6e'/> 
 
 From a bioinformatics perspective, studying biological diversity is centered around a few key pieces of information:
 
@@ -44,7 +44,7 @@ If we want the observation count vector for sample `A` from the above table, we 
 
 Before we start looking at what we can do with this data once we have it, let's discuss some terminology.
 
-## Terminology
+## Terminology <link src='e67fbb'/> 
 
 There are literally hundreds of metrics of biological diversity. Here is some terminology that is useful for classifying these metrics. 
 
@@ -65,7 +65,7 @@ There are literally hundreds of metrics of biological diversity. Here is some te
 
 In the next sections we'll look at some metrics that cross these different categories. As new metrics are introduced, try to classify each them into one class for each of the above three categories.
 
-## Measuring alpha diversity
+## Measuring alpha diversity <link src='200e93'/> 
 
 The first type of metric that we'll look at will be alpha diversity, and we'll specifically focus on *richness* here. Richness refers to how many different *types* of organisms are present in a sample: for example, if we're interested in species richness of plants in the Sonoran Desert and the Costa Rican rainforest, we could go to each, count the number of different species of plants that we observe, and have a basic measure of species richness in each environment. 
 
@@ -73,7 +73,7 @@ An alternative type of alpha diversity measure would be *evenness*, and would te
 
 Let's look at two metrics of alpha diversity: observed species, and phylogenetic diversity.
 
-#### Observed species (or Observed OTUs)
+#### Observed species (or Observed OTUs) <link src='e3f5c8'/> 
 
 Observed species, or Observed OTUs as it's more accurately described, is about as simple of a metric as can be used to quantify alpha diversity. With this metric, we simply count the OTUs that are observed in a given sample. Note that this is a qualitative metric: we treat each OTU as being observed or not observed - we don't care how many times it was observed.
 
@@ -115,7 +115,7 @@ We could compute this in python as follows:
 >>> print(observed_otus(table2, 'C'))
 ```
 
-#### A limitation of OTU counting
+#### A limitation of OTU counting <link src='a3bd5f'/> 
 
 Imagine now that we have the same table, but some additional information about the OTUs in the table. Specifically, we've computed the following phylogenetic tree. And, for the sake of illustration, imagine that we've also assigned taxonomy to each of the OTUs and found that our samples contain representatives from the archaea, bacteria, and eukaryotes (their labels begin with `A`, `B`, and `E`, respectively).
 
@@ -127,7 +127,7 @@ Pairing this with the table we defined above (displayed again in the cell below)
 >>> table2
 ```
 
-#### Phylogenetic Diversity (PD)
+#### Phylogenetic Diversity (PD) <link src='c407f8'/> 
 
 Phylogenetic Diversity (PD) is a metric that was developed by Dan Faith in the early 1990s (find the original paper [here](http://www.sciencedirect.com/science/article/pii/0006320792912013)). Like many of the measures that are used in microbial community ecology, it wasn't initially designed for studying microbial communities, but rather communities of "macro-organisms" (macrobes?). Some of these metrics, including PD, do translate well to microbial community analysis, while some don't translate as well. (For an illustration of the effect of sequencing error on PD, where it is handled well, versus it's effect on the Chao1 metric, where it is handled less well, see Figure 1 of [Reeder and Knight (2010)](http://www.nature.com/nmeth/journal/v7/n9/full/nmeth0910-668b.html)).
 
@@ -193,7 +193,7 @@ And then apply those to compute the PD of our three samples. For each computatio
 
 How does this result compare to what we observed above with the Observed OTUs metric? Based on your knowledge of biology, which do you think is a better representation of the relative diversities of these samples?
 
-#### Even sampling
+#### Even sampling <link src='2466b2'/> 
 
 Imagine again that we're going out to count plants in the Sonoran Desert and the Costa Rican rainforest. We're interested in getting an idea of the plant richness in each environment. In the Sonoran Desert, we survey a square kilometer area, and count 150 species of plants. In the rainforest, we survey a square meter, and count 15 species of plants. So, clearly the plant species richness in the Sonoran Desert is higher, right? What's wrong with this comparison?
 
@@ -232,13 +232,13 @@ In sequencing-based studies of microorganism richness, the analog of sampling ar
 
 **TODO**: Add alpha rarefaction discussion.
 
-## Measuring beta diversity
+## Measuring beta diversity <link src='cb4608'/> 
 
 $\beta$-diversity (canonically pronounced *beta diversity*) refers to **between sample diversity**, and is typically used to answer questions of the form: is sample $A$ more similar in composition to sample $B$ or sample $C$? In this section we'll explore two (of tens or hundreds) of metrics for computing pairwise dissimilarity of samples to estimate $\beta$ diversity.
 
-### Distance metrics
+### Distance metrics <link src='eac92f'/> 
 
-#### Bray-Curtis
+#### Bray-Curtis <link src='dac934'/> 
 
 The first metric that we'll look at is a quantitative non-phylogenetic $\beta$ diversity metric called Bray-Curtis. The Bray-Curtis dissimilarity between a pair of samples, $j$ and $k$, is defined as follows:
 
@@ -312,7 +312,7 @@ Ultimately, we likely want to apply this to all pairs of samples to get a distan
 >>> print(bc_dm)
 ```
 
-#### Unweighted UniFrac
+#### Unweighted UniFrac <link src='2682aa'/> 
 
 Just as phylogenetic alpha diversity metrics can be more informative than non-phylogenetic alpha diversity metrics, phylogenetic beta diversity metrics offer advantages over non-phylogenetic metrics such as Bray-Curtis. The most widely applied phylogenetic beta diversity metric as of this writing is unweighted UniFrac. UniFrac was initially presented in [Lozupone and Knight, 2005, Applied and Environmental Microbiology](http://aem.asm.org/content/71/12/8228.abstract), and has been widely applied in microbial ecology since (and the illustration of UniFrac computation presented below is derived from a similar example originally developed by Lozupone and Knight).
 
@@ -401,11 +401,11 @@ As an exercise, now compute the UniFrac distances between samples $B$ and $C$, a
 >>> print(unweighted_unifrac(tree1, table1, 'B', 'C'))
 ```
 
-#### Even sampling
+#### Even sampling <link src='200e13'/> 
 
 **TODO**: Add discussion on necessity of even sampling
 
-### Interpreting distance matrices
+### Interpreting distance matrices <link src='2be688'/> 
 
 In the previous section we computed distance matrices that contained the pairwise distances between a few samples. You can look at those distance matrices and get a pretty good feeling for what the patterns are. For example, what are the most similar samples? What are the most dissimilar samples? 
 
@@ -449,7 +449,7 @@ Let's generate a small distance matrix representing just a few of these body sit
 >>> print(human_microbiome_dm)
 ```
 
-#### Distribution plots and comparisons
+#### Distribution plots and comparisons <link src='8fcf92'/> 
 
 First, let's look at the analysis presented in panels E and F. Instead of generating bar plots here, we'll generate box plots as these are more informative (i.e., they provide a more detailed summary of the distribution being investigated). One important thing to notice here is the central role that the sample metadata plays in the visualization. If we just had our sample ids (i.e., letters ``A`` through ``F``) we wouldn't be able to group distances into *within* and *between* sample type categories, and we therefore couldn't perform the comparisons we're interested in.
 
@@ -513,7 +513,7 @@ If we run through these same steps, but base our analysis on a different metadat
 
 Why do you think the distribution of distances between people has such as larger range than the distribution of distances within people in this particular example?
 
-#### Heirarchical clustering
+#### Heirarchical clustering <link src='09f456'/> 
 
 Next, let's look at a hierarchical clustering analysis, similar to that presented in panel G above. Here I'm applying the UPGMA functionality implemented in [scipy](http://www.scipy.org/scipylib/index.html) to generate a tree which we visualize with a dendrogram. However the tips in this tree don't represent sequences or OTUs, like they did when we covered UPGMA in the [Phylogenetic reconstruction chapter](../algorithms/3-phylogeny-reconstruction.ipynb) chapter, but instead they represent samples, and samples with a smaller branch length between them are more similar in composition than samples with a longer branch length between them. (Remember that only horizontal branch length is counted - vertical branch length is just to aid in the organization of the dendrogram.)
 
@@ -538,7 +538,7 @@ Again, we can see how the data really only becomes interpretable in the context 
 >>>                link_color_func=lambda x: 'black')
 ```
 
-### Ordination
+### Ordination <link src='b1cdbe'/> 
 
 Finally, let's look at ordination, similar to that presented in panels A-D. The basic idea behind oridination is dimensionality reduction: we want to take high-dimensionality data (a distance matrix) and represent that in a few (usually two or three) dimensions. As humans, we're very bad at interpreting high dimensionality data directly: with ordination, we can take an $n$-dimensional data set (e.g., a distance matrix of shape $n \times n$, representing the distances between $n$ biological samples) and reduce that to a 2-dimensional scatter plot similar to that presented in panels A-D above. 
 
@@ -546,7 +546,7 @@ Ordination is a technique that is widely applied in ecology and in bioinformatic
 
 An excellent site for learning more about ordination is [Michael W. Palmer's Ordination Methods page](http://ordination.okstate.edu/).
 
-#### Polar ordination
+#### Polar ordination <link src='538e18'/> 
 
 First, let's print our distance matrix again so we have it nearby.
 
@@ -623,7 +623,7 @@ And next we'll color the samples by the person that they're derived from. Notice
 >>> ord_plot = scatter(a1_values, a2_values, s=40, c=person_c)
 ```
 
-#### Determining the most important axes in polar ordination
+#### Determining the most important axes in polar ordination <link src='fb483b'/> 
 
 Generally, you would compute the polar ordination axes for all possible axes. You could then order the axes by which represent the largest differences in sample composition, and the lowest correlation with previous axes. This might look like the following:
 
@@ -658,7 +658,7 @@ So why do we care about axes being uncorrelated? And why do we care about explai
 >>> ord_plot = scatter(data[0][4], data[14][4], s=40, c=c)
 ```
 
-#### Interpreting ordination plots
+#### Interpreting ordination plots <link src='40e0a6'/> 
 
 There are a few points that are important to keep in mind when interpreting ordination plots. Review each one of these in the context of polar ordination to figure out the reason for each.
 
@@ -687,7 +687,7 @@ Some other important features:
 * Most techniques result in uncorrelated axes.
 * Additional axes can be generated (third, fourth, ...)
 
-## Tools for using ordination in practice: scikit-bio, pandas, and matplotlib
+## Tools for using ordination in practice: scikit-bio, pandas, and matplotlib <link src='098854'/> 
 
 As I mentioned above, polar ordination isn't widely used in practice, but the features that it illustrates are common to ordination methods. One of the most widely used ordination methods used to study biological diversity is Principal Coordinates Analysis or PCoA, which is implemented in [scikit-bio](http://scikit-bio.org/)'s [``ordination`` module](http://scikit-bio.org/maths.stats.ordination.html) (among many other packages). 
 
@@ -758,11 +758,11 @@ In the next plot, we'll color the points by the pH of the soil sample they repre
 
 Taken together, these plots and statistics suggest that soil microbial community composition is much more closely associated with pH than it is with latitude: the key result that was presented in [Lauber *et al.* (2009)](http://www.ncbi.nlm.nih.gov/pubmed/19502440). 
 
-## PCoA versus PCA: what's the difference?
+## PCoA versus PCA: what's the difference? <link src='163769'/> 
 
 You may have also heard of a method related to PCoA, called Principal Components Analysis or PCA. There is a key difference between these methods that is important for our useds. PCoA, which is what we've been working with, performs ordination with a distance matrix as input. PCA on the other hand performs ordination with sample by observation count data, such as the OTU tables that we've been working with, as input. It achieves this by computing Euclidean distance (see [here](http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.euclidean.html#scipy.spatial.distance.euclidean)) between the samples and then running PCoA. So, if your distance metric is Euclidean, PCA and PCoA are the same. In practice however, we want to be able to use distance metrics that work better for studying biological diversity, such as Bray-Curtis or UniFrac. Therefore we typically compute distances with whatever metric we want, and then run PCoA. 
 
-## Are two different analysis approaches giving me the same result?
+## Are two different analysis approaches giving me the same result? <link src='371f0d'/> 
 
 A question that comes up frequently, often in method comparison, is whether two different approaches for analyzing some data giving the consistent results. This could come up, for example, if you were comparing DNA sequence data from the same samples generated on the 454 Titanium platform with data generated on the Illumina MiSeq platform to see if you would derive the same biological conclusions based on either platform. This was done, for example, in [Additional Figure 1](http://genomebiology.com/2011/12/5/R50/additional) of [*Moving Pictures of the Human Microbiome*](http://genomebiology.com/content/12/5/R50). Similarly, you might wonder if two different OTU clustering methods or beta diversity metrics would lead you to the same biological conclusion. Let's look at one way that you might address this question.
 
@@ -827,7 +827,7 @@ The way that we'd interpret these results is that, although the plots above look
 
 We could apply this same approach, for example, if we had clustered sequences into OTUs with two different approaches. For example, if we used *de novo* OTU picking and open reference OTU picking, we could compute UniFrac distance matrices based on each resulting BIOM table, and then compare those distance matrices with a Mantel test. This approach was applied in [Rideout et al 2014](https://peerj.com/articles/545/) to determine which OTU clustering methods would result in different biological conclusions being drawn from a data set.
 
-### Procrustes analysis
+### Procrustes analysis <link src='baaa8e'/> 
 
 A related approach, but which I think is less useful as it compares PCoA plots directly (and therefore a summary of the distance data, rather than the distance data itself) is called Procrustes analysis (you can read about the origin of the name [here](http://en.wikipedia.org/wiki/Procrustes)). Procrustes analysis takes two coordinate matrices as input and effectively tries to find the best superimposition of one on top of the other. The transformations that are applies are as follows:
 
@@ -837,10 +837,10 @@ A related approach, but which I think is less useful as it compares PCoA plots d
 
 The output is a pair of *transformed coordinate matrices*, and an $M^{2}$ statistic which represents how dissimilar the coordinate matrices are to each other (so a small $M^{2}$ means that the coordinate matrices, and the plots, are more similar). [Procrustes analysis is implemented in scikit-bio](http://scikit-bio.org/generated/skbio.maths.stats.spatial.procrustes.html).
 
-## Where to go from here
+## Where to go from here <link src='fc527a'/> 
 
 If you're interested in learning more about the topics presented in this chapter, I recommend [Measuring Biological Diversity](http://www.amazon.com/Measuring-Biological-Diversity-Anne-Magurran/dp/0632056339) by Anne E. Magurran, and the [QIIME tutorials](http://qiime.org/tutorials/index.html). The [QIIME software package](http://www.qiime.org) is designed for performing the types of analyses described in this chapter. 
 
-## Acknowledgements
+## Acknowledgements <link src='0d9866'/> 
 
 The majority of content in this section is based on knowledge that I gained through years of working with [Rob Knight](https://knightlab.colorado.edu/) and the rest of the [QIIME](http://qiime.org/) [development group](https://github.com/biocore/qiime/graphs/contributors). Thanks everyone, I'm looking forward to many more years of productive, fun and exciting work together!

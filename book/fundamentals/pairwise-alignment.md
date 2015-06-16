@@ -1,5 +1,5 @@
 
-# Pairwise sequence alignment
+# Pairwise sequence alignment <link src='a76822'/> 
 
 One of the most fundamental problems in bioinformatics is determining how "similar" a pair of biological sequences are. There are many applications for this, including inferring the function or source organism of an unknown gene sequence, developing hypotheses about the relatedness of organisms, or grouping sequences from closely related organisms. On the surface this seems like a pretty straight-forward problem, not one that would have been at the center of decades of research and the subject of [one of the most cited papers](http://scholar.google.com/citations?view_op=view_citation&hl=en&user=VRccPlQAAAAJ&citation_for_view=VRccPlQAAAAJ:u-x6o8ySG0sC) in modern biology. In this chapter we'll explore why determining sequence similarity is harder than it might initially seem, and learn about *pairwise sequence alignment*, the standard approach for determining sequence similarity.
 
@@ -56,7 +56,7 @@ What we've done here is create a pairwise alignment of ``r1`` and ``q3``. In oth
 
 Scanning through these two sequences, we can see that they are largely identical, with the exception of one ``-`` character, and about 25% *substitutions* of one base for another. We refer to ``-`` characters in aligned sequences as **gaps**.
 
-## The problem
+## The problem <link src='e63a4f'/> 
 
 The problem of **pairwise sequence alignment** is, **given two sequences, generate a hypothesis about which bases were derived from a common ancestor**. In other words, we align them to one another inserting gaps as necessary, in a way that maximizes their similarity. 
 
@@ -68,7 +68,7 @@ Sequence alignment is tricky for several reasons:
 
 In the next section we'll work through one algorithm for aligning a pair of sequences. As you work through this exercise, try to make a list of the assumptions that we're making that violate what you know about how sequences evolve. 
 
-## A simple procedure for aligning a pair of sequences
+## A simple procedure for aligning a pair of sequences <link src='86c6b7'/> 
 
 Aligning ``seq1`` and ``seq2`` can be achieved algorithmically in a few steps. First, let's define the sequences that we want to align.
 
@@ -171,7 +171,7 @@ All scoring schemes have limitations, and you should consider alignments that co
 
 Over the next several sections we'll explore ways of addressing each of these complexities. This notebook covers solutions to address the first and second. We'll introduce the problem of the third in this notebook, but save exploring solutions for the next chapter.
 
-## Substitution matrices
+## Substitution matrices <link src='9f5e71'/> 
 
 The first of the limitations we identified above was that all matches and mismatches are scored equally, though we know that that isn't the most biologically meaningful way to score an alignment. We'll next explore a more general approach to the problem of *global sequence alignment* for protein sequences, or aligning a pair of protein sequences from beginning to end. We'll start by defining a **substitution matrix which defines the score associated with substitution of one amino acid for another**.  
 
@@ -206,7 +206,7 @@ Here's a global view of the matrix.
 >>> print(format_matrix(aas, aas, data))
 ```
 
-# Needleman-Wunsch global pairwise sequence alignment
+# Needleman-Wunsch global pairwise sequence alignment <link src='15efc2'/> 
 
 Now let's get started on using this to align a pair of sequences.
 
@@ -378,11 +378,11 @@ You can then execute this as follows, and print out the resulting alignment.
 >>> print(alignment.score())
 ```
 
-## Global versus local alignment
+## Global versus local alignment <link src='c80f21'/> 
 
 The alignment we just constructed is what's known as a *global alignment*, meaning we align both sequences from the beginning through the end. This has some important specific applications: for example, if we have two full-length protein sequences, and we have a crystal structure for one of them, we may want to have a direct mapping between all positions in both sequences. Probably more common however, is local alignment: where we have a pair of sequences that we suspect may partially overlap each other, and we want to know what the best possible alignment of all or part of one sequence is with all or part of the other sequences. Perhaps the most widely used application of this is in the BLAST search algorithm, where we a query sequence and we want to know what the closest match (or matches) are in a reference database containing many different gene sequences. In this case, the whole reference database could be represented as a single sequence, as we could perform a local alignment against it to find the region that contains the highest scoring match. 
 
-## Smith-Waterman local sequence alignment
+## Smith-Waterman local sequence alignment <link src='c9656e'/> 
 
 The Smith-Waterman algorithm is used for performing pairwise local alignment. It is nearly identical to Needleman-Wunsch, with three small important differences. 
 
@@ -501,7 +501,7 @@ And we can take the *convenience function* one step futher, and wrap `sw_align` 
 
 So there you have it: the basics of pairwise sequence alignment, which is easily the most fundamental algorithm in bioinformatics. 
 
-## Smith-Waterman local alignment with affine gap scoring
+## Smith-Waterman local alignment with affine gap scoring <link src='976169'/> 
 
 The second limitation of the our simple alignment algorithm, and one that is also present in our version of Smith-Waterman as implemented above, is that all gaps are scored equally whether they represent the opening of a new insertion/deletion, or the extension of an existing insertion/deletion. This isn't ideal based on what we know about how insertion/deletion events occur (see [this discussion of replication slippage](http://www.ncbi.nlm.nih.gov/books/NBK21114/)). Instead, **we might want to incur a large penalty for opening a gap, but a smaller penalty for extending a gap**. To do this, **we need to make two small changes to our scoring scheme**. When we compute the score for a gap, we should incurr a *gap open penalty* if the previous max score was derived from inserting a gap character in the same sequence. If we represent our traceback matrix as $T$, our gap open penalty as $d^0$, and our gap extend penalty as $d^e$, our scoring scheme would look like the following:
 
@@ -562,7 +562,7 @@ The convenience functions we worked with above all take ``gap_open_penalty`` and
 >>> print(alignment.score())
 ```
 
-## How long does pairwise sequence alignment take?
+## How long does pairwise sequence alignment take? <link src='ac446d'/> 
 
 The focus of this course is *applied* bioinformatics, and **some of the practical considerations we need to think about when developing applications is their runtime and memory requirements**. The third issue we mentioned above is general to the problem of sequence alignment: runtime can be problematic. Over the next few cells we'll explore the runtime of sequence alignment.
 

@@ -1,7 +1,7 @@
 
-# An Introduction To Applied Bioinformatics
+# An Introduction To Applied Bioinformatics <link src='017ff3'/> 
 
-## Table of Contents
+## Table of Contents <link src='c62b6e'/> 
 
 <div style="float: right; margin-left: 30px; width: 200px"><img title="Logo by @gregcaporaso." style="float: right;margin-left: 30px;" src="https://raw.github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/images/logo.png" align=right height=250/></div>
 
@@ -17,7 +17,7 @@
   1. [Studying biological diversity](applications/biological-diversity.ipynb)
 4. Wrapping up
 
-## Disclaimer
+## Disclaimer <link src='681765'/> 
 
 **This project is in very early development stage.** It's not ready for prime-time by any means, but I fall firmly into the "publish early, publish often" mindset, hence its public availability. I am very interested in feedback. The best way to get feedback to me is through [the IAB issue tracker](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues), and the best way to contribute is through [pull requests](https://help.github.com/articles/using-pull-requests).
 

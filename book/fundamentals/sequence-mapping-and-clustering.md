@@ -1,5 +1,5 @@
 
-# Sequence mapping and clustering
+# Sequence mapping and clustering <link src='676499'/> 
 
 A common need in bioinformatics is, given a number of *query* sequences, group them based on their similarity either to one another, or their similarity to sequences in an external reference database, or to both. The most common way to do this is using sequence alignment (you may be noticing a theme here...).
 
@@ -26,7 +26,7 @@ We have learned the key tools we need for both sequence mapping and clustering i
 >>> from skbio.alignment import local_pairwise_align_ssw, global_pairwise_align_nucleotide
 ```
 
-## *De novo* clustering of sequences by similarity 
+## *De novo* clustering of sequences by similarity  <link src='e2c048'/> 
 
 The algorithm at the core of *de novo* clustering is sequence alignment. In an ideal world, we would perform a full multiple sequence alignment of all of our sequences, compute their pairwise similarities (or dissimilarities), and use those values to group sequences that are above some *similarity threshold* into *OTU clusters* (just *OTUs* from here). As we discussed in the mutliple sequence alignment chapter however, that is infeasible for more than a few tens of sequences due to computational and memory requirements. Even progressive alignment can't typically handle more than a few tens of thousands of sequences (at least with the currently available implementations, that I am aware of), so OTU clustering is generally acheived by picking pairs of sequences to align. You'll notice in this section that many of the heuristics that have been applied for speeding up database searching are similar to the heuristics applied for OTU clustering.
 
@@ -51,7 +51,7 @@ Let's define a collection of sequences to work with. These are derived from the 
 >>> print(seqs_16s.sequence_count())
 ```
 
-### Furthest neighbor clustering
+### Furthest neighbor clustering <link src='f2f8fb'/> 
 
 The first approach we'll look at is one that has been called *furthest neighbor*, because whether a sequence becomes a member of a cluster is defined by it's most dissimilar (furthest) "neighbor" in that cluster.
 
@@ -220,7 +220,7 @@ Now let's apply that:
 >>> r = evaluate_cluster_fn(furthest_neighbor, seqs_16s, 0.70)
 ```
 
-### Nearest neighbor clustering
+### Nearest neighbor clustering <link src='ab202d'/> 
 
 Let's try a variant on this algorithm. How would things change if **instead of requiring that a sequence be within the similarity treshold of all sequences in an OTU, we only required that it be within the similarity threshold of one sequence in that OTU**? This is referred to as **nearest neighbor** clustering, because cluster membership is defined by the percent similarity to the most similar (or *nearest*) "neighbor" in the cluster. 
 
@@ -303,7 +303,7 @@ You'll notice that both the runtime and the number of alignments performed here 
 
 There was another affect here though: we have a different number of OTUs. Is this result better or worse? There is not a definitive answer to that question: it really depends on the application, so what we'd ultimately want to know is how does that affect our ability to interpret the data. **Remember: OTU clustering is a necessary evil to deal with the massive amounts of data that we have. We don't necessary care about things like how many OTUs a method gives us, but rather how the clustering process helps or hurts us answer the biological questions driving the analysis.** We'll explore this concept more in later chapters, but it is an important one that algorithm developers sometimes lose track of.
 
-### Centroid clustering
+### Centroid clustering <link src='88add2'/> 
 
 So, given that the number of alignments performed is correlated with runtime, are there ways that we can reduce the number of alignments that are computed by a clustering algorithm? One approach for that is generally referred to as **centroid clustering**. Here, we can say that **a sequence is assigned to an OTU if it is within the similarity threshold of the first sequence in that OTU**. The first sequence in that cluster then becomes the *cluster centroid*: cluster membership is defined by similarity to that one particular sequence, which effectively sits at the "center" of that OTU.
 
@@ -374,7 +374,7 @@ Again, let's think about order dependence here. How would this differ if ``s3`` 
 
 We've now reduced the number of alignments and the runtime. What was the effect on the results?
 
-### Three different definitions of OTUs
+### Three different definitions of OTUs <link src='f3eb49'/> 
 
 With these three algorithms, we've looked at three different ways of defining a cluster or OTUs. This figure illustrates the differences in each definition, where the points illustrate sequences, the solid lines illustrated a similarity threshold, and the grey areas represent the space defining an OTU (or where a new sequence must fall to be considered part of an OTU).
 
@@ -390,7 +390,7 @@ In centroid distance, where membership in a cluster is defined by a query sequen
 
 All of these methods have good features and bad features, and that in fact is a common feature of heuristics (if they were perfect, they wouldn't be heuristics after all...). 
 
-## Comparing properties of our clustering algorithms
+## Comparing properties of our clustering algorithms <link src='35f028'/> 
 
 We so far looked at these algorithms based on a single similarity threshold and a single sequence collection, but as we know from previous chapters it's important to know how features such as run time change with different inputs. Let's explore these algorithms in the context of changing sequence collection sizes and similarity thresholds. 
 
@@ -493,7 +493,7 @@ Finally, let's look at the number of clusters (or OTUs) that are generated with 
 >>>                    kind="box")
 ```
 
-## Reference-based clustering to assist with parallelization
+## Reference-based clustering to assist with parallelization <link src='e96c31'/> 
 
 Up until this point we have focused our discussion on *de novo* OTU clustering, meaning that sequences are clustered only against each other, with no external reference. This is a very widely applied protocol, and the primary function of popular bioinformatics tools such as [cdhit](http://bioinformatics.oxfordjournals.org/content/28/23/3150.long) and [uclust](http://bioinformatics.oxfordjournals.org/content/26/19/2460.long). Another category of OTU clustering protocols is also popular however: reference-based OTU clustering, where a external reference database of sequences is used to aid in cluster defintion.  
 
