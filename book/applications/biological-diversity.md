@@ -15,28 +15,30 @@ The sample by observation count table is central to investigations of biological
 
 The basic data that goes into a BIOM table is the list of sample ids, the list of observation (e.g., OTU) ids, and the count matrix, which describes how many times each OTU was observed in each sample. We can build and display a BIOM table as follows:
 
-
-    %pylab inline
-    
-    from __future__ import division
-    import numpy as np
-    import pandas as pd
-    
-    sample_ids = ['A', 'B', 'C']
-    observation_ids = ['OTU1', 'OTU2', 'OTU3', 'OTU4', 'OTU5']
-    data = array([[1, 0, 0],
-                  [3, 2, 0],
-                  [0, 0, 6],
-                  [1, 4, 2],
-                  [0, 4, 1]])
-    
-    table1 = pd.DataFrame(data, index=observation_ids, columns=sample_ids)
-    table1
+```python
+>>> %pylab inline
+...
+>>> from __future__ import division
+>>> import numpy as np
+>>> import pandas as pd
+...
+>>> sample_ids = ['A', 'B', 'C']
+>>> observation_ids = ['OTU1', 'OTU2', 'OTU3', 'OTU4', 'OTU5']
+>>> data = array([[1, 0, 0],
+>>>               [3, 2, 0],
+>>>               [0, 0, 6],
+>>>               [1, 4, 2],
+>>>               [0, 4, 1]])
+...
+>>> table1 = pd.DataFrame(data, index=observation_ids, columns=sample_ids)
+>>> table1
+```
 
 If we want the observation count vector for sample `A` from the above table, we use the pandas API to get that as follows:
 
-
-    table1['A']
+```python
+>>> table1['A']
+```
 
 **TODO**: Trees in newick format; sample metadata in tsv format, and loaded into a pandas DataFrame.
 
@@ -61,7 +63,6 @@ There are literally hundreds of metrics of biological diversity. Here is some te
  * non-phylogenetic metrics treat all OTUs as being equally related
  * phylogenetic metrics incorporate evolutionary relationships between the OTUs
 
-
 In the next sections we'll look at some metrics that cross these different categories. As new metrics are introduced, try to classify each them into one class for each of the above three categories.
 
 ## Measuring alpha diversity
@@ -78,36 +79,41 @@ Observed species, or Observed OTUs as it's more accurately described, is about a
 
 Let's define a new table for this analysis:
 
-
-    sample_ids = ['A', 'B', 'C']
-    observation_ids = ['B1','B2','B3','B4','B5','A1','E2']
-    data = array([[1, 1, 5],
-                  [1, 2, 0],
-                  [3, 1, 0],
-                  [0, 2, 0],
-                  [0, 0, 0],
-                  [0, 0, 3],
-                  [0, 0, 1]])
-    
-    table2 = pd.DataFrame(data, index=observation_ids, columns=sample_ids)
-    table2
+```python
+>>> sample_ids = ['A', 'B', 'C']
+>>> observation_ids = ['B1','B2','B3','B4','B5','A1','E2']
+>>> data = array([[1, 1, 5],
+>>>               [1, 2, 0],
+>>>               [3, 1, 0],
+>>>               [0, 2, 0],
+>>>               [0, 0, 0],
+>>>               [0, 0, 3],
+>>>               [0, 0, 1]])
+...
+>>> table2 = pd.DataFrame(data, index=observation_ids, columns=sample_ids)
+>>> table2
+```
 
 Our sample $A$ has an observed OTU count value of 3, sample $B$ has an observed OTU count of 4, and sample $C$ has an observed OTU count of 3. Note that this is different than the total counts for each column (which would be 5, 6, and 9 respectively). Based on the observed OTUs metric, we could consider samples $A$ and $C$ to have even OTU richness, and sample $B$ to have 33% higher OTU richness.
 
 We could compute this in python as follows:
 
+```python
+>>> def observed_otus(table, sample_id):
+>>>     return sum([e > 0 for e in table[sample_id]])
+```
 
-    def observed_otus(table, sample_id):
-        return sum([e > 0 for e in table[sample_id]])
+```python
+>>> print(observed_otus(table2, 'A'))
+```
 
+```python
+>>> print(observed_otus(table2, 'B'))
+```
 
-    print(observed_otus(table2, 'A'))
-
-
-    print(observed_otus(table2, 'B'))
-
-
-    print(observed_otus(table2, 'C'))
+```python
+>>> print(observed_otus(table2, 'C'))
+```
 
 #### A limitation of OTU counting
 
@@ -117,8 +123,9 @@ Imagine now that we have the same table, but some additional information about t
 
 Pairing this with the table we defined above (displayed again in the cell below), given what you now now about these OTUs, which would you consider the most diverse? Are you happy with the $\alpha$ diversity conclusion that you obtained when computing the number of observed OTUs in each sample?
 
-
-    table2
+```python
+>>> table2
+```
 
 #### Phylogenetic Diversity (PD)
 
@@ -128,56 +135,61 @@ PD is relatively simple to calculate. It is computed simply as the sum of the br
 
 First, let's define a phylogenetic tree using the newick format (which is described [here](http://evolution.genetics.washington.edu/phylip/newicktree.html), and more formally defined [here](http://evolution.genetics.washington.edu/phylip/newick_doc.html)). We'll then load that up with using [scikit-bio](http://scikit-bio.org)'s [TreeNode](http://scikit-bio.org/generated/skbio.core.tree.TreeNode.html#skbio.core.tree.TreeNode) object.
 
-
-    newick_tree = '(((B1:0.2,B2:0.3):0.3,((B3:0.5,B4:0.3):0.2,B5:0.9):0.3):0.35,(((A1:0.2,A2:0.3):0.3,(E1:0.3,E2:0.4):0.7):0.2):0.05)root;'
-    
-    from skbio.tree import TreeNode
-    
-    tree = TreeNode.from_newick(newick_tree)
-    tree = tree.root_at_midpoint()
+```python
+>>> newick_tree = '(((B1:0.2,B2:0.3):0.3,((B3:0.5,B4:0.3):0.2,B5:0.9):0.3):0.35,(((A1:0.2,A2:0.3):0.3,(E1:0.3,E2:0.4):0.7):0.2):0.05)root;'
+...
+>>> from skbio.tree import TreeNode
+...
+>>> tree = TreeNode.from_newick(newick_tree)
+>>> tree = tree.root_at_midpoint()
+```
 
 I'll now define a couple of functions that we'll use to compute PD. 
 
-
-    def get_observed_nodes(tree, table, sample_id, verbose=False):
-        observed_otus = [obs_id for obs_id in table.index 
-                    if table[sample_id][obs_id] > 0]
-        observed_nodes = set()
-        # iterate over the observed OTUs
-        for otu in observed_otus:
-            t = tree.find(otu)
-            observed_nodes.add(t)
-            if verbose:
-                print(t.name, t.length, end=' ')
-            for internal_node in t.ancestors():
-                if internal_node.length is None:
-                    # we've hit the root
-                    if verbose:
-                        print('')
-                else:
-                    if verbose and internal_node not in observed_nodes:
-                        print(internal_node.length, end=' ')
-                    observed_nodes.add(internal_node)
-        return observed_nodes
-    
-    def phylogenetic_diversity(tree, table, sample_id, verbose=False):
-        observed_nodes = get_observed_nodes(tree, table, sample_id, verbose=verbose)
-        result = sum(o.length for o in observed_nodes)
-        return result
+```python
+>>> def get_observed_nodes(tree, table, sample_id, verbose=False):
+>>>     observed_otus = [obs_id for obs_id in table.index 
+>>>                 if table[sample_id][obs_id] > 0]
+>>>     observed_nodes = set()
+>>>     # iterate over the observed OTUs
+>>>     for otu in observed_otus:
+>>>         t = tree.find(otu)
+>>>         observed_nodes.add(t)
+>>>         if verbose:
+>>>             print(t.name, t.length, end=' ')
+>>>         for internal_node in t.ancestors():
+>>>             if internal_node.length is None:
+>>>                 # we've hit the root
+>>>                 if verbose:
+>>>                     print('')
+>>>             else:
+>>>                 if verbose and internal_node not in observed_nodes:
+>>>                     print(internal_node.length, end=' ')
+>>>                 observed_nodes.add(internal_node)
+>>>     return observed_nodes
+...
+>>> def phylogenetic_diversity(tree, table, sample_id, verbose=False):
+>>>     observed_nodes = get_observed_nodes(tree, table, sample_id, verbose=verbose)
+>>>     result = sum(o.length for o in observed_nodes)
+>>>     return result
+```
 
 And then apply those to compute the PD of our three samples. For each computation, we're also printing out the branch lengths of the branches that are observed *for the first time* when looking at a given OTU. When computing PD, we include the length of each branch only one time.
 
+```python
+>>> pd_A = phylogenetic_diversity(tree, table2, 'A', verbose=True)
+>>> print(pd_A)
+```
 
-    pd_A = phylogenetic_diversity(tree, table2, 'A', verbose=True)
-    print(pd_A)
+```python
+>>> pd_B = phylogenetic_diversity(tree, table2, 'B', verbose=True)
+>>> print(pd_B)
+```
 
-
-    pd_B = phylogenetic_diversity(tree, table2, 'B', verbose=True)
-    print(pd_B)
-
-
-    pd_C = phylogenetic_diversity(tree, table2, 'C', verbose=True)
-    print(pd_C)
+```python
+>>> pd_C = phylogenetic_diversity(tree, table2, 'C', verbose=True)
+>>> print(pd_C)
+```
 
 How does this result compare to what we observed above with the Observed OTUs metric? Based on your knowledge of biology, which do you think is a better representation of the relative diversities of these samples?
 
@@ -189,29 +201,34 @@ The problem is that we've expended a lot more sampling effort in the desert than
 
 In sequencing-based studies of microorganism richness, the analog of sampling area is sequencing depth. If we collect 100 sequences from one sample, and 10,000 sequences from another sample, we can't directly compare the number of observed OTUs or the phylogenetic diversity of these because we expended a lot more sampling effort on the sample with 10,000 sequences than on the sample with 100 sequences. The way this is typically handled is by randomly subsampling sequences from the sample with more sequences until the sequencing depth is equal to that in the sample with fewer sequences. If we randomly select 100 sequences at random from the sample with 10,000 sequences, and compute the alpha diversity based on that random subsample, we'll have a better idea of the relative alpha diversities of the two samples.
 
+```python
+>>> sample_ids = ['A', 'B', 'C']
+>>> observation_ids = ['OTU1', 'OTU2', 'OTU3', 'OTU4', 'OTU5']
+>>> data = array([[50, 4, 0],
+>>>               [35, 200, 0],
+>>>               [100, 2, 1],
+>>>               [15, 400, 1],
+>>>               [0, 40, 1]])
+...
+>>> bad_table = pd.DataFrame(data, index=observation_ids, columns=sample_ids)
+>>> bad_table
+```
 
-    sample_ids = ['A', 'B', 'C']
-    observation_ids = ['OTU1', 'OTU2', 'OTU3', 'OTU4', 'OTU5']
-    data = array([[50, 4, 0],
-                  [35, 200, 0],
-                  [100, 2, 1],
-                  [15, 400, 1],
-                  [0, 40, 1]])
-    
-    bad_table = pd.DataFrame(data, index=observation_ids, columns=sample_ids)
-    bad_table
+```python
+>>> print(observed_otus(bad_table, 'A'))
+```
 
+```python
+>>> print(observed_otus(bad_table, 'B'))
+```
 
-    print(observed_otus(bad_table, 'A'))
+```python
+>>> print(observed_otus(bad_table, 'C'))
+```
 
-
-    print(observed_otus(bad_table, 'B'))
-
-
-    print(observed_otus(bad_table, 'C'))
-
-
-    print(bad_table.sum())
+```python
+>>> print(bad_table.sum())
+```
 
 **TODO**: Add alpha rarefaction discussion.
 
@@ -236,55 +253,64 @@ $X_{ik}$ : count of observation $i$ in sample $k$
 This could be implemented in python as follows:
 
 
+```python
+>>> def bray_curtis_distance(table, sample1_id, sample2_id):
+>>>     numerator = 0
+>>>     denominator = 0
+>>>     sample1_counts = table[sample1_id]
+>>>     sample2_counts = table[sample2_id]
+>>>     for sample1_count, sample2_count in zip(sample1_counts, sample2_counts):
+>>>         numerator += abs(sample1_count - sample2_count)
+>>>         denominator += sample1_count + sample2_count
+>>>     return numerator / denominator
+```
 
-    def bray_curtis_distance(table, sample1_id, sample2_id):
-        numerator = 0
-        denominator = 0
-        sample1_counts = table[sample1_id]
-        sample2_counts = table[sample2_id]
-        for sample1_count, sample2_count in zip(sample1_counts, sample2_counts):
-            numerator += abs(sample1_count - sample2_count)
-            denominator += sample1_count + sample2_count
-        return numerator / denominator
-
-
-    table1
+```python
+>>> table1
+```
 
 Let's now apply this to some pairs of samples:
 
+```python
+>>> print(bray_curtis_distance(table1, 'A', 'B'))
+```
 
-    print(bray_curtis_distance(table1, 'A', 'B'))
+```python
+>>> print(bray_curtis_distance(table1, 'A', 'C'))
+```
 
+```python
+>>> print(bray_curtis_distance(table1, 'B', 'C'))
+```
 
-    print(bray_curtis_distance(table1, 'A', 'C'))
+```python
+>>> print(bray_curtis_distance(table1, 'A', 'A'))
+```
 
-
-    print(bray_curtis_distance(table1, 'B', 'C'))
-
-
-    print(bray_curtis_distance(table1, 'A', 'A'))
-
-
-    print(bray_curtis_distance(table1, 'C', 'B'))
+```python
+>>> print(bray_curtis_distance(table1, 'C', 'B'))
+```
 
 Ultimately, we likely want to apply this to all pairs of samples to get a distance matrix containing all pairwise distances. Let's define a function for that, and then compute all pairwise Bray-Curtis distances between samples `A`, `B` and `C`.
 
+```python
+>>> from skbio.stats.distance import DistanceMatrix
+>>> from numpy import zeros
+...
+>>> def table_to_distances(table, pairwise_distance_fn):
+>>>     sample_ids = table.columns
+>>>     num_samples = len(sample_ids)
+>>>     data = zeros((num_samples, num_samples))
+>>>     for i, sample1_id in enumerate(sample_ids):
+>>>         for j, sample2_id in enumerate(sample_ids[:i]):
+>>>             data[i,j] = data[j,i] = pairwise_distance_fn(table, sample1_id, sample2_id)
+>>>     return DistanceMatrix(data, sample_ids)
+```
 
-    from skbio.stats.distance import DistanceMatrix
-    from numpy import zeros
-    
-    def table_to_distances(table, pairwise_distance_fn):
-        sample_ids = table.columns
-        num_samples = len(sample_ids)
-        data = zeros((num_samples, num_samples))
-        for i, sample1_id in enumerate(sample_ids):
-            for j, sample2_id in enumerate(sample_ids[:i]):
-                data[i,j] = data[j,i] = pairwise_distance_fn(table, sample1_id, sample2_id)
-        return DistanceMatrix(data, sample_ids)
-
-
-    bc_dm = table_to_distances(table1, bray_curtis_distance)
-    print(bc_dm)
+```python
+>>> bc_dm = table_to_distances(table1, bray_curtis_distance)
+>>> print(bc_dm)
+```
 
 #### Unweighted UniFrac
 
@@ -314,7 +340,6 @@ In the tree on the right, all of the OTUs that are observed in either sample are
 
 On the other end of the spectrum, in the second tree, all of the OTUs in the tree are observed either in the red sample, or in the blue sample. All of the observed branch length in the tree is either red or blue, meaning that if you follow a branch out to the tips, you will observed only red or blue samples. In this case the unique branch length is equal to the observed branch length, so **we have a UniFrac distance of 1 between the red and blue samples**.
 
-
 <hr>
 
 <div style="float: right; margin-left: 30px;"><img title="Image by @gregcaporaso." style="float: right; margin-left: 30px;" src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/applications/images/unifrac_tree_d0.5.png" align=right/></div>
@@ -326,8 +351,9 @@ Finally, most of the time we're somewhere in the middle. In this tree, some of o
 
 Let's now compute the Unweighted UniFrac distances between some samples. Imagine we have the following tree, paired with our table below (printed below, for quick reference).
 
-
-    table1
+```python
+>>> table1
+```
 
 <div style="float: right; margin-left: 30px;"><img title="Image by @gregcaporaso." style="float: right; margin-left: 30px;" src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/applications/images/unifrac_tree_with_distances_ab.png" align=right/></div>
 
@@ -345,33 +371,35 @@ $uu_{ab} = \frac{unique_{ab}}{observed_{ab}} = \frac{1.25}{5.25} = 0.238$
 
 As an exercise, now compute the UniFrac distances between samples $B$ and $C$, and samples $A$ and $C$, using the above table and tree. When I do this, I get the following distance matrix. 
 
-
-    ids = ['A', 'B', 'C']
-    d = [[0.00, 0.24, 0.52],
-          [0.24, 0.00, 0.35],
-          [0.52, 0.35, 0.00]]
-    print(DistanceMatrix(d, ids))
+```python
+>>> ids = ['A', 'B', 'C']
+>>> d = [[0.00, 0.24, 0.52],
+>>>       [0.24, 0.00, 0.35],
+>>>       [0.52, 0.35, 0.00]]
+>>> print(DistanceMatrix(d, ids))
+```
 
  **TODO**: Interface change so this code can be used with ``table_to_distances``. 
 
-
-    ## This is untested!! I'm not certain that it's exactly right, just a quick test.
-    
-    newick_tree1 = '(((((OTU1:0.5,OTU2:0.5):0.5,OTU3:1.0):1.0),(OTU4:0.75,OTU5:0.75):1.25))root;'
-    tree1 = TreeNode.from_newick(newick_tree1)
-    
-    def unweighted_unifrac(tree, table, sample_id1, sample_id2, verbose=False):
-        observed_nodes1 = get_observed_nodes(tree, table, sample_id1, verbose=verbose)
-        observed_nodes2 = get_observed_nodes(tree, table, sample_id2, verbose=verbose)
-        observed_branch_length = sum(o.length for o in observed_nodes1 | observed_nodes2)
-        shared_branch_length = sum(o.length for o in observed_nodes1 & observed_nodes2)
-        unique_branch_length = observed_branch_length - shared_branch_length
-        unweighted_unifrac = unique_branch_length / observed_branch_length
-        return unweighted_unifrac
-    
-    print(unweighted_unifrac(tree1, table1, 'A', 'B'))
-    print(unweighted_unifrac(tree1, table1, 'A', 'C'))
-    print(unweighted_unifrac(tree1, table1, 'B', 'C'))
+```python
+>>> ## This is untested!! I'm not certain that it's exactly right, just a quick test.
+...
+>>> newick_tree1 = '(((((OTU1:0.5,OTU2:0.5):0.5,OTU3:1.0):1.0),(OTU4:0.75,OTU5:0.75):1.25))root;'
+>>> tree1 = TreeNode.from_newick(newick_tree1)
+...
+>>> def unweighted_unifrac(tree, table, sample_id1, sample_id2, verbose=False):
+>>>     observed_nodes1 = get_observed_nodes(tree, table, sample_id1, verbose=verbose)
+>>>     observed_nodes2 = get_observed_nodes(tree, table, sample_id2, verbose=verbose)
+>>>     observed_branch_length = sum(o.length for o in observed_nodes1 | observed_nodes2)
+>>>     shared_branch_length = sum(o.length for o in observed_nodes1 & observed_nodes2)
+>>>     unique_branch_length = observed_branch_length - shared_branch_length
+>>>     unweighted_unifrac = unique_branch_length / observed_branch_length
+>>>     return unweighted_unifrac
+...
+>>> print(unweighted_unifrac(tree1, table1, 'A', 'B'))
+>>> print(unweighted_unifrac(tree1, table1, 'A', 'C'))
+>>> print(unweighted_unifrac(tree1, table1, 'B', 'C'))
+```
 
 #### Even sampling
 
@@ -399,81 +427,89 @@ Figure 1 shows several different approaches for comparing the resulting UniFrac 
 
 Let's generate a small distance matrix representing just a few of these body sites, and figure out how we'd generate and interpret each of these visualizations. The values in the distance matrix below are a subset of the unweighted UniFrac distance matrix representing two samples each from three body sites from the Costello *et al.* (2009) study.
 
-
-    sample_ids = ['A', 'B', 'C', 'D', 'E', 'F']
-    
-    human_microbiome_sample_md = {
-                       'A': {'body_habitat': 'gut', 'person': 'subject 1'},
-                       'B': {'body_habitat': 'gut', 'person': 'subject 2'},
-                       'C': {'body_habitat': 'tongue', 'person': 'subject 1'},
-                       'D': {'body_habitat': 'tongue', 'person': 'subject 2'},
-                       'E': {'body_habitat': 'skin', 'person': 'subject 1'},
-                       'F': {'body_habitat': 'skin', 'person': 'subject 2'}}
-    
-    dm_data = array([[0.00, 0.35, 0.83, 0.83, 0.90, 0.90],
-                     [0.35, 0.00, 0.86, 0.85, 0.92, 0.91],
-                     [0.83, 0.86, 0.00, 0.25, 0.88, 0.87],
-                     [0.83, 0.85, 0.25, 0.00, 0.88, 0.88],
-                     [0.90, 0.92, 0.88, 0.88, 0.00, 0.50],
-                     [0.90, 0.91, 0.87, 0.88, 0.50, 0.00]])
-    
-    human_microbiome_dm = DistanceMatrix(dm_data, sample_ids)
-    print(human_microbiome_dm)
+```python
+>>> sample_ids = ['A', 'B', 'C', 'D', 'E', 'F']
+...
+>>> human_microbiome_sample_md = {
+>>>                    'A': {'body_habitat': 'gut', 'person': 'subject 1'},
+>>>                    'B': {'body_habitat': 'gut', 'person': 'subject 2'},
+>>>                    'C': {'body_habitat': 'tongue', 'person': 'subject 1'},
+>>>                    'D': {'body_habitat': 'tongue', 'person': 'subject 2'},
+>>>                    'E': {'body_habitat': 'skin', 'person': 'subject 1'},
+>>>                    'F': {'body_habitat': 'skin', 'person': 'subject 2'}}
+...
+>>> dm_data = array([[0.00, 0.35, 0.83, 0.83, 0.90, 0.90],
+>>>                  [0.35, 0.00, 0.86, 0.85, 0.92, 0.91],
+>>>                  [0.83, 0.86, 0.00, 0.25, 0.88, 0.87],
+>>>                  [0.83, 0.85, 0.25, 0.00, 0.88, 0.88],
+>>>                  [0.90, 0.92, 0.88, 0.88, 0.00, 0.50],
+>>>                  [0.90, 0.91, 0.87, 0.88, 0.50, 0.00]])
+...
+>>> human_microbiome_dm = DistanceMatrix(dm_data, sample_ids)
+>>> print(human_microbiome_dm)
+```
 
 #### Distribution plots and comparisons
 
 First, let's look at the analysis presented in panels E and F. Instead of generating bar plots here, we'll generate box plots as these are more informative (i.e., they provide a more detailed summary of the distribution being investigated). One important thing to notice here is the central role that the sample metadata plays in the visualization. If we just had our sample ids (i.e., letters ``A`` through ``F``) we wouldn't be able to group distances into *within* and *between* sample type categories, and we therefore couldn't perform the comparisons we're interested in.
 
+```python
+>>> def within_between_category_distributions(dm, md, md_category):
+>>>     within_category_distances = []
+>>>     between_category_distances = []
+>>>     for i, sample_id1 in enumerate(dm.ids):
+>>>         sample_md1 = md[sample_id1][md_category]
+>>>         for sample_id2 in dm.ids[:i]:
+>>>             sample_md2 = md[sample_id2][md_category]
+>>>             if sample_md1 == sample_md2:
+>>>                 within_category_distances.append(dm[sample_id1, sample_id2])
+>>>             else:
+>>>                 between_category_distances.append(dm[sample_id1, sample_id2])
+>>>     return within_category_distances, between_category_distances
+```
 
-    def within_between_category_distributions(dm, md, md_category):
-        within_category_distances = []
-        between_category_distances = []
-        for i, sample_id1 in enumerate(dm.ids):
-            sample_md1 = md[sample_id1][md_category]
-            for sample_id2 in dm.ids[:i]:
-                sample_md2 = md[sample_id2][md_category]
-                if sample_md1 == sample_md2:
-                    within_category_distances.append(dm[sample_id1, sample_id2])
-                else:
-                    between_category_distances.append(dm[sample_id1, sample_id2])
-        return within_category_distances, between_category_distances
+```python
+>>> within_category_distances, between_category_distances = within_between_category_distributions(human_microbiome_dm, human_microbiome_sample_md, "body_habitat")
+>>> print(within_category_distances)
+>>> print(between_category_distances)
+```
 
+```python
+>>> from skbio.draw import boxplots
+...
+>>> plot = boxplots([within_category_distances, between_category_distances],
+>>>                 x_tick_labels=['same body habitat', 'different body habitat'],
+>>>                 x_tick_labels_orientation='horizontal',
+>>>                 y_label="Unweighted UniFrac distance",
+>>>                 y_min=0.0, y_max=1.0)
+```
 
-    within_category_distances, between_category_distances = within_between_category_distributions(human_microbiome_dm, human_microbiome_sample_md, "body_habitat")
-    print(within_category_distances)
-    print(between_category_distances)
-
-
-    from skbio.draw import boxplots
-    
-    plot = boxplots([within_category_distances, between_category_distances],
-                    x_tick_labels=['same body habitat', 'different body habitat'],
-                    x_tick_labels_orientation='horizontal',
-                    y_label="Unweighted UniFrac distance",
-                    y_min=0.0, y_max=1.0)
-
-
-    from scipy.stats import ttest_ind
-    t, p_value = ttest_ind(within_category_distances, between_category_distances)
-    print(t, p_value)
+```python
+>>> from scipy.stats import ttest_ind
+>>> t, p_value = ttest_ind(within_category_distances, between_category_distances)
+>>> print(t, p_value)
+```
 
 If we run through these same steps, but base our analysis on a different metadata category where we don't expect to see any significant clustering, you can see that we no longer get a significant result.
 
+```python
+>>> within_category_distances, between_category_distances = within_between_category_distributions(human_microbiome_dm, human_microbiome_sample_md, "person")
+>>> print(within_category_distances)
+>>> print(between_category_distances)
+```
 
-    within_category_distances, between_category_distances = within_between_category_distributions(human_microbiome_dm, human_microbiome_sample_md, "person")
-    print(within_category_distances)
-    print(between_category_distances)
+```python
+>>> plot = boxplots([within_category_distances, between_category_distances],
+>>>                 x_tick_labels=['same person', 'different person'],
+>>>                 x_tick_labels_orientation='horizontal',
+>>>                 y_label="Unweighted UniFrac distance",
+>>>                 y_min=0.0, y_max=1.0)
+```
 
-
-    plot = boxplots([within_category_distances, between_category_distances],
-                    x_tick_labels=['same person', 'different person'],
-                    x_tick_labels_orientation='horizontal',
-                    y_label="Unweighted UniFrac distance",
-                    y_min=0.0, y_max=1.0)
-
-
-    t, p_value = ttest_ind(within_category_distances, between_category_distances)
-    print(t, p_value)
+```python
+>>> t, p_value = ttest_ind(within_category_distances, between_category_distances)
+>>> print(t, p_value)
+```
 
 Why do you think the distribution of distances between people has such as larger range than the distribution of distances within people in this particular example?
 
@@ -481,23 +517,26 @@ Why do you think the distribution of distances between people has such as larger
 
 Next, let's look at a hierarchical clustering analysis, similar to that presented in panel G above. Here I'm applying the UPGMA functionality implemented in [scipy](http://www.scipy.org/scipylib/index.html) to generate a tree which we visualize with a dendrogram. However the tips in this tree don't represent sequences or OTUs, like they did when we covered UPGMA in the [Phylogenetic reconstruction chapter](../algorithms/3-phylogeny-reconstruction.ipynb) chapter, but instead they represent samples, and samples with a smaller branch length between them are more similar in composition than samples with a longer branch length between them. (Remember that only horizontal branch length is counted - vertical branch length is just to aid in the organization of the dendrogram.)
 
-
-    from scipy.cluster.hierarchy import average, dendrogram
-    lm = average(human_microbiome_dm.condensed_form())
-    d = dendrogram(lm, labels=human_microbiome_dm.ids, orientation='right', 
-                   link_color_func=lambda x: 'black')
+```python
+>>> from scipy.cluster.hierarchy import average, dendrogram
+>>> lm = average(human_microbiome_dm.condensed_form())
+>>> d = dendrogram(lm, labels=human_microbiome_dm.ids, orientation='right', 
+>>>                link_color_func=lambda x: 'black')
+```
 
 Again, we can see how the data really only becomes interpretable in the context of metadata:
 
+```python
+>>> labels = [human_microbiome_sample_md[sid]['body_habitat'] for sid in sample_ids]
+>>> d = dendrogram(lm, labels=labels, orientation='right', 
+>>>                link_color_func=lambda x: 'black')
+```
 
-    labels = [human_microbiome_sample_md[sid]['body_habitat'] for sid in sample_ids]
-    d = dendrogram(lm, labels=labels, orientation='right', 
-                   link_color_func=lambda x: 'black')
-
-
-    labels = [human_microbiome_sample_md[sid]['person'] for sid in sample_ids]
-    d = dendrogram(lm, labels=labels, orientation='right', 
-                   link_color_func=lambda x: 'black')
+```python
+>>> labels = [human_microbiome_sample_md[sid]['person'] for sid in sample_ids]
+>>> d = dendrogram(lm, labels=labels, orientation='right', 
+>>>                link_color_func=lambda x: 'black')
+```
 
 ### Ordination
 
@@ -507,13 +546,13 @@ Ordination is a technique that is widely applied in ecology and in bioinformatic
 
 An excellent site for learning more about ordination is [Michael W. Palmer's Ordination Methods page](http://ordination.okstate.edu/).
 
-
 #### Polar ordination
 
 First, let's print our distance matrix again so we have it nearby.
 
-
-    print(human_microbiome_dm)
+```python
+>>> print(human_microbiome_dm)
+```
 
 Polar ordination works in a few steps:
 
@@ -537,77 +576,87 @@ $D2$ is distance between sample and endpoint 2.
 
 Here is what steps 2 and 3 look like in python:
 
+```python
+>>> def compute_axis_values(dm, endpoint1, endpoint2):
+>>>     d = dm[endpoint1, endpoint2]
+>>>     result = {endpoint1: 0, endpoint2: d}
+>>>     non_endpoints = set(dm.ids) - set([endpoint1, endpoint2])
+>>>     for e in non_endpoints:
+>>>         d1 = dm[endpoint1, e]
+>>>         d2 = dm[endpoint2, e]
+>>>         result[e] = (d**2 + d1**2 - d2**2) / (2 * d)
+>>>     return d, [result[e] for e in dm.ids]
+```
 
-    def compute_axis_values(dm, endpoint1, endpoint2):
-        d = dm[endpoint1, endpoint2]
-        result = {endpoint1: 0, endpoint2: d}
-        non_endpoints = set(dm.ids) - set([endpoint1, endpoint2])
-        for e in non_endpoints:
-            d1 = dm[endpoint1, e]
-            d2 = dm[endpoint2, e]
-            result[e] = (d**2 + d1**2 - d2**2) / (2 * d)
-        return d, [result[e] for e in dm.ids]
+```python
+>>> d, a1_values = compute_axis_values(human_microbiome_dm, 'B', 'E')
+>>> for sid, a1_value in zip(human_microbiome_dm.ids, a1_values):
+>>>     print(sid, a1_value)
+```
 
+```python
+>>> d, a2_values = compute_axis_values(human_microbiome_dm, 'D', 'E')
+>>> for sid, a2_value in zip(human_microbiome_dm.ids, a2_values):
+>>>     print(sid, a2_value)
+```
 
-    d, a1_values = compute_axis_values(human_microbiome_dm, 'B', 'E')
-    for sid, a1_value in zip(human_microbiome_dm.ids, a1_values):
-        print(sid, a1_value)
-
-
-    d, a2_values = compute_axis_values(human_microbiome_dm, 'D', 'E')
-    for sid, a2_value in zip(human_microbiome_dm.ids, a2_values):
-        print(sid, a2_value)
-
-
-    from pylab import scatter
-    ord_plot = scatter(a1_values, a2_values, s=40)
+```python
+>>> from pylab import scatter
+>>> ord_plot = scatter(a1_values, a2_values, s=40)
+```
 
 And again, let's look at how including metadata helps us to interpret our results.
 
 First, we'll color the points by the body habitat that they're derived from:
 
-
-    colors = {'tongue': 'red', 'gut':'yellow', 'skin':'blue'}
-    c = [colors[human_microbiome_sample_md[e]['body_habitat']] for e in human_microbiome_dm.ids]
-    ord_plot = scatter(a1_values, a2_values, s=40, c=c)
+```python
+>>> colors = {'tongue': 'red', 'gut':'yellow', 'skin':'blue'}
+>>> c = [colors[human_microbiome_sample_md[e]['body_habitat']] for e in human_microbiome_dm.ids]
+>>> ord_plot = scatter(a1_values, a2_values, s=40, c=c)
+```
 
 And next we'll color the samples by the person that they're derived from. Notice that this plot and the one above are identical except for coloring. Think about how the colors (and therefore the sample metadata) help you to interpret these plots.
 
-
-    person_colors = {'subject 1': 'red', 'subject 2':'yellow'}
-    person_c = [person_colors[human_microbiome_sample_md[e]['person']] for e in human_microbiome_dm.ids]
-    ord_plot = scatter(a1_values, a2_values, s=40, c=person_c)
+```python
+>>> person_colors = {'subject 1': 'red', 'subject 2':'yellow'}
+>>> person_c = [person_colors[human_microbiome_sample_md[e]['person']] for e in human_microbiome_dm.ids]
+>>> ord_plot = scatter(a1_values, a2_values, s=40, c=person_c)
+```
 
 #### Determining the most important axes in polar ordination
 
 Generally, you would compute the polar ordination axes for all possible axes. You could then order the axes by which represent the largest differences in sample composition, and the lowest correlation with previous axes. This might look like the following:
 
-
-    from scipy.stats import spearmanr
-    
-    data = []
-    for i, sample_id1 in enumerate(human_microbiome_dm.ids):
-        for sample_id2 in human_microbiome_dm.ids[:i]:
-            d, axis_values = compute_axis_values(human_microbiome_dm, sample_id1, sample_id2)
-            r, p = spearmanr(a1_values, axis_values)
-            data.append((d, abs(r), sample_id1, sample_id2, axis_values))
-    
-    data.sort()
-    data.reverse()
-    for i, e in enumerate(data):
-        print("axis %d:" % i, end=' ')
-        print("\t%1.3f\t%1.3f\t%s\t%s" % e[:4])
+```python
+>>> from scipy.stats import spearmanr
+...
+>>> data = []
+>>> for i, sample_id1 in enumerate(human_microbiome_dm.ids):
+>>>     for sample_id2 in human_microbiome_dm.ids[:i]:
+>>>         d, axis_values = compute_axis_values(human_microbiome_dm, sample_id1, sample_id2)
+>>>         r, p = spearmanr(a1_values, axis_values)
+>>>         data.append((d, abs(r), sample_id1, sample_id2, axis_values))
+...
+>>> data.sort()
+>>> data.reverse()
+>>> for i, e in enumerate(data):
+>>>     print("axis %d:" % i, end=' ')
+>>>     print("\t%1.3f\t%1.3f\t%s\t%s" % e[:4])
+```
 
 So why do we care about axes being uncorrelated? And why do we care about explaining a lot of the variation? Let's look at a few of these plots and see how they compare to the plots above, where we compared axes 1 and 4.
 
+```python
+>>> ord_plot = scatter(data[0][4], data[1][4], s=40, c=c)
+```
 
-    ord_plot = scatter(data[0][4], data[1][4], s=40, c=c)
+```python
+>>> ord_plot = scatter(data[0][4], data[13][4], s=40, c=c)
+```
 
-
-    ord_plot = scatter(data[0][4], data[13][4], s=40, c=c)
-
-
-    ord_plot = scatter(data[0][4], data[14][4], s=40, c=c)
+```python
+>>> ord_plot = scatter(data[0][4], data[14][4], s=40, c=c)
+```
 
 #### Interpreting ordination plots
 
@@ -617,16 +666,19 @@ There are a few points that are important to keep in mind when interpreting ordi
 
 One thing that you may have notices as you computed the polar ordination above is that the method is *not symmetric*: in other words, the axis values for axis $EB$ are different than for axis $BE$. In practice though, we derive the same conclusions regardless of how we compute that axis: in this example, that samples cluster by body site.
 
+```python
+>>> d, a1_values = compute_axis_values(human_microbiome_dm, 'E', 'B')
+>>> d, a2_values = compute_axis_values(human_microbiome_dm, 'E', 'D')
+>>> d, alt_a1_values = compute_axis_values(human_microbiome_dm, 'B', 'E')
+```
 
-    d, a1_values = compute_axis_values(human_microbiome_dm, 'E', 'B')
-    d, a2_values = compute_axis_values(human_microbiome_dm, 'E', 'D')
-    d, alt_a1_values = compute_axis_values(human_microbiome_dm, 'B', 'E')
+```python
+>>> ord_plot = scatter(a1_values, a2_values, s=40, c=c)
+```
 
-
-    ord_plot = scatter(a1_values, a2_values, s=40, c=c)
-
-
-    ord_plot = scatter(alt_a1_values, a2_values, s=40, c=c)
+```python
+>>> ord_plot = scatter(alt_a1_values, a2_values, s=40, c=c)
+```
 
 Some other important features:
 
@@ -644,66 +696,71 @@ In this setion, we're going to make use of three python third-party modules to a
 First, we'll load sample metadata into a [pandas DateFrame](http://pandas.pydata.org/pandas-docs/dev/generated/pandas.DataFrame.html). These are really useful for loading and working with the type of tabular information that you'd typically store in a spreadsheet or database table. (Note that one thing I'm doing in the following cell is tricking pandas into thinking that it's getting a file as input, even though I have the information represented as tab-separated lines in a multiline string. [python's StringIO](https://docs.python.org/2/library/stringio.html) is very useful for this, and it's especially convenient in your unit tests... which you're writing for all of your code, right?) Here we'll load the tab-separated text, and then print it.
 
 
-
-    from iab.data import lauber_soil_sample_md
-    
-    lauber_soil_sample_md
+```python
+>>> from iab.data import lauber_soil_sample_md
+...
+>>> lauber_soil_sample_md
+```
 
 Just as one simple example of the many things that pandas can do, to look up a value, such as the pH of sample ``MT2.141698``, we can do the following. If you're interesting in learning more about pandas, [*Python for Data Analysis*](http://shop.oreilly.com/product/0636920023784.do) is a very good resource.
 
-
-    lauber_soil_sample_md['pH']['MT2.141698']
+```python
+>>> lauber_soil_sample_md['pH']['MT2.141698']
+```
 
 Next we'll load our distance matrix. This is similar to ``human_microbiome_dm_data`` one that we loaded above, just a little bigger. After loading, we can visualize the resulting ``DistanceMatrix`` object for a summary.
 
-
-    from iab.data import lauber_soil_unweighted_unifrac_dm
-    
-    _ = lauber_soil_unweighted_unifrac_dm.plot(cmap='Greens')
+```python
+>>> from iab.data import lauber_soil_unweighted_unifrac_dm
+...
+>>> _ = lauber_soil_unweighted_unifrac_dm.plot(cmap='Greens')
+```
 
 Does this visualization help you to interpret the results? Probably not. Generally we'll need to apply some approaches that will help us with interpretation. Let's use ordination here. We'll run Pricipal Coordinates Analysis on our ``DistanceMatrix`` object. This gives us a matrix of coordinate values for each sample, which we can then plot. We can use ``scikit-bio``'s implementation of PCoA as follows:
 
-
-    from skbio.stats.ordination import PCoA
-    
-    # Create the PCoA object...
-    lauber_soil_unweighted_unifrac_pcoa = PCoA(lauber_soil_unweighted_unifrac_dm)
-    # ... and run PCoA
-    lauber_soil_unweighted_unifrac_result = lauber_soil_unweighted_unifrac_pcoa.scores()
-
+```python
+>>> from skbio.stats.ordination import PCoA
+...
+>>> # Create the PCoA object...
+>>> lauber_soil_unweighted_unifrac_pcoa = PCoA(lauber_soil_unweighted_unifrac_dm)
+>>> # ... and run PCoA
+>>> lauber_soil_unweighted_unifrac_result = lauber_soil_unweighted_unifrac_pcoa.scores()
+```
 
 What does the following ordination plot tell you about the relationship between the similarity of microbial communities taken from similar and dissimilar latitudes?
 
-
-    _ = lauber_soil_unweighted_unifrac_result.plot(lauber_soil_sample_md, 'Latitude', cmap='Greens', title="Samples colored by Latitude", axis_labels=('PC1', 'PC2', 'PC3'))
+```python
+>>> _ = lauber_soil_unweighted_unifrac_result.plot(lauber_soil_sample_md, 'Latitude', cmap='Greens', title="Samples colored by Latitude", axis_labels=('PC1', 'PC2', 'PC3'))
+```
 
 If the answer to the above question is that there doesn't seem to be much association, you're on the right track. We can qualtify this, for example, by testing for correlation between pH and value on PC 1.
 
-
-    from scipy.stats import spearmanr
-    spearman_rho, spearman_p = spearmanr(lauber_soil_unweighted_unifrac_result.site.T[0], 
-                                         [lauber_soil_sample_md['Latitude'][sample_id] for sample_id in lauber_soil_unweighted_unifrac_result.site_ids])
-    print('rho: %1.3f' % spearman_rho)
-    print('p-value: %1.1e' % spearman_p)
+```python
+>>> from scipy.stats import spearmanr
+>>> spearman_rho, spearman_p = spearmanr(lauber_soil_unweighted_unifrac_result.site.T[0], 
+>>>                                      [lauber_soil_sample_md['Latitude'][sample_id] for sample_id in lauber_soil_unweighted_unifrac_result.site_ids])
+>>> print('rho: %1.3f' % spearman_rho)
+>>> print('p-value: %1.1e' % spearman_p)
+```
 
 In the next plot, we'll color the points by the pH of the soil sample they represent. What does this plot suggest about the relationship between the similarity of microbial communities taken from similar and dissimilar pH? 
 
+```python
+>>> _ = lauber_soil_unweighted_unifrac_result.plot(lauber_soil_sample_md, 'pH', cmap='Greens', title="Samples colored by pH", axis_labels=('PC1', 'PC2', 'PC3'))
+```
 
-    _ = lauber_soil_unweighted_unifrac_result.plot(lauber_soil_sample_md, 'pH', cmap='Greens', title="Samples colored by pH", axis_labels=('PC1', 'PC2', 'PC3'))
-
-
-    spearman_rho, spearman_p = spearmanr(lauber_soil_unweighted_unifrac_result.site.T[0], 
-                                         [lauber_soil_sample_md['pH'][sample_id] for sample_id in lauber_soil_unweighted_unifrac_result.site_ids])
-    print('rho: %1.3f' % spearman_rho)
-    print('p-value: %1.1e' % spearman_p)
+```python
+>>> spearman_rho, spearman_p = spearmanr(lauber_soil_unweighted_unifrac_result.site.T[0], 
+>>>                                      [lauber_soil_sample_md['pH'][sample_id] for sample_id in lauber_soil_unweighted_unifrac_result.site_ids])
+>>> print('rho: %1.3f' % spearman_rho)
+>>> print('p-value: %1.1e' % spearman_p)
+```
 
 Taken together, these plots and statistics suggest that soil microbial community composition is much more closely associated with pH than it is with latitude: the key result that was presented in [Lauber *et al.* (2009)](http://www.ncbi.nlm.nih.gov/pubmed/19502440). 
 
 ## PCoA versus PCA: what's the difference?
 
-
 You may have also heard of a method related to PCoA, called Principal Components Analysis or PCA. There is a key difference between these methods that is important for our useds. PCoA, which is what we've been working with, performs ordination with a distance matrix as input. PCA on the other hand performs ordination with sample by observation count data, such as the OTU tables that we've been working with, as input. It achieves this by computing Euclidean distance (see [here](http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.euclidean.html#scipy.spatial.distance.euclidean)) between the samples and then running PCoA. So, if your distance metric is Euclidean, PCA and PCoA are the same. In practice however, we want to be able to use distance metrics that work better for studying biological diversity, such as Bray-Curtis or UniFrac. Therefore we typically compute distances with whatever metric we want, and then run PCoA. 
-
 
 ## Are two different analysis approaches giving me the same result?
 
@@ -711,54 +768,60 @@ A question that comes up frequently, often in method comparison, is whether two 
 
 Imagine you ran three different beta diversity metrics on your BIOM table: unweighted UniFrac, Bray-Curtis, and weighted UniFrac (the quantitative analog of unweighted UniFrac), and then generated the following PCoA plots.
 
+```python
+>>> _ = lauber_soil_unweighted_unifrac_result.plot(lauber_soil_sample_md, 'pH', cmap='Greens', 
+>>>                                                title="Unweighted UniFrac, samples colored by pH",
+>>>                                                axis_labels=('PC1', 'PC2', 'PC3'))
+```
 
-    _ = lauber_soil_unweighted_unifrac_result.plot(lauber_soil_sample_md, 'pH', cmap='Greens', 
-                                                   title="Unweighted UniFrac, samples colored by pH",
-                                                   axis_labels=('PC1', 'PC2', 'PC3'))
+```python
+>>> from iab.data import lauber_soil_bray_curtis_dm
+...
+>>> lauber_soil_bray_curtis_pcoa = PCoA(lauber_soil_bray_curtis_dm)
+>>> lauber_soil_bray_curtis_result = lauber_soil_bray_curtis_pcoa.scores()
+...
+>>> _ = lauber_soil_bray_curtis_result.plot(lauber_soil_sample_md, 'pH', cmap='Greens', 
+>>>                                         title="Bray-Curtis, samples colored by pH",
+>>>                                         axis_labels=('PC1', 'PC2', 'PC3'))
+```
 
-
-    from iab.data import lauber_soil_bray_curtis_dm
-    
-    lauber_soil_bray_curtis_pcoa = PCoA(lauber_soil_bray_curtis_dm)
-    lauber_soil_bray_curtis_result = lauber_soil_bray_curtis_pcoa.scores()
-    
-    _ = lauber_soil_bray_curtis_result.plot(lauber_soil_sample_md, 'pH', cmap='Greens', 
-                                            title="Bray-Curtis, samples colored by pH",
-                                            axis_labels=('PC1', 'PC2', 'PC3'))
-
-
-    from iab.data import lauber_soil_weighted_unifrac_dm
-    
-    lauber_soil_weighted_unifrac_pcoa = PCoA(lauber_soil_weighted_unifrac_dm)
-    lauber_soil_weighted_unifrac_result = lauber_soil_weighted_unifrac_pcoa.scores()
-    
-    _ = lauber_soil_weighted_unifrac_result.plot(lauber_soil_sample_md, 'pH', cmap='Greens', 
-                                                 title="Weighted UniFrac, samples colored by pH",
-                                                 axis_labels=('PC1', 'PC2', 'PC3'))
+```python
+>>> from iab.data import lauber_soil_weighted_unifrac_dm
+...
+>>> lauber_soil_weighted_unifrac_pcoa = PCoA(lauber_soil_weighted_unifrac_dm)
+>>> lauber_soil_weighted_unifrac_result = lauber_soil_weighted_unifrac_pcoa.scores()
+...
+>>> _ = lauber_soil_weighted_unifrac_result.plot(lauber_soil_sample_md, 'pH', cmap='Greens', 
+>>>                                              title="Weighted UniFrac, samples colored by pH",
+>>>                                              axis_labels=('PC1', 'PC2', 'PC3'))
+```
 
 Specifically, what we want to ask when comparing these results is **given a pair of ordination plots, is their shape (in two or three dimensions) the same?** The reason we care is that we want to know, **given a pair of ordination plots, would we derive the same biological conclusions regardless of which plot we look at?**
 
 We can use a [Mantel test](http://scikit-bio.org/docs/latest/generated/generated/skbio.stats.distance.mantel.html) for this, which is way of testing for correlation between distance matrics. 
 
+```python
+>>> from skbio.stats.distance import mantel
+...
+>>> r, p, n = mantel(lauber_soil_unweighted_unifrac_dm, lauber_soil_weighted_unifrac_dm, method='spearman', strict=False)
+>>> print("Mantel r: %1.3f" % r)
+>>> print("p-value: %1.1e" % p)
+>>> print("Number of samples compared: %d" % n)
+```
 
-    from skbio.stats.distance import mantel
-    
-    r, p, n = mantel(lauber_soil_unweighted_unifrac_dm, lauber_soil_weighted_unifrac_dm, method='spearman', strict=False)
-    print("Mantel r: %1.3f" % r)
-    print("p-value: %1.1e" % p)
-    print("Number of samples compared: %d" % n)
+```python
+>>> r, p, n = mantel(lauber_soil_unweighted_unifrac_dm, lauber_soil_bray_curtis_dm, method='spearman', strict=False)
+>>> print("Mantel r: %1.3f" % r)
+>>> print("p-value: %1.1e" % p)
+>>> print("Number of samples compared: %d" % n)
+```
 
-
-    r, p, n = mantel(lauber_soil_unweighted_unifrac_dm, lauber_soil_bray_curtis_dm, method='spearman', strict=False)
-    print("Mantel r: %1.3f" % r)
-    print("p-value: %1.1e" % p)
-    print("Number of samples compared: %d" % n)
-
-
-    r, p, n = mantel(lauber_soil_weighted_unifrac_dm, lauber_soil_bray_curtis_dm, method='spearman', strict=False)
-    print("Mantel r: %1.3f" % r)
-    print("p-value: %1.1e" % p)
-    print("Number of samples compared: %d" % n)
+```python
+>>> r, p, n = mantel(lauber_soil_weighted_unifrac_dm, lauber_soil_bray_curtis_dm, method='spearman', strict=False)
+>>> print("Mantel r: %1.3f" % r)
+>>> print("p-value: %1.1e" % p)
+>>> print("Number of samples compared: %d" % n)
+```
 
 The way that we'd interpret these results is that, although the plots above look somewhat different from one another, the underlying data (the distances between samples) are highly correlated across the different diversity metrics. As a result, we'd conclude that with any of these three diversity metrics we'd come to the conclusion that samples that are more similar in pH are more similar in their microbial community composition.
 
@@ -773,7 +836,6 @@ A related approach, but which I think is less useful as it compares PCoA plots d
 * Rotation (choosing one set of points as the reference, and rotate the other to minimize the sum of squares distance (SSD) between the corresponding points)
 
 The output is a pair of *transformed coordinate matrices*, and an $M^{2}$ statistic which represents how dissimilar the coordinate matrices are to each other (so a small $M^{2}$ means that the coordinate matrices, and the plots, are more similar). [Procrustes analysis is implemented in scikit-bio](http://scikit-bio.org/generated/skbio.maths.stats.spatial.procrustes.html).
-
 
 ## Where to go from here
 

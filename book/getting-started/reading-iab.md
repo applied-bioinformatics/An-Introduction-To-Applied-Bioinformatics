@@ -48,25 +48,28 @@ IAB is built using the IPython Notebook, an interactive HTML-based computing env
 
 Most of the code that is used in IAB comes from [scikit-bio](http://scikit-bio.org) package, or other python scientific computing tools. You can access these in the same way that you would in a python script. For example:
 
-
-    import skbio
-    
-    from __future__ import print_function
-    from IPython.core import page
-    page.page = print
+```python
+>>> import skbio
+...
+>>> from __future__ import print_function
+>>> from IPython.core import page
+>>> page.page = print
+```
 
 We can then access functions, variables, and classes from these modules.
 
-
-    print(skbio.title)
-    print(skbio.art)
+```python
+>>> print(skbio.title)
+>>> print(skbio.art)
+```
 
 We'll inspect a lot of source code in IAB as we explore bioinformatics algorithms. If you're ever interested in seeing the source code for some functionality that we're using, you can do that using IPython's ``psource`` magic.
 
-
-    from skbio.alignment import Alignment
-    
-    %psource Alignment.position_entropies
+```python
+>>> from skbio.alignment import Alignment
+...
+>>> %psource Alignment.position_entropies
+```
 
 The documentation for scikit-bio is also very extensive (though the package itself is still in early development). You can view the documentation for the `Alignment` object, for example, [here](http://scikit-bio.org/docs/0.2.3/generated/skbio.alignment.Alignment.html). These documents will be invaluable for learning how to use the objects.
 
@@ -76,12 +79,9 @@ If you're new to biology, these are some books and resources that will help you 
 
 * [The Processes of Life](http://www.amazon.com/Processes-Life-Introduction-Molecular-Biology/dp/0262013053) by Lawrence Hunter. *An introduction to biology for computer scientists.*
 
-
 * [Molecular Biology of the Cell](http://www.amazon.com/Molecular-Biology-Cell-Bruce-Alberts/dp/0815341059/ref=sr_1_1?s=books&ie=UTF8&qid=1314225305&sr=1-1) by Bruce Alberts, Alexander Johnson, Julian Lewis, Martin Raff, Keith Roberts, Peter Walter. *One of the best texts on molecular biology. This is fairly advanced (it's generally used in upper division molecular biology courses) so it may not be the best place to start. You'll find it invaluable though if you plan to go on in Bioinformatics. This book is available via the NIH Bookshelf (for example, from Chapter 1: [The Universal Features of Cells on Earth](http://www.ncbi.nlm.nih.gov/books/NBK26864/) and [The Diversity of Genomes and the Tree of Life](http://www.ncbi.nlm.nih.gov/books/NBK26866/).*
 
-
 * [Brock Biology of Microorganisms](http://www.amazon.com/Brock-Biology-Microorganisms-Michael-Madigan/dp/032164963X/ref=dp_ob_title_bk) by Michael T. Madigan, John M. Martinko, David Stahl, David P. Clark. *One of the best textbooks on microbiology. This is also fairly advanced, but if you're interested in microbial ecology or other aspects of microbiology it will likely be extremely useful.*
-
 
 * The [NIH Bookshelf](http://www.ncbi.nlm.nih.gov/books/) A lot of free biology texts, some obviously better than others.
 
@@ -91,12 +91,9 @@ If you're new to Computer Science and programming, these are some books and reso
 
 * [Software Carpentry](www.software-carpentry.org) *Online resources for learning scientific computing skills, and regular in-person workshops all over the world. Taking a Software Carpentry workshop **will** pay off for biology students interested in a career in research.*
 
-
 * [Practical Computing for Biologists](http://www.amazon.com/Practical-Computing-Biologists-Steven-Haddock/dp/0878933913) by Steven Haddock and Casey Dunn. *A great introduction to many computational skills that are required of modern biologists. I *highly* recommend this book to all Biology undergraduate and graduate students.*
 
-
 * [Practical Programming: A Introduction to Computer Science Using Python](http://www.amazon.com/Practical-Programming-Introduction-Pragmatic-Programmers/dp/1934356271) by Jennifer Campbell, Paul Gries, Jason Montojo, Greg Wilson. *An introduction to the python programming language and basic computer science. This is a great first programming book for people interested in bioinformatics or scientific computing in general.*
-
 
 * [Learn Python the Hard Way](http://learnpythonthehardway.org/) by Zed Shaw. *Another good python introduction. This one is very focused on exercises and is great for practicing python. My students have complained that it doesn't provide enough background information (i.e., `what` you're doing and `why` it works) and for that reason I recommend using this in conjunction with `Practical Programming`. Beware that the two don't follow each other exactly. One strategy that some students use is to work through these exercises in order and use `Practical Programming` as a reference.*
 
