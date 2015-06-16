@@ -73,7 +73,7 @@ An alternative type of alpha diversity measure would be *evenness*, and would te
 
 Let's look at two metrics of alpha diversity: observed species, and phylogenetic diversity.
 
-#### Observed species (or Observed OTUs) <link src='e3f5c8'/>
+### Observed species (or Observed OTUs) <link src='e3f5c8'/>
 
 Observed species, or Observed OTUs as it's more accurately described, is about as simple of a metric as can be used to quantify alpha diversity. With this metric, we simply count the OTUs that are observed in a given sample. Note that this is a qualitative metric: we treat each OTU as being observed or not observed - we don't care how many times it was observed.
 
@@ -127,7 +127,7 @@ Pairing this with the table we defined above (displayed again in the cell below)
 >>> table2
 ```
 
-#### Phylogenetic Diversity (PD) <link src='c407f8'/>
+### Phylogenetic Diversity (PD) <link src='c407f8'/>
 
 Phylogenetic Diversity (PD) is a metric that was developed by Dan Faith in the early 1990s (find the original paper [here](http://www.sciencedirect.com/science/article/pii/0006320792912013)). Like many of the measures that are used in microbial community ecology, it wasn't initially designed for studying microbial communities, but rather communities of "macro-organisms" (macrobes?). Some of these metrics, including PD, do translate well to microbial community analysis, while some don't translate as well. (For an illustration of the effect of sequencing error on PD, where it is handled well, versus it's effect on the Chao1 metric, where it is handled less well, see Figure 1 of [Reeder and Knight (2010)](http://www.nature.com/nmeth/journal/v7/n9/full/nmeth0910-668b.html)).
 
@@ -193,7 +193,7 @@ And then apply those to compute the PD of our three samples. For each computatio
 
 How does this result compare to what we observed above with the Observed OTUs metric? Based on your knowledge of biology, which do you think is a better representation of the relative diversities of these samples?
 
-#### Even sampling <link src='2466b2'/>
+### Even sampling <link src='2466b2'/>
 
 Imagine again that we're going out to count plants in the Sonoran Desert and the Costa Rican rainforest. We're interested in getting an idea of the plant richness in each environment. In the Sonoran Desert, we survey a square kilometer area, and count 150 species of plants. In the rainforest, we survey a square meter, and count 15 species of plants. So, clearly the plant species richness in the Sonoran Desert is higher, right? What's wrong with this comparison?
 
