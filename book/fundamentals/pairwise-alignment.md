@@ -206,7 +206,7 @@ Here's a global view of the matrix.
 >>> print(format_matrix(aas, aas, data))
 ```
 
-# Needleman-Wunsch global pairwise sequence alignment <link src='15efc2'/>
+## Needleman-Wunsch global pairwise sequence alignment <link src='15efc2'/>
 
 Now let's get started on using this to align a pair of sequences.
 
@@ -501,7 +501,7 @@ And we can take the *convenience function* one step futher, and wrap `sw_align` 
 
 So there you have it: the basics of pairwise sequence alignment, which is easily the most fundamental algorithm in bioinformatics.
 
-## Smith-Waterman local alignment with affine gap scoring <link src='976169'/>
+### Smith-Waterman local alignment with affine gap scoring <link src='976169'/>
 
 The second limitation of the our simple alignment algorithm, and one that is also present in our version of Smith-Waterman as implemented above, is that all gaps are scored equally whether they represent the opening of a new insertion/deletion, or the extension of an existing insertion/deletion. This isn't ideal based on what we know about how insertion/deletion events occur (see [this discussion of replication slippage](http://www.ncbi.nlm.nih.gov/books/NBK21114/)). Instead, **we might want to incur a large penalty for opening a gap, but a smaller penalty for extending a gap**. To do this, **we need to make two small changes to our scoring scheme**. When we compute the score for a gap, we should incurr a *gap open penalty* if the previous max score was derived from inserting a gap character in the same sequence. If we represent our traceback matrix as $T$, our gap open penalty as $d^0$, and our gap extend penalty as $d^e$, our scoring scheme would look like the following:
 
