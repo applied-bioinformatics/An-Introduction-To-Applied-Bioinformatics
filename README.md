@@ -5,19 +5,21 @@
 
 An **I**ntroduction to **A**pplied **B**ioinformatics (or IAB) is a free, open source interactive text that introduces readers to core concepts of bioinformatics in the context of their implementation an application.
 
-To learn more about who should read IAB, you should begin by reading *[Reading IAB](http://readIAB.org/book/latest/1/1)*. For an overview of the content, start with the *[IAB Table of Contents](http://readIAB.org/book/latest/)*.
+To learn more about who should read IAB, you should begin by reading *[Reading IAB](http://readIAB.org/book/latest/1/1)*. For an overview of the content, start with the *[IAB Table of Contents](http://readIAB.org/book/latest/)*. If you're interested in getting involved in writing content or code for IAB, or editing IAB, see [CONTRIBUTING.md](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/CONTRIBUTING.md).
 
 <div style="float: right; margin-left: 30px;"><img title="Logo by @gregcaporaso." style="float: right;margin-left: 30px;" src="https://raw.github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/to-rst/book/images/logo.png" align=right height=300/></div>
 
-IAB is in early development stage. To see the plans for where the project will go over the next two years, see the [project milestones](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/milestones). Currently, the **best example of where I'm hoping to go with these materials** is the [multiple sequence alignment](http://readIAB.org/book/latest/2/3) chapter.
+IAB is in early development stage. To see the plans for where the project will go, see the [project milestones](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/milestones). **A good example of where we're going** is the [multiple sequence alignment](http://readIAB.org/book/latest/2/3) chapter.
 
-**Warning:** The code in the ``iab`` module is **not sufficiently tested, documented, or optimized for production use**, but is rather intended for internal use only. As code reaches those quality standards it will be ported to [scikit-bio](http://www.scikit-bio.org). I do not recommend using the code in the ``iab`` module outside of the text. In other words, don't `import iab` outside of the text - if you want access to the functionality in your own code, you should `import skbio`.
+**Warning:** The code in the ``iab`` module is **not sufficiently tested, documented, or optimized for production use**, but is rather intended for educational use only. As code reaches those quality standards it is ported to [scikit-bio](http://www.scikit-bio.org). I do not recommend using the code in the ``iab`` module outside of the text. In other words, don't `import iab` outside of the text - if you want access to the functionality in your own code, you should `import skbio`.
 
 ## More information
 
 <div style="float: right; margin-left: 30px;"><a href="http://www.sloan.org"><img title="Logo by @gregcaporaso." style="float: right;margin-left: 30px;" src="http://www.sloan.org/fileadmin/media/images/logos/SloanLogo-primary-black.png" align=right></a></div>
 
 IAB is primarily being developed by [Greg Caporaso](http://caporasolab.us/people/greg-caporaso/) (GitHub/Twitter: [@gregcaporaso](https://github.com/gregcaporaso)) in the [Caporaso Lab](http://www.caporasolab.us) at [Northern Arizona University](http://www.nau.edu). You can find information on the courses I teach on [my teaching website](http://www.caporasolab.us/teaching) and information on my research and lab on [my lab website](http://www.caporasolab.us).
+
+See the full list of [IAB contributors here](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/graphs/contributors).
 
 IAB is funded in part by the [Alfred P. Sloan Foundation](www.sloan.org). Initial prototyping was funded in part by [Arizona's Technology and Research Initiative Fund](http://nau.edu/Research/Funding/Technology-Research-Initiative-Fund/).
 
