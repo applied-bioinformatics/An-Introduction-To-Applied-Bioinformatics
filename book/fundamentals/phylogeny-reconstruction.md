@@ -76,7 +76,6 @@ Computing a UPGMA tree for a group of sequences relies on first computing *dista
 
 Let's start with something more similar that sequences. Let's compute the distances between points in a Cartesian plane, to explore what each of these mean.  
 
-
 ```python
 >>> %pylab inline
 >>> from __future__ import print_function
