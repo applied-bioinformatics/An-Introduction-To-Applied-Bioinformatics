@@ -1,5 +1,5 @@
 
-# Generalized dynamic programming for multiple sequence alignment <link src='737114'/> 
+# Generalized dynamic programming for multiple sequence alignment <link src='737114'/>
 
 It's possible to generalize Smith-Waterman and Needleman-Wunsch, the dynamic programming algorithms that we explored for pairwise sequence aligment, to identify the optimal alignment of more than two sequences. Remember that our scoring scheme for pairwise alignment with Smith-Waterman looked like the following:
 
@@ -90,15 +90,15 @@ And for four sequences:
 >>> plt.ylabel('Runtime (s)')
 ```
 
-We clearly have a problem here, and that is that **the runtime for multiple sequence alignment using full dynamic programming algoriths grows exponentially with the number of sequences to be aligned**. If $n$ is our sequence length, and $s$ is the number of sequences, that means that runtime is proportional to $n^s$. In pairwise alignment, $s$ is always equal to 2, so the problem is more manangeable. However, **for the general case of $s$ sequences, we really can't even consider Smith-Waterman or Needleman-Wunsch for more than just a few sequences.** The pattern in the plots above should illustrate why. 
+We clearly have a problem here, and that is that **the runtime for multiple sequence alignment using full dynamic programming algoriths grows exponentially with the number of sequences to be aligned**. If $n$ is our sequence length, and $s$ is the number of sequences, that means that runtime is proportional to $n^s$. In pairwise alignment, $s$ is always equal to 2, so the problem is more manangeable. However, **for the general case of $s$ sequences, we really can't even consider Smith-Waterman or Needleman-Wunsch for more than just a few sequences.** The pattern in the plots above should illustrate why.
 
 As we explored with database searching, we need to figure out how to align fewer sequences. This is where *progressive alignment* comes in.
 
-# Progressive alignment <link src='aa5e0a'/> 
+## Progressive alignment <link src='aa5e0a'/>
 
 <div style="float: right; margin-left: 30px;"><img title="Image by @gregcaporaso." style="float: right; margin-left: 30px;" src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/fundamentals/images/confusion.png" align=right width=330/></div>
 
-**In progressive alignment, the problem of exponential growth of runtime and space is managed by selectively aligning pairs of sequences, and aligning alignments of sequences.** What we typically do is identify a pair of closely sequences, and align those. Then, we identify the next closely related sequence to that initial pair, and align that sequence to the alignment. This concept of aligning a sequence to an alignment is new, and we'll come back to it in just a few minutes. The other concept of identifying the most closely related sequences, and then the next most closely related sequence, and so on should sound familar. It effectively means that we're traversing a tree. And herein lies our problem: **we need a tree to efficently align multiple sequences, but we need an alignment to build a good tree**. 
+**In progressive alignment, the problem of exponential growth of runtime and space is managed by selectively aligning pairs of sequences, and aligning alignments of sequences.** What we typically do is identify a pair of closely sequences, and align those. Then, we identify the next closely related sequence to that initial pair, and align that sequence to the alignment. This concept of aligning a sequence to an alignment is new, and we'll come back to it in just a few minutes. The other concept of identifying the most closely related sequences, and then the next most closely related sequence, and so on should sound familar. It effectively means that we're traversing a tree. And herein lies our problem: **we need a tree to efficently align multiple sequences, but we need an alignment to build a good tree**.
 
 You probably have two burning questions in your mind right now:
 
@@ -129,7 +129,7 @@ And finally, we can compute the alignment at the root node of the tree, by align
 
 **The alignment at the root node is our multiple sequence alignment.**
 
-## Building the guide tree <link src='2d97eb'/> 
+### Building the guide tree <link src='2d97eb'/>
 
 Let's address the first of our outstanding questions. **I mentioned above that *we need an alignment to build a good tree*. The key word here is *good*. We can build a very rough tree - one that we would never want to present as representing the actual relationships between the sequences in question - without first aligning the sequences.** Remember that building a UPGMA tree requires only a distance matrix, so if we can find a non-alignment-dependent way to compute distances between the sequences, we can build a rough UPGMA tree from them.
 
@@ -155,7 +155,7 @@ Let's compute distances between the sequences based on their *word* composition.
 >>>     print(e)
 ```
 
-If we then have two sequences, we can compute the word counts for each and define a distance between the sequences as the fraction of words that are unique to either sequence. 
+If we then have two sequences, we can compute the word counts for each and define a distance between the sequences as the fraction of words that are unique to either sequence.
 
 ```python
 >>> from iab.algorithms import kmer_distance
@@ -217,8 +217,8 @@ We can next use some functionality from SciPy to cluster the sequences with UPGM
 >>> for q in query_sequences:
 >>>     print(q)
 ...
->>> guide_lm = average(guide_dm.condensed_form())    
->>> guide_d = dendrogram(guide_lm, labels=guide_dm.ids, orientation='right', 
+>>> guide_lm = average(guide_dm.condensed_form())
+>>> guide_d = dendrogram(guide_lm, labels=guide_dm.ids, orientation='right',
 >>>                      link_color_func=lambda x: 'black')
 >>> guide_tree = to_tree(guide_lm)
 ```
@@ -234,7 +234,7 @@ We can next use some functionality from SciPy to cluster the sequences with UPGM
 
 We now have a guide tree, so we can move on to the next step of progressive alignment.
 
-## Generalization of Needleman-Wunsch (with affine gap scoring) for progressive multiple sequence alignment <link src='e6484e'/> 
+### Generalization of Needleman-Wunsch (with affine gap scoring) for progressive multiple sequence alignment <link src='e6484e'/>
 
 Next, we'll address our second burning question: aligning alignments. As illustrated above, there are basically three different types of pairwise alignment we need to support for progressive multiple sequenence alignment with Needleman-Wunsch. These are:
 
@@ -242,7 +242,7 @@ Next, we'll address our second burning question: aligning alignments. As illustr
 2. Alignment of a sequence and an alignment.
 3. Alignment of a pair of alignments.
 
-Standard Needleman-Wunsch supports the first, and it is very easy to generalize it to support the latter two. The only change that is necessary is in how the alignment of two non-gap characters is scored. Recall that we previously scored an alignment of two characters by looking up the score of subsitution from one to the other in a substitution matrix. To adapt this for aligning a sequence to an alignment, or for aligning an alignment to an alignment, we compute this subsitution as the average score of aligning the pairs of characters. 
+Standard Needleman-Wunsch supports the first, and it is very easy to generalize it to support the latter two. The only change that is necessary is in how the alignment of two non-gap characters is scored. Recall that we previously scored an alignment of two characters by looking up the score of subsitution from one to the other in a substitution matrix. To adapt this for aligning a sequence to an alignment, or for aligning an alignment to an alignment, we compute this subsitution as the average score of aligning the pairs of characters.
 
 For example, if we want to align the alignment column from $aln1$:
 
@@ -268,7 +268,7 @@ The following code adapts our implementation of Needleman-Wunsh to support align
 
 ```python
 >>> from iab.algorithms import format_dynamic_programming_matrix, format_traceback_matrix
->>> from skbio.alignment._pairwise import _compute_score_and_traceback_matrices 
+>>> from skbio.alignment._pairwise import _compute_score_and_traceback_matrices
 ...
 >>> %psource _compute_score_and_traceback_matrices
 ```
@@ -280,7 +280,7 @@ The following code adapts our implementation of Needleman-Wunsh to support align
 
 ```python
 >>> from skbio.alignment import global_pairwise_align_nucleotide
->>> %psource global_pairwise_align_nucleotide 
+>>> %psource global_pairwise_align_nucleotide
 ```
 
 For the sake of the examples below, I'm going to override one of the ``global_pairwise_align_nucleotide`` defaults to penalize terminal gaps. This effectively tells the algorithm that we know we have a collection of sequences that are homologous from beginning to end.
@@ -299,7 +299,7 @@ For example, we can still use this code to align pairs of sequences (but note th
 >>> print(aln1)
 ```
 
-We can align that alignment to one of our other sequences. 
+We can align that alignment to one of our other sequences.
 
 ```python
 ...
@@ -323,9 +323,9 @@ And then align that alignment against our previous alignment:
 >>> print(aln3)
 ```
 
-## Putting it all together: progressive multiple sequence alignment <link src='082f33'/> 
+### Putting it all together: progressive multiple sequence alignment <link src='082f33'/>
 
-We can now combine all of these steps to take a set of query sequences, build a guide tree, perform progressive multiple sequence alignment, and return the guide tree (as a SciPy linkage matrix) and the alignment. 
+We can now combine all of these steps to take a set of query sequences, build a guide tree, perform progressive multiple sequence alignment, and return the guide tree (as a SciPy linkage matrix) and the alignment.
 
 ```python
 >>> from skbio import TreeNode
@@ -362,13 +362,13 @@ We can now build a (hopefully) improved tree from our multiple sequence alignmen
 The UPGMA trees that result from these alignments are very different. First we'll look at the guide tree, and then the tree resulting from the progressive multiple sequence alignment.
 
 ```python
->>> d = dendrogram(guide_lm, labels=guide_dm.ids, orientation='right', 
+>>> d = dendrogram(guide_lm, labels=guide_dm.ids, orientation='right',
 >>>                link_color_func=lambda x: 'black')
 ```
 
 ```python
 >>> msa_lm = average(msa_dm.condensed_form())
->>> d = dendrogram(msa_lm, labels=msa_dm.ids, orientation='right', 
+>>> d = dendrogram(msa_lm, labels=msa_dm.ids, orientation='right',
 >>>                link_color_func=lambda x: 'black')
 ```
 
@@ -383,9 +383,9 @@ And we can wrap this all up in a single convenience function:
 >>> msa, tree = progressive_msa_and_tree(query_sequences, pairwise_aligner=global_pairwise_align_nucleotide, display_tree=True, display_aln=True)
 ```
 
-# Progressive alignment versus iterative alignment <link src='7319bd'/> 
+## Progressive alignment versus iterative alignment <link src='7319bd'/>
 
-In an iterative alignment, the output tree from the above progressive alignment is used as a guide tree, and the full process repeated. This is performed to reduce errors that result from a low-quality guide tree. 
+In an iterative alignment, the output tree from the above progressive alignment is used as a guide tree, and the full process repeated. This is performed to reduce errors that result from a low-quality guide tree.
 
 ```python
 >>> from iab.algorithms import iterative_msa_and_tree
@@ -408,4 +408,4 @@ In an iterative alignment, the output tree from the above progressive alignment 
 >>> msa, tree = iterative_msa_and_tree(query_sequences, pairwise_aligner=global_pairwise_align_nucleotide, num_iterations=5, display_aln=True, display_tree=True)
 ```
 
-Some references that I used in assembling these notes include [1](http://statweb.stanford.edu/~nzhang/345_web/sequence_slides3.pdf), [2](http://math.mit.edu/classes/18.417/Slides/alignment.pdf), [3](http://www.sciencedirect.com/science/article/pii/0378111988903307), [4](http://bioinformatics.oxfordjournals.org/content/23/21/2947.full), and [5](http://nar.oxfordjournals.org/content/32/5/1792.full). 
+Some references that I used in assembling these notes include [1](http://statweb.stanford.edu/~nzhang/345_web/sequence_slides3.pdf), [2](http://math.mit.edu/classes/18.417/Slides/alignment.pdf), [3](http://www.sciencedirect.com/science/article/pii/0378111988903307), [4](http://bioinformatics.oxfordjournals.org/content/23/21/2947.full), and [5](http://nar.oxfordjournals.org/content/32/5/1792.full).
