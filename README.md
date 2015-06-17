@@ -13,7 +13,7 @@ IAB is in early development stage. To see the plans for where the project will g
 
 **Warning:** The code in the ``iab`` module is **not sufficiently tested, documented, or optimized for production use**, but is rather intended for educational use only. As code reaches those quality standards it is ported to [scikit-bio](http://www.scikit-bio.org). I do not recommend using the code in the ``iab`` module outside of the text. In other words, don't `import iab` outside of the text - if you want access to the functionality in your own code, you should `import skbio`.
 
-## More information
+## Who's involved?
 
 <div style="float: right; margin-left: 30px;"><a href="http://www.sloan.org"><img title="Logo by @gregcaporaso." style="float: right;margin-left: 30px;" src="http://www.sloan.org/fileadmin/media/images/logos/SloanLogo-primary-black.png" align=right></a></div>
 
