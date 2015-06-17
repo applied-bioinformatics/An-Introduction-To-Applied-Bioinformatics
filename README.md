@@ -5,11 +5,11 @@
 
 An **I**ntroduction to **A**pplied **B**ioinformatics (or IAB) is a free, open source interactive text that introduces readers to core concepts of bioinformatics in the context of their implementation an application.
 
-To learn more about who should read IAB, you should begin by reading *[Reading IAB](http://readIAB.org/book/1/1)*. For an overview of the content, start with the *[IAB Table of Contents](http://readIAB.org/book)*.
+To learn more about who should read IAB, you should begin by reading *[Reading IAB](http://readIAB.org/book/latest/1/1)*. For an overview of the content, start with the *[IAB Table of Contents](http://readIAB.org/book/latest/)*.
 
 <div style="float: right; margin-left: 30px;"><img title="Logo by @gregcaporaso." style="float: right;margin-left: 30px;" src="https://raw.github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/to-rst/book/images/logo.png" align=right height=300/></div>
 
-IAB is in early development stage. To see the plans for where the project will go over the next two years, see the [project milestones](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/milestones). Currently, the **best example of where I'm hoping to go with these materials** is the [multiple sequence alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/0.1.0/fundamentals/multiple-sequence-alignment.ipynb) chapter.
+IAB is in early development stage. To see the plans for where the project will go over the next two years, see the [project milestones](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/milestones). Currently, the **best example of where I'm hoping to go with these materials** is the [multiple sequence alignment](http://readIAB.org/book/latest/2/3) chapter.
 
 **Warning:** The code in the ``iab`` module is **not sufficiently tested, documented, or optimized for production use**, but is rather intended for internal use only. As code reaches those quality standards it will be ported to [scikit-bio](http://www.scikit-bio.org). I do not recommend using the code in the ``iab`` module outside of the text. In other words, don't `import iab` outside of the text - if you want access to the functionality in your own code, you should `import skbio`.
 

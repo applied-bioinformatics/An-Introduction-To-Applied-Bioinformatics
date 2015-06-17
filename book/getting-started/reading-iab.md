@@ -14,7 +14,7 @@ IAB is also an **electronic-only resource**. There are currently no plans to com
 
 We are in the process of developing a **project status page** that will detail the plans for IAB. This will include the full table of contents, and what stage you can expect chapters to be at at different times. You can track progress of this on [IAB #97](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/97).
 
-[My](http://github.com/gregcaporaso) goal for IAB is for it to make bioinformatics as accessible as possible to students from varied backgrounds, and to get more people into this hugely exciting field. I'm very interested in hearing from readers and instructors who are using IAB, so get in touch if you have corrections, suggestions for how to improve the content, or any other thoughts or comments on the text. In the spirit of openness, I'd prefer to be contacted via the [IAB issue tracker](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/). I'll respond to direct e-mail as well, but I'm always backlogged (just ask my students), so e-mail responses are likely to be slower.
+[My](alias://fedd13) goal for IAB is for it to make bioinformatics as accessible as possible to students from varied backgrounds, and to get more people into this hugely exciting field. I'm very interested in hearing from readers and instructors who are using IAB, so get in touch if you have corrections, suggestions for how to improve the content, or any other thoughts or comments on the text. In the spirit of openness, I'd prefer to be contacted via the [IAB issue tracker](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/). I'll respond to direct e-mail as well, but I'm always backlogged (just ask my students), so e-mail responses are likely to be slower.
 
 I hope you find IAB useful, and that you enjoy reading it!
 
@@ -24,16 +24,16 @@ IAB is written for scientists, software developers, and students interested in u
 
 IAB was initially developed for an undergraduate course cross-listed in computer science and biology with no pre-requisites. It therefore assumes little background in biology or computer science, however some basic background is very helpful. For example, an understanding of the roles of and relationship between DNA and protein in a cell, and the ability to read and follow well-annotated python code, are both helpful (but not necessary) to get started.
 
-In the *Getting started with...* sections below I provide some suggestions for other texts that will help you to get started.
+In the *Getting started with [Biology](alias://cf88ac) and [Computer Science](alias://6ad7e1)* sections below I provide some suggestions for other texts that will help you to get started.
 
 ## How to read IAB <link src='de1bc2'/>
 
 There are two ways to read *An Introduction To Applied Bioinformatics*:
 
-* The *recommended* way is to install it and work with it interactively.
-* The *easiest* way is to view the static notebooks online using [nbviewer](http://nbviewer.ipython.org/). You should:
- * [start here to view the latest release version](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/0.1.0/Index.ipynb), or
- * [start here to view the development version](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/Index.ipynb) (which will have the latest content, but will be less polished and possibly buggy).
+* The *recommended* way is to install it and work with it interactively. See the [install instructions below](alias://96d24f).
+* The *easiest* way is to view the static notebooks online at  [readIAB.org](http://readIAB.org/). You should:
+ * [start here to view the latest release version](http://readIAB.org/book/latest/), or
+ * [start here to view the development version](http://readIAB.org/book/dev/) (which will have the latest content, but will be less polished and possibly buggy).
 
 IAB is split into four different sections: *Getting started*, *Fundamentals*, *Applications*, and *Wrapping up*. You should start reading IAB by working through the *Getting started* and *Fundamentals* chapters in order. You should then read the *Applications* chapters and *Wrapping up* in any order, based on your own interest.
 
@@ -42,17 +42,17 @@ IAB is split into four different sections: *Getting started*, *Fundamentals*, *A
 If you're going to read *An Introduction to Applied Bioinformatics* interactively (recommended), you'll need to install it. The following commands should work for Linux and Mac OS X users:
 
 ```
-    pip install numpy
-    wget https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/0.1.0.tar.gz
-    tar -xzf 0.1.0.tar.gz
-    cd An-Introduction-To-Applied-Bioinformatics-0.1.0
-    pip install .
+pip install numpy
+pip install https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/0.1.0.tar.gz
+wget http://readIAB.org/downloads/0.1.0/iab-notebooks-0.1.0.tgz
+tar -xzf iab-notebooks-0.1.0.tgz
+cd iab-notebooks-0.1.0
 ```
 
-Then, launch the IPython Notebook to get started (be sure that you're in the ``An-Introduction-To-Applied-Bioinformatics`` directory when you run this command):
+Then, launch the IPython Notebook to get started:
 
 ```
-    ipython notebook Index.ipynb
+ipython notebook index.ipynb
 ```
 
 ## Using the IPython Notebook <link src='fdf5dd'/>
@@ -63,7 +63,6 @@ Most of the code that is used in IAB comes from [scikit-bio](http://scikit-bio.o
 
 ```python
 >>> import skbio
-...
 >>> from __future__ import print_function
 >>> from IPython.core import page
 >>> page.page = print
@@ -80,7 +79,6 @@ We'll inspect a lot of source code in IAB as we explore bioinformatics algorithm
 
 ```python
 >>> from skbio.alignment import Alignment
-...
 >>> %psource Alignment.position_entropies
 ```
 
@@ -116,7 +114,7 @@ If you're having issues getting *An Introduction to Applied Bioinformatics* runn
 
 ## Contributing to IAB <link src='b1c06a'/>
 
-If you're interested in contributing content or features to IAB, I'd love to hear from you. You should start by reviewing [CONTRIBUTING.md](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/CONTRIBUTING.md) which provides guidelines on how to get involved.
+If you're interested in contributing content or features to IAB, you should start by reviewing [CONTRIBUTING.md](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/CONTRIBUTING.md) which provides guidelines on how to get involved.
 
 ## About the author <link src='fedd13'/>
 
