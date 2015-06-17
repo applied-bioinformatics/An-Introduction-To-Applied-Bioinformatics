@@ -378,9 +378,9 @@ We've now reduced the number of alignments and the runtime. What was the effect 
 
 With these three algorithms, we've looked at three different ways of defining a cluster or OTUs. This figure illustrates the differences in each definition, where the points illustrate sequences, the solid lines illustrated a similarity threshold, and the grey areas represent the space defining an OTU (or where a new sequence must fall to be considered part of an OTU).
 
-<div style="float: right; margin-left: 30px;"><img style="float: right; margin-left: 30px;" src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/fundamentals/images/cluster-legend.png" align=right></div>
+<div style="float: right; margin-left: 30px;"><img style="float: right; margin-left: 30px;" src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/cluster-legend.png" align=right></div>
 
-<div style="float: right; margin-left: 30px;"><img style="float: right; margin-left: 30px;" src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/fundamentals/images/cluster-types.png" align=right></div>
+<div style="float: right; margin-left: 30px;"><img style="float: right; margin-left: 30px;" src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/cluster-types.png" align=right></div>
 
 In furthest neighbor, where membership in a cluster is defined by a query sequence's distance to the most dissimilar sequence already in the cluster (its furthest neighbor), the definition of the cluster shrinks with additional sequences. This can have some undesired effects, such as the definition of a cluster becoming so restrictive that it is unlikely that new sequences will ever be added.
 

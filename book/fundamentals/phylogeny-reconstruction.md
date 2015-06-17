@@ -23,7 +23,7 @@ UPGMA is a heirarchical clustering algorithm. It is widely used, though it's app
 
 Here's the goal (well, *a* goal, but this is the basic idea):
 
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/fundamentals/images/basic-rooted-tree1.jpg" width=600>
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/basic-rooted-tree1.jpg" width=600>
 
 Each *leaf* (or *tip*, or *terminal node*) in this tree represents a sequence, and the length of the horizonal branches between them indicate their dissimilarity to one another. This is a *rooted tree*, which means that it includes an assumption about the last common ancestor of all sequences represented in the tree.
 
@@ -31,7 +31,7 @@ Note that the vertical lines in this tree are used for layout purposes only - th
 
 An **unrooted trees**, like the following, doesn't include an assumption about the last common ancestor of all sequences:
 
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/fundamentals/images/basic-unrooted-tree1.jpg" width=600>
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/basic-unrooted-tree1.jpg" width=600>
 
 **Terminal nodes, tips or leaves** extant organisms, frequently called operational taxonomic units or OTUs. OTUs are families of related organisms.
 
@@ -43,19 +43,19 @@ An **unrooted trees**, like the following, doesn't include an assumption about t
 
 **Branches** representative of the distance between the nodes.
 
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/fundamentals/images/tree-schematic1.png">
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-schematic1.png">
 
 **Monophyletic group** the last common ancestor was a member of the group (e.g., multicellular organisms)
 
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/fundamentals/images/tree-monophyly.png">
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-monophyly.png">
 
 **Polyphyletic group** the last common ancestor was not a member of the group (e.g., flying animals)
 
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/fundamentals/images/tree-polyphyly.png">
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-polyphyly.png">
 
 We assume that as time progresses, sequences will diverge such that more similar sequences have diverged more recently. The problem of phylogenetic reconstruction however is that we only have the tips. We don't have sequences for the internal nodes, and so we use modern sequences to develop a hypothesis about the evolutionary history of a sequence (and hopefully of the organisms who encode those sequences in their genomes).
 
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/fundamentals/images/sequence-evo-tree.png">
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/sequence-evo-tree.png">
 
 How many (rooted) trees are there for `n` sequences? This topic is discussed in detail in Chapter 3 of [Inferring Phylogenies](http://www.amazon.com/Inferring-Phylogenies-Joseph-Felsenstein/dp/0878931775/ref=sr_1_1?s=books&ie=UTF8&qid=1393288952&sr=1-1&keywords=inferring+phylogenies), the definitive text on this topic, but the basic answer is **a lot**.
 
@@ -203,7 +203,7 @@ Step 1.1: The smallest distance in the above matrix is `1.00`, between `s4` and 
 
 Step 1.2: Next, we'll create a new, smaller distance matrix where the sequences `s4` and `s5` are now represented by a single clade, `(s4, s5)`.
 
-<img src="files/images/upgma-tree-iter1.png">
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-iter1.png">
 
 ```python
 >>> iter1_ids = ['s1', 's2', 's3', '(s4, s5)']
@@ -254,7 +254,7 @@ Step 2.1: The smallest distance in the above matrix is `2.00`, between `s1` and 
 
 Step 2.2: Next, we'll create a new, smaller distance matrix where the sequences `s1` and `s3` are now represented by a single clade, `(s1, s3)`.
 
-<img src="files/images/upgma-tree-iter2.png">
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-iter2.png">
 
 ```python
 >>> iter2_ids = ['(s1, s3)', 's2', '(s4, s5)']
@@ -296,7 +296,7 @@ Step 3.1: The smallest distance in the above matrix is `3.50`, between `(s1, s3)
 
 Step 3.2: Next, we'll create a new, smaller distance matrix where the clade `(s1, s3)` and the sequence `s2` are now represented by a single clade, `((s1, s3), s2)`.
 
-<img src="files/images/upgma-tree-iter3.png">
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-iter3.png">
 
 ```python
 >>> iter3_ids = ['((s1, s3), s2)', '(s4, s5)']
@@ -323,7 +323,7 @@ Step 3.3 (continued): We can now fill in all of the distances in our iteration 3
 
 Step 3.4: At this stage, there is only one distance below the diagonal in our distance matrix. So, we can use that distance to draw the final branch in our tree, setting the total branch length to 4.8.
 
-<img src="files/images/upgma-tree-final.png">
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-final.png">
 
 [SciPy](http://www.scipy.org/) contains support for running UPGMA and generating *dendrograms* (or basic tree visualizations). We can apply this to our distance matrix as follows. You can explore other options for hierarchical clustering in SciPy [here](http://docs.scipy.org/doc/scipy/reference/cluster.hierarchy.html) (see the *routines for agglomerative clustering*).  
 
