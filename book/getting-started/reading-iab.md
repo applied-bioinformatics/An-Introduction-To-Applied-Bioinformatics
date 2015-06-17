@@ -39,7 +39,21 @@ IAB is split into four different sections: *Getting started*, *Fundamentals*, *A
 
 ## Installation <link src='96d24f'/>
 
-The [project website](http://caporasolab.us/An-Introduction-To-Applied-Bioinformatics/) has instructions installing and running *An Introduction To Applied Bioinformatics*.
+If you're going to read *An Introduction to Applied Bioinformatics* interactively (recommended), you'll need to install it. The following commands should work for Linux and Mac OS X users:
+
+```
+    pip install numpy
+    wget https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/0.1.0.tar.gz
+    tar -xzf 0.1.0.tar.gz
+    cd An-Introduction-To-Applied-Bioinformatics-0.1.0
+    pip install .
+```
+
+Then, launch the IPython Notebook to get started (be sure that you're in the ``An-Introduction-To-Applied-Bioinformatics`` directory when you run this command):
+
+```
+    ipython notebook Index.ipynb
+```
 
 ## Using the IPython Notebook <link src='fdf5dd'/>
 
@@ -104,14 +118,6 @@ If you're having issues getting *An Introduction to Applied Bioinformatics* runn
 
 If you're interested in contributing content or features to IAB, I'd love to hear from you. You should start by reviewing [CONTRIBUTING.md](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/CONTRIBUTING.md) which provides guidelines on how to get involved.
 
-## Disclaimer <link src='681765'/>
-
-**This project is in very early development stage.** It's not ready for prime-time by any means, but I fall firmly into the "publish early, publish often" mindset, hence its public availability. I am very interested in feedback. The best way to get feedback to me is through [the IAB issue tracker](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues), and the best way to contribute is through [pull requests](https://help.github.com/articles/using-pull-requests).
-
-The code in the iab module is **not sufficiently tested, documented, or optimized for production use**. As code reaches those quality standards it will be ported to [scikit-bio](http://www.scikit-bio.org). I do not recommend using the code in the iab module outside of these notebooks. In other words, don't `import iab` outside of the notebooks - if you want access to the functionality in your own code, you should `import skbio`.
-
-Currently, the **best example of where I'm hoping to go with these materials** is the [multiple sequence alignment](http://nbviewer.ipython.org/github/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/algorithms/4-multiple-sequence-alignment.ipynb) chapter.
-
 ## About the author <link src='fedd13'/>
 
 My name is Greg Caporaso. I'm the primary author of *An Introduction to Applied Bioinformatics*, but there are [other contributors](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/graphs/contributors) and I hope that list will grow.
@@ -127,3 +133,11 @@ I'm not the world expert on the topics that I present in IAB, but I have a passi
 I'm very active in open source bioinformatics software development. I am most widely known for my involvement in the development of the [QIIME software package](http://www.qiime.org), and more recently for leading the development of [scikit-bio](http://www.scikit-bio.org). I am also involved in many other bioinformatics software projects (see my [GitHub page](http://github.com/gregcaporaso)). IAB is one of the projects that I'm currently most excited about, so I truly hope that it's as useful for you as it is fun for me.
 
 For updates on IAB and various other things, you should [follow me on Twitter](https://twitter.com/gregcaporaso).
+
+## Acknowledgements <link src="CLeix6"/>
+
+<div style="float: right; margin-left: 30px;"><a href="http://www.sloan.org"><img title="Logo by @gregcaporaso." style="float: right;margin-left: 30px;" src="http://www.sloan.org/fileadmin/media/images/logos/SloanLogo-primary-black.png" align=right></a></div>
+
+*An Introduction to Applied Bioinformatics* is funded in part by the [Alfred P. Sloan Foundation](www.sloan.org). Initial prototyping was funded by [Arizona's Technology and Research Initiative Fund](http://nau.edu/Research/Funding/Technology-Research-Initiative-Fund/). The style of the project was inspired by [Bayesian Methods for Hackers](http://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/).
+
+See the repository's [contributors page](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/graphs/contributors) for information on who has contributed to the project.
