@@ -19,3 +19,28 @@ If you're interested in making contributions involving code refactoring, new cha
 ## Who's contributing?
 
 See the list of [IAB contributors](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/graphs/contributors) to find out who is involved with the project. If you submit a pull request that is merged, your GitHub account will be automatically listed on that page.
+
+## Building IAB locally
+
+If you're interested in building the IAB html and/or IPython Notebooks locally, you'll need to install IAB and build-iab. You can do this as follows:
+
+```
+pip install numpy
+pip install https://github.com/gregcaporaso/build-iab/archive/master.zip
+wget https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/master.zip
+unzip master.zip
+cd An-Introduction-To-Applied-Bioinformatics-master/
+pip install .
+```
+
+Then, to build the IPython Notebooks, you can run:
+
+```
+biab notebook -i book -o ipynb
+```
+
+or to build the HTML version, you can run:
+
+```
+biab html -i book -o html
+```
