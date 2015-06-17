@@ -1,9 +1,21 @@
-Contributing to An Introduction to Applied Bioinformatics
-=========================================================
+# Contributing to *An Introduction to Applied Bioinformatics*
 
-Thanks for your interest in contributing to *An Introduction to Applied Bioinformatics*!
+*An Introduction to Applied Bioinformatics* (IAB), is an open source project and we welcome community contributions. Contributions should generally be made in the form of GitHub pull requests. We've simplified the process of submitting these for changes to the IAB content, as described below.
 
-An Introduction to Applied Bioinformatics, or IAB, is an open source project and we welcome community contributions. Contributions should generally be made in the form of GitHub pull requests. 
+You will need a (free) GitHub account to submit a pull request.
 
-As of the time of this writing, [@gregcaporaso](https://github.com/gregcaporaso) is the primary author/developer, and is working on figuring out how to most efficiently accept community contributions. The problem is that it's currently challenging to diff IPython Notebooks, and it's hard to resolve merge conflicts in IPython Notebooks. For that reason I (sadly) may implement some type of *check out* approach that we can use to ensure that only a single person is working on a notebook at a time. While I'm working this out, to avoid wasting your time making changes that I can't merge, it's best to comment on existing issues (or create new issues) indicating what you want to work on, and wait for me to approve your starting to work on some changes. This will ensure that changes will be efficiently mergable. In general, I'll likely suggest that you submit your pull requests on a chapter-by-chapter basis, rather than as a single large pull request that touches several chapters. I'm working on improving this process, and will update this document when I do. 
+## How IAB is developed
 
+IAB is written in [markdown](http://commonmark.org/). [build-iab](https://github.com/gregcaporaso/build-iab) is then used to convert that markdown to html (for static online viewing) and ipynb (for interactive use). If you're submitting changes to content, you'll be submitting changes to markdown files. These are much more manageable that submitting changes to IPython notebooks, as it's much easier to diff the content.
+
+## Small contributions
+
+Contributions such as typo fixes, wording changes, and small code updates are relatively easy to submit. Every unit, chapter, section, and subsection heading in IAB has an *Edit on GitHub* link below it. You should click the link corresponding to the section that you want to edit, which will take you to the GitHub online editor. You can make your changes and submit a [pull request](https://help.github.com/articles/using-pull-requests/) from that page. This will initiate the IAB tests, which will ensure that your change hasn't broken anything. After the tests pass, we will review your changes and either merge them, request modifications before merging, or let you know why we won't integrate your proposed changes.
+
+## Large contributions
+
+If you're interested in making contributions involving code refactoring, new chapters or sections, restructuring of content, etc, you should first comment on existing issues (or create new issues) indicating what you want to work on, and wait for us to discuss the changes with you before you get started. This will ensure that the changes you want to make are in line with the direction of the project, compatible with future plans, and that there is no one else already working on related contributions. This will avoid wasted time if your change involves something that we wouldn't ultimately be merged. If in doubt, bring it up on the [issue tracker](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/) first.
+
+## Who's contributing?
+
+See the list of [IAB contributors](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/graphs/contributors) to find out who is involved with the project. If you submit a pull request that is merged, your GitHub account will be automatically listed on that page.
