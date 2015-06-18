@@ -44,9 +44,9 @@ If you're going to read *An Introduction to Applied Bioinformatics* interactivel
 ```
 pip install numpy
 pip install https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/0.1.0.tar.gz
-wget http://readIAB.org/downloads/0.1.0/iab-notebooks-0.1.0.tgz
-tar -xzf iab-notebooks-0.1.0.tgz
-cd iab-notebooks-0.1.0
+wget http://readIAB.org/book/0.1.0/IAB-notebooks.zip
+unzip IAB-notebooks.zip
+cd IAB-notebooks
 ```
 
 Then, launch the IPython Notebook to get started:
