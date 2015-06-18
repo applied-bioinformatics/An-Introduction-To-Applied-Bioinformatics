@@ -1,13 +1,18 @@
-[![Build Status](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.png?branch=master)](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics) [![DOI](https://zenodo.org/badge/11339/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.svg)](http://dx.doi.org/10.5281/zenodo.16419)
+[![Build Status](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.png?branch=master)](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics)
+[![DOI](https://zenodo.org/badge/11339/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.svg)](http://dx.doi.org/10.5281/zenodo.16419)
 [![Join the chat at https://gitter.im/gregcaporaso/An-Introduction-To-Applied-Bioinformatics](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gregcaporaso/An-Introduction-To-Applied-Bioinformatics?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 # An Introduction To Applied Bioinformatics
 
-An **I**ntroduction to **A**pplied **B**ioinformatics (or IAB) is a free, open source interactive text that introduces readers to core concepts of bioinformatics in the context of their implementation an application.
-
-To learn more about who should read IAB, you should begin by reading *[Reading IAB](http://readIAB.org/book/latest/1/1)*. For an overview of the content, start with the *[IAB Table of Contents](http://readIAB.org/book/latest/)*. If you're interested in getting involved in writing content or code for IAB, or editing IAB, see [CONTRIBUTING.md](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/CONTRIBUTING.md).
-
 <div style="float: right; margin-left: 30px;"><img title="Logo by @gregcaporaso." style="float: right;margin-left: 30px;" src="https://raw.github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/images/logo.png" align=right height=300/></div>
+
+An **I**ntroduction to **A**pplied **B**ioinformatics (or IAB) is a **free, open source interactive text** that introduces readers to core concepts of bioinformatics in the context of their implementation and application.
+
+* To learn more about who should read IAB or how to read IAB, see *[Reading IAB](http://readIAB.org/book/latest/1/1)*.
+
+* For an overview of the content, see the *[IAB Table of Contents](http://readIAB.org/book/latest/)*.
+
+* If you're interested in writing or editing content or code for IAB, see [CONTRIBUTING.md](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/CONTRIBUTING.md).
 
 IAB is in early development stage. To see the plans for where the project will go, see the [project milestones](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/milestones). **A good example of where we're going** is the [multiple sequence alignment](http://readIAB.org/book/latest/2/3) chapter.
 
