@@ -7,7 +7,7 @@
 # http://creativecommons.org/licenses/by-nc-sa/4.0/.
 # -----------------------------------------------------------------------------
 
-__version__ = '0.1.1'
+__version__ = '0.1.1-dev'
 
 from setuptools import find_packages, setup
 

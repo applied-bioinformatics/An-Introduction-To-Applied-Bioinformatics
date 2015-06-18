@@ -1,5 +1,7 @@
 # *An Introduction to Applied Bioinformatics* Change Log
 
+## Version 0.1.1-dev (changes since 0.1.1 go here)
+
 ## Version 0.1.1
 
 ### Content changes
