@@ -20,7 +20,7 @@ I hope you find IAB useful, and that you enjoy reading it!
 
 ## Who should read IAB? <link src='976b11'/>
 
-IAB is written for scientists, software developers, and students interested in understanding and applying bioinformatics methods, and ultimately in developing their own bioinformatics analysis pipelines or softare.
+IAB is written for scientists, software developers, and students interested in understanding and applying bioinformatics methods, and ultimately in developing their own bioinformatics analysis pipelines or software.
 
 IAB was initially developed for an undergraduate course cross-listed in computer science and biology with no pre-requisites. It therefore assumes little background in biology or computer science, however some basic background is very helpful. For example, an understanding of the roles of and relationship between DNA and protein in a cell, and the ability to read and follow well-annotated python code, are both helpful (but not necessary) to get started.
 
