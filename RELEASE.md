@@ -31,12 +31,23 @@ From the [An Introduction to Applied Bioinformatics GitHub page](https://github.
 
 1. Download the release that was just created on GitHub, and unzip that. Change into the resulting directory.
 
-1. Perform the s3 build, which will required that you have the ``AWS_ACCESS_KEY_ID`` and ``AWS_SECRET_ACCESS_KEY`` environment variables set.
+1. Perform the s3 build and upload, which will required that you have the ``AWS_ACCESS_KEY_ID`` and ``AWS_SECRET_ACCESS_KEY`` environment variables set.
 
-    ```bash
-    biab s3 -i book -v <version>
-    ```
-    Note that ``<version>`` should be replaced with the current release version.
+   ```bash
+   biab s3build -i book -o s3built
+   biab s3upload -i s3built -v latest
+   biab s3upload -i s3built -v <version>
+   ```
+   Note that ``<version>`` should be replaced with the current release version.
+
+1. Optional: If there are changes to the README.md (which is the content that lives at readIAB.org/index.html), convert that to html:
+
+   ```bash
+   ipython -c "import biab.util; biab.util.md_to_html('README.md', 'index.html')"
+   ```
+   Upload the resulting HTML file to the readiab.org S3 bucket.
+
+These steps are pretty clunky now, but will be updated in the near future to be a single step.
 
 ## Part 5:
 
