@@ -43,8 +43,8 @@ If you're going to read *An Introduction to Applied Bioinformatics* interactivel
 
 ```
 pip install numpy
-pip install https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/0.1.0.tar.gz
-wget http://readIAB.org/book/0.1.0/IAB-notebooks.zip
+pip install https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/0.1.1.tar.gz
+wget http://readIAB.org/book/0.1.1/IAB-notebooks.zip
 unzip IAB-notebooks.zip
 cd IAB-notebooks
 ```
