@@ -21,7 +21,7 @@ IAB is primarily being developed by [Greg Caporaso](http://caporasolab.us/people
 
 See the full list of [IAB contributors here](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/graphs/contributors).
 
-IAB is funded in part by the [Alfred P. Sloan Foundation](www.sloan.org). Initial prototyping was funded in part by [Arizona's Technology and Research Initiative Fund](http://nau.edu/Research/Funding/Technology-Research-Initiative-Fund/).
+IAB is funded in part by the [Alfred P. Sloan Foundation](http://www.sloan.org). Initial prototyping was funded in part by [Arizona's Technology and Research Initiative Fund](http://nau.edu/Research/Funding/Technology-Research-Initiative-Fund/).
 
 ## License
 
