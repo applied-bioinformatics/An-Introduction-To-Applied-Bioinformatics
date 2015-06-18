@@ -7,7 +7,7 @@
 # http://creativecommons.org/licenses/by-nc-sa/4.0/.
 # -----------------------------------------------------------------------------
 
-__version__ = '0.1.0-dev'
+__version__ = '0.1.1'
 
 from setuptools import find_packages, setup
 
@@ -40,10 +40,10 @@ setup(name='An-Introduction-To-Applied-Bioinformatics',
       author_email='gregcaporaso@gmail.com',
       maintainer='Greg Caporaso',
       maintainer_email='gregcaporaso@gmail.com',
-      url='http://caporasolab.us/An-Introduction-To-Applied-Bioinformatics',
+      url='http://readIAB.org',
       packages=find_packages(),
       install_requires=['scikit-bio >= 0.2.3, < 0.3.0',
-                        'ipython[all] >= 3.0.0, < 4.0.0',
+                        'ipython[all] >= 3.1.0, < 4.0.0',
                         'runipy', 'seaborn >= 0.5.1, < 0.6.0',
                         'qiime-default-reference >= 0.1.3, < 0.2.0',
                         'pandas >= 0.15.0, < 0.16.0',
