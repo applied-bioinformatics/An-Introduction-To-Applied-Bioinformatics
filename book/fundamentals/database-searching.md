@@ -113,7 +113,7 @@ In the next cell, I took a shorter exact match from `query1`. What is the effect
 
 ## Using heuristics to reduce runtime for database searches <link src='0f9232'/> 
 
-**As illustrated above, runtimes for performing pairwise alignments can be prohibitive for database searching.** The Smith-Waterman implementation we're using here, [SSW](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0082138), is very fast. As we covered in the prvious chapter, if we were to create an even faster implementation, that provide some initial help (it'd reduce our runtime by some factor $f$) but ultimately, we're still going to have a problem regardless of how big $f$ is, because **the runtime of the algorithm scales quadratically with sequence lengths**. Experiment with different values of $f$ to see how it changes the curve below. 
+**As illustrated above, runtimes for performing pairwise alignments can be prohibitive for database searching.** The Smith-Waterman implementation we're using here, [SSW](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0082138), is very fast. As we covered in the previous chapter, if we were to create an even faster implementation, that would provide some initial help (it'd reduce our runtime by some factor $f$) but ultimately, we're still going to have a problem regardless of how big $f$ is, because **the runtime of the algorithm scales quadratically with sequence lengths**. Experiment with different values of $f$ to see how it changes the curve below. 
 
 $f$ represents the fold-reduction in runtime (e.g., $f=2$ represents a two-fold reduction, or halving, of runtime, and $f=10$ equals a ten-fold reduction in runtime).
 
@@ -349,7 +349,7 @@ First, let's generate a longer subject sequence at random. Then, we'll create a 
 >>> print(fraction_better_or_equivalent_alignments(query,subject))
 ```
 
-**We've now look at two extremes: where sequences are obviously homologous, and where sequences are obviously not homologous. Next, we'll explore the region between these.** We'll obscurce the homology of a pair of sequences by randomly introducing some number of substitutions to make them approximately ``percent_id`` equal. By doing this, we can explore how this strategy works for increasingly more distantly related pairs of sequences.
+**We've now looked at two extremes: where sequences are obviously homologous, and where sequences are obviously not homologous. Next, we'll explore the region between these.** We'll obscure the homology of a pair of sequences by randomly introducing some number of substitutions to make them approximately ``percent_id`` equal. By doing this, we can explore how this strategy works for increasingly more distantly related pairs of sequences.
 
 ```python
 >>> def query_at_percent_id(percent_id, subject):
