@@ -30,7 +30,7 @@ We have learned the key tools we need for both sequence mapping and clustering i
 
 The algorithm at the core of *de novo* clustering is sequence alignment. In an ideal world, we would perform a full multiple sequence alignment of all of our sequences, compute their pairwise similarities (or dissimilarities), and use those values to group sequences that are above some *similarity threshold* into *OTU clusters* (just *OTUs* from here). As we discussed in the mutliple sequence alignment chapter however, that is infeasible for more than a few tens of sequences due to computational and memory requirements. Even progressive alignment can't typically handle more than a few tens of thousands of sequences (at least with the currently available implementations, that I am aware of), so OTU clustering is generally acheived by picking pairs of sequences to align. You'll notice in this section that many of the heuristics that have been applied for speeding up database searching are similar to the heuristics applied for OTU clustering.
 
-We'll work with SSW for Smith-Waterman pairwise alignment with affine gap scoring here, though in principle any pairwise aligner could be substituted.
+We'll work with [SSW](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0082138) for Smith-Waterman pairwise alignment with affine gap scoring here, though in principle any pairwise aligner could be substituted.
 
 In the figures that follow, points (or nodes) represent sequences, and line (or edges) connecting points indicate that a pair of sequences are within a defined percent identity threshold. These illustrations are used to describe OTUs, such that a set of points that are connected either directly or indirecty represent a grouping of sequences into an OTU.
 
