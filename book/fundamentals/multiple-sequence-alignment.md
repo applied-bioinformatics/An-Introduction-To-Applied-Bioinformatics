@@ -203,7 +203,7 @@ We can now apply one of these functions to build a distance matrix for a set of 
 >>> print(guide_dm)
 ```
 
-scikit-bio also has some basic visualization functionality for these objects. For example, we can easily visualize this object as a heatmap.
+scikit-bio also has some basic visualization functinality for these objects. For example, we can easily visualize this object as a heatmap.
 
 ```python
 >>> fig = guide_dm.plot(cmap='Greens')
