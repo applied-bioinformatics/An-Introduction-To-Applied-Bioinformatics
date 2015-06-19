@@ -90,7 +90,7 @@ And for four sequences:
 >>> plt.ylabel('Runtime (s)')
 ```
 
-We clearly have a problem here, and that is that **the runtime for multiple sequence alignment using full dynamic programming algoriths grows exponentially with the number of sequences to be aligned**. If $n$ is our sequence length, and $s$ is the number of sequences, that means that runtime is proportional to $n^s$. In pairwise alignment, $s$ is always equal to 2, so the problem is more manangeable. However, **for the general case of $s$ sequences, we really can't even consider Smith-Waterman or Needleman-Wunsch for more than just a few sequences.** The pattern in the plots above should illustrate why.
+We clearly have a problem here, and that is that **the runtime for multiple sequence alignment using full dynamic programming algorithms grows exponentially with the number of sequences to be aligned**. If $n$ is our sequence length, and $s$ is the number of sequences, that means that runtime is proportional to $n^s$. In pairwise alignment, $s$ is always equal to 2, so the problem is more manangeable. However, **for the general case of $s$ sequences, we really can't even consider Smith-Waterman or Needleman-Wunsch for more than just a few sequences.** The pattern in the plots above should illustrate why.
 
 As we explored with database searching, we need to figure out how to align fewer sequences. This is where *progressive alignment* comes in.
 
@@ -98,7 +98,7 @@ As we explored with database searching, we need to figure out how to align fewer
 
 <div style="float: right; margin-left: 30px;"><img title="Image by @gregcaporaso." style="float: right; margin-left: 30px;" src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/confusion.png" align=right width=330/></div>
 
-**In progressive alignment, the problem of exponential growth of runtime and space is managed by selectively aligning pairs of sequences, and aligning alignments of sequences.** What we typically do is identify a pair of closely sequences, and align those. Then, we identify the next closely related sequence to that initial pair, and align that sequence to the alignment. This concept of aligning a sequence to an alignment is new, and we'll come back to it in just a few minutes. The other concept of identifying the most closely related sequences, and then the next most closely related sequence, and so on should sound familar. It effectively means that we're traversing a tree. And herein lies our problem: **we need a tree to efficently align multiple sequences, but we need an alignment to build a good tree**.
+**In progressive alignment, the problem of exponential growth of runtime and space is managed by selectively aligning pairs of sequences, and aligning alignments of sequences.** What we typically do is identify a pair of closely related sequences, and align those. Then, we identify the next most closely related sequence to that initial pair, and align that sequence to the alignment. This concept of aligning a sequence to an alignment is new, and we'll come back to it in just a few minutes. The other concept of identifying the most closely related sequences, and then the next most closely related sequence, and so on should sound familar. It effectively means that we're traversing a tree. And herein lies our problem: **we need a tree to efficiently align multiple sequences, but we need an alignment to build a good tree**.
 
 You probably have two burning questions in your mind right now:
 
