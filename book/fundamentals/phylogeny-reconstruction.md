@@ -29,7 +29,7 @@ Each *leaf* (or *tip*, or *terminal node*) in this tree represents a sequence, a
 
 Note that the vertical lines in this tree are used for layout purposes only - they do not represent dissimilarity between sequences.
 
-An **unrooted trees**, like the following, doesn't include an assumption about the last common ancestor of all sequences:
+An **unrooted tree**, like the following, doesn't include an assumption about the last common ancestor of all sequences:
 
 <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/basic-unrooted-tree1.jpg" width=600>
 
@@ -74,7 +74,7 @@ Computing a UPGMA tree for a group of sequences relies on first computing *dista
 3. `d(x,y) = d(y,x)` (symmetry)
 4. `d(x,z) <= d(x,y) + d(y,z)` (triangle inequality)
 
-Let's start with something more similar that sequences. Let's compute the distances between points in a Cartesian plane, to explore what each of these mean.  
+Let's start with something more similar than sequences. Let's compute the distances between points in a Cartesian plane, to explore what each of these mean.  
 
 ```python
 >>> %pylab inline
@@ -146,7 +146,7 @@ The conditions of a distance matrix listed above lead to a few specific features
 
 ## Computing the distance between pairs of sequences. <link src='9d757a'/>
 
-Most often, distances between pairs of sequences are derived from a multiple sequence alignment. These differ from the pairwise alignments that we've looked at thus far, but use the same underlying algorithms (and we'll be coming back to this in the next chapeter).
+Most often, distances between pairs of sequences are derived from a multiple sequence alignment. These differ from the pairwise alignments that we've looked at thus far, but use the same underlying algorithms (and we'll be coming back to this in the next chapter).
 
 Let's load up some aligned sequences, and compute a distance matrix. For now, we'll compute distances between the sequences using the ``hamming`` function that we worked with in the pairwise alignment chapter.
 
@@ -212,7 +212,7 @@ Step 1.2: Next, we'll create a new, smaller distance matrix where the sequences 
 >>>             [None, None, None, None]]
 ```
 
-Step 1.3: We'll now fill in the values from the new clade to each of the existing sequences (or clades). The distance will be the mean between a pre-existing clades, and each of the sequences in the new clade. For example, the distance between `s1` and `(s4, s5)` is the mean of the distance between `s1` and `s4` and `s1` and `s5`:
+Step 1.3: We'll now fill in the values from the new clade to each of the existing sequences (or clades). The distance will be the mean between each pre-existing clade, and each of the sequences in the new clade. For example, the distance between `s1` and `(s4, s5)` is the mean of the distance between `s1` and `s4` and `s1` and `s5`:
 
 ```python
 >>> import numpy as np
@@ -263,7 +263,7 @@ Step 2.2: Next, we'll create a new, smaller distance matrix where the sequences 
 >>>       [None,  5.5, 0.0]]
 ```
 
-Step 2.3: We'll now fill in the values from the new clade to each of the existing sequences (or clades). The distance will be the mean between a pre-existing clades, and each of the sequences in the new clade. For example, the distance between `s2` and `(s1, s3)` is the mean of the distance between `s2` and `s1` and `s2` and `s3`:
+Step 2.3: We'll now fill in the values from the new clade to each of the existing sequences (or clades). The distance will be the mean between each pre-existing clade, and each of the sequences in the new clade. For example, the distance between `s2` and `(s1, s3)` is the mean of the distance between `s2` and `s1` and `s2` and `s3`:
 
 ```python
 >>> np.mean([master_dm[1][0], master_dm[1][2]])
