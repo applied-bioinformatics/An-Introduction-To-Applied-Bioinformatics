@@ -63,7 +63,7 @@ There are literally hundreds of metrics of biological diversity. Here is some te
  * non-phylogenetic metrics treat all OTUs as being equally related
  * phylogenetic metrics incorporate evolutionary relationships between the OTUs
 
-In the next sections we'll look at some metrics that cross these different categories. As new metrics are introduced, try to classify each them into one class for each of the above three categories.
+In the next sections we'll look at some metrics that cross these different categories. As new metrics are introduced, try to classify each of them into one class for each of the above three categories.
 
 ## Measuring alpha diversity <link src='200e93'/>
 
@@ -711,7 +711,7 @@ Next we'll load our distance matrix. This is similar to ``human_microbiome_dm_da
 >>> _ = lauber_soil_unweighted_unifrac_dm.plot(cmap='Greens')
 ```
 
-Does this visualization help you to interpret the results? Probably not. Generally we'll need to apply some approaches that will help us with interpretation. Let's use ordination here. We'll run Pricipal Coordinates Analysis on our ``DistanceMatrix`` object. This gives us a matrix of coordinate values for each sample, which we can then plot. We can use ``scikit-bio``'s implementation of PCoA as follows:
+Does this visualization help you to interpret the results? Probably not. Generally we'll need to apply some approaches that will help us with interpretation. Let's use ordination here. We'll run Principal Coordinates Analysis on our ``DistanceMatrix`` object. This gives us a matrix of coordinate values for each sample, which we can then plot. We can use ``scikit-bio``'s implementation of PCoA as follows:
 
 ```python
 >>> from skbio.stats.ordination import PCoA
@@ -824,7 +824,7 @@ We could apply this same approach, for example, if we had clustered sequences in
 
 ### Procrustes analysis <link src='baaa8e'/>
 
-A related approach, but which I think is less useful as it compares PCoA plots directly (and therefore a summary of the distance data, rather than the distance data itself) is called Procrustes analysis (you can read about the origin of the name [here](http://en.wikipedia.org/wiki/Procrustes)). Procrustes analysis takes two coordinate matrices as input and effectively tries to find the best superimposition of one on top of the other. The transformations that are applies are as follows:
+A related approach, but which I think is less useful as it compares PCoA plots directly (and therefore a summary of the distance data, rather than the distance data itself) is called Procrustes analysis (you can read about the origin of the name [here](http://en.wikipedia.org/wiki/Procrustes)). Procrustes analysis takes two coordinate matrices as input and effectively tries to find the best superimposition of one on top of the other. The transformations that are applied are as follows:
 
 * Translation (the mean of all points is set to 1 on each dimension)
 * Scaling (root mean square distance of all points from the origin is 1 on each dimension)

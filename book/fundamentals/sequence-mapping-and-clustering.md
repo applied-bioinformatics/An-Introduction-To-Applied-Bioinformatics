@@ -301,7 +301,7 @@ Finally, let's apply this to our collection of real sequences again.
 
 You'll notice that both the runtime and the number of alignments performed here are different. Most of the runtime is spent aligning, so runtime and number of alignments should be strongly correlated.
 
-There was another affect here though: we have a different number of OTUs. Is this result better or worse? There is not a definitive answer to that question: it really depends on the application, so what we'd ultimately want to know is how does that affect our ability to interpret the data. **Remember: OTU clustering is a necessary evil to deal with the massive amounts of data that we have. We don't necessary care about things like how many OTUs a method gives us, but rather how the clustering process helps or hurts us answer the biological questions driving the analysis.** We'll explore this concept more in later chapters, but it is an important one that algorithm developers sometimes lose track of.
+There was another affect here though: we have a different number of OTUs. Is this result better or worse? There is not a definitive answer to that question: it really depends on the application, so what we'd ultimately want to know is how does that affect our ability to interpret the data. **Remember: OTU clustering is a necessary evil to deal with the massive amounts of data that we have. We don't necessary care about things like how many OTUs a method gives us, but rather how the clustering process helps or hurts us in answering the biological questions driving the analysis.** We'll explore this concept more in later chapters, but it is an important one that algorithm developers sometimes lose track of.
 
 ### Centroid clustering <link src='88add2'/>
 
@@ -386,7 +386,7 @@ In furthest neighbor, where membership in a cluster is defined by a query sequen
 
 In nearest neighbor, where membership in a cluster is defined by a query sequence's distance to the most similar sequence already in the cluster (its nearest neighbor), the definition of the cluster can grow with additional sequences. This can have some undesired effects as well: in the worst case we could end up with one single cluster that contains all of our sequences.
 
-In centroid distance, where membership in a cluster is defined by a query sequence's distance to the cluster's centroid sequence, the size of the cluster always remains the same, but the role that the first sequence added to a cluster plays becomes much more important. So, it's very important that the cluster centroids are well-chosen. One undesired effect of centroid distance cluster is that the cluster sizes are fixed, which may or may not always make biological sense (for example, if the marker gene evolves at a faster rate in some taxa than others, that can't be reflected in the cluster defintions.
+In centroid distance, where membership in a cluster is defined by a query sequence's distance to the cluster's centroid sequence, the size of the cluster always remains the same, but the role that the first sequence added to a cluster plays becomes much more important. So, it's very important that the cluster centroids are well-chosen. One undesired effect of centroid distance cluster is that the cluster sizes are fixed, which may or may not always make biological sense (for example, if the marker gene evolves at a faster rate in some taxa than others, that can't be reflected in the cluster definitions.
 
 All of these methods have good features and bad features, and that in fact is a common feature of heuristics (if they were perfect, they wouldn't be heuristics after all...).
 
@@ -458,7 +458,7 @@ For the sake of runtime, I'm only looking at few settings for each of the input 
 >>>                                  "Run time (s)", "Number of clusters", "Similarity threshold"])
 ```
 
-Remember that above I said that most of the time in each of these clustering algorithms is spent doing pairwise alignment. Let's plot the run time of each clustering method as a function of the number of alignments comptued in the cluster process so I can prove that to you.
+Remember that above I said that most of the time in each of these clustering algorithms is spent doing pairwise alignment. Let's plot the run time of each clustering method as a function of the number of alignments computed in the cluster process so I can prove that to you.
 
 ```python
 >>> r, p = pearsonr(df["Number of alignments"], df["Run time (s)"])
