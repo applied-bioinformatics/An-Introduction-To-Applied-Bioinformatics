@@ -1,7 +1,8 @@
 
 # Generalized dynamic programming for multiple sequence alignment <link src='737114'/>
 
-It's possible to generalize Smith-Waterman and Needleman-Wunsch, the dynamic programming algorithms that we explored for pairwise sequence aligment, to identify the optimal alignment of more than two sequences. Remember that our scoring scheme for pairwise alignment with Smith-Waterman looked like the following:
+Until now we worked with alignments between two sequences, but it is likely that you will want to align many sequences at the same time. For example, if you are trying to gain insight on the evolutionary relationships between all of the 16S bacterial genes in a given sample, it would be time consuming and very inefficient to compare them two at a time. It would be more efficient and useful to compare all of the 16S sequences from the bacteria in the same alignment.
+In the pariwise sequence alignment chapter, we went over dynamic programming algorithms. It's possible to generalize Smith-Waterman and Needleman-Wunsch, the dynamic programming algorithms that we explored for pairwise sequence aligment, to identify the optimal alignment of more than two sequences. Remember that our scoring scheme for pairwise alignment with Smith-Waterman looked like the following:
 
 $$
 \begin{align}
@@ -59,7 +60,7 @@ However the complexity of this algorithm is much worse than for pairwise alignme
 >>> plt.ylabel('Runtime (s)')
 ```
 
-**The exponent in the $n^2$ term comes from the fact that, in pairwise alignment, if we assume our sequences are both of length $n$, there are $n \times n$ cells to fill in in the dynamic programming matrix. If we were to generalize either Smith-Waterman or Needleman-Wunsch to three sequences, we would need to create a 3 dimensional array to score and traceback the alignment.** For sequences of length $n$, we would therefore have $n \times n \times n$ cells to fill in, and our runtime versus sequence length curve would look like the following.
+**The exponent in the $n^2$ term comes from the fact that, in pairwise alignment, if we assume our sequences are both of length $n$, there are $n \times n$ cells to fill in in the dynamic programming matrix. If we were to generalize either Smith-Waterman or Needleman-Wunsch to three sequences, we would need to create a 3 dimensional array to score and trace back the alignment.** For sequences of length $n$, we would therefore have $n \times n \times n$ cells to fill in, and our runtime versus sequence length curve would look like the following.
 
 ```python
 >>> s3_times = [t ** 3 for t in range(25)]
