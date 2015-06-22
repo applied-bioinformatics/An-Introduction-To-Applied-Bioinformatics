@@ -12,6 +12,8 @@ IAB is written in [markdown](http://commonmark.org/). [build-iab](https://github
 
 Contributions such as typo fixes, wording changes, and small code updates are relatively easy to submit. Every unit, chapter, section, and subsection heading in IAB has an *Edit on GitHub* link below it. You should click the link corresponding to the section that you want to edit, which will take you to the GitHub online editor. You can make your changes and submit a [pull request](https://help.github.com/articles/using-pull-requests/) from that page. This will initiate the IAB tests, which will ensure that your change hasn't broken anything. After the tests pass, we will review your changes and either merge them, request modifications before merging, or let you know why we won't integrate your proposed changes.
 
+Watch a five-minute YouTube video illustrating this process [here](https://www.youtube.com/watch?v=s9-aZrX5CY8).
+
 ## Large contributions
 
 If you're interested in making contributions involving code refactoring, new chapters or sections, restructuring of content, etc, you should first comment on existing issues (or create new issues) indicating what you want to work on, and wait for us to discuss the changes with you before you get started. This will ensure that the changes you want to make are in line with the direction of the project, compatible with future plans, and that there is no one else already working on related contributions. This will avoid wasted time if your change involves something that we wouldn't ultimately be merged. If in doubt, bring it up on the [issue tracker](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/) first.
