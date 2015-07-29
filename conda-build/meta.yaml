@@ -1,0 +1,30 @@
+package:
+  name: iab
+  version: "0.1.1"
+ 
+source:
+  fn: An-Introduction-To-Applied-Bioinformatics-0.1.1.tar.gz
+  url: https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/0.1.1.tar.gz
+  md5: 1ff0b165d203b13d1f075ded72097c32
+ 
+requirements:
+  build:
+    - python >=3.4
+    - numpy
+  run:
+    - python >=3.4
+    - ipython-notebook <4.0
+    - scikit-bio <0.3.0
+    - seaborn <0.6.0
+    - qiime-default-reference <0.2.0
+    - pandas <0.16.0
+    - markdown2 >=2.3.0
+    - networkx <2.0.0
+
+test:
+  imports:
+    - iab
+ 
+about:
+  home: http://readIAB.org
+  license: CC BY-NC-SA 4.0
