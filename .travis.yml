@@ -10,12 +10,13 @@ before_install:
   - export PATH=/home/travis/anaconda/bin:$PATH
   # Update conda itself
   - conda update --yes conda
+  - conda install conda-build
 install:
-  - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip numpy scipy matplotlib nose
+  - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip nose
   - source activate env_name
   - pip install https://github.com/gregcaporaso/build-iab/archive/master.zip
   # need gregcaporaso's conda channel for qiime-default-reference
-  - conda build -c http://conda.binstar.org/gregcaporaso conda-build python=$TRAVIS_PYTHON_VERSION
+  - conda build -c http://conda.binstar.org/gregcaporaso conda-recipe python=$TRAVIS_PYTHON_VERSION
   - conda install iab --use-local
   - biab notebook -i book -o ipynb
 script:
