@@ -6,16 +6,18 @@ python:
   - "3.4"
 before_install:
   - wget http://repo.continuum.io/miniconda/Miniconda-2.2.2-Linux-x86_64.sh -O miniconda.sh
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -b
+  - bash miniconda.sh -b
   - export PATH=/home/travis/anaconda/bin:$PATH
   # Update conda itself
   - conda update --yes conda
+  - conda install --yes conda-build
 install:
-  - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip numpy scipy matplotlib nose
+  - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip nose
   - source activate env_name
   - pip install https://github.com/gregcaporaso/build-iab/archive/master.zip
-  - pip install --allow-all-external --allow-unverified scikit-bio --process-dependency-links .
+  # need gregcaporaso's conda channel for qiime-default-reference
+  - conda build -c http://conda.binstar.org/gregcaporaso conda-recipe --python=$TRAVIS_PYTHON_VERSION
+  - conda install -c http://conda.binstar.org/gregcaporaso --yes iab --use-local
   - biab notebook -i book -o ipynb
 script:
   # Running through all notebooks takes awhile, so bail if the unit tests fail.
