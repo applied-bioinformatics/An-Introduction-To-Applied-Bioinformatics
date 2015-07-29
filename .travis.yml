@@ -14,8 +14,11 @@ install:
   - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip numpy scipy matplotlib nose
   - source activate env_name
   - pip install https://github.com/gregcaporaso/build-iab/archive/master.zip
-  - pip install --allow-all-external --allow-unverified scikit-bio --process-dependency-links .
+  # need gregcaporaso's conda channel for qiime-default-reference
+  - conda build -c http://conda.binstar.org/gregcaporaso conda-build python=$TRAVIS_PYTHON_VERSION
+  - conda install iab --use-local
   - biab notebook -i book -o ipynb
 script:
+  # Run the unit tests and build the HTML (which executes all of the notebooks).
   # Running through all notebooks takes awhile, so bail if the unit tests fail.
-  - nosetests --with-doctest && python runipynbs.py ipynb
+  - nosetests --with-doctest && biab html -i book -o html
