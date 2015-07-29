@@ -39,21 +39,23 @@ IAB is split into four different sections: *Getting started*, *Fundamentals*, *A
 
 ## Installation <link src='96d24f'/>
 
-If you're going to read *An Introduction to Applied Bioinformatics* interactively (recommended), you'll need to install it. The following commands should work for Linux and Mac OS X users:
+If you're going to read *An Introduction to Applied Bioinformatics* interactively (recommended), you'll need to install it. The easiest way to install IAB is using [``conda``](http://conda.pydata.org/docs/intro.html), a free package and environment manager for Python. You'll first need to install Miniconda following the instructions [here](http://conda.pydata.org/docs/install/quick.html#miniconda-quick-install-requirements).
 
-```
-pip install numpy
-pip install https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/0.1.1.tar.gz
-wget http://readIAB.org/book/0.1.1/IAB-notebooks.zip
-unzip IAB-notebooks.zip
-cd IAB-notebooks
+After installing Miniconda, change to the directory where you'd like to store the IAB notebooks (e.g., ``cd $HOME/Documents``). Then, run:
+
+```bash
+conda create --name iab -c http://conda.binstar.org/gregcaporaso python=3.4 iab
 ```
 
-Then, launch the IPython Notebook to get started:
+This will create a new ``iab`` environment, install IAB and its dependencies in it, and download the IAB notebooks. Once that completes, you should be able to run:
 
-```
+```bash
+source activate iab
+cd $HOME/Documents/IAB-notebooks
 ipython notebook index.ipynb
 ```
+
+to get started. If you installed in a directory other than ``$HOME/Documents``, you'll need to adapt the second command to refer to the directory containing ``IAB-notebooks``. Whenever you want to start reading and working with IAB, you'll run these three commands.
 
 ## Using the IPython Notebook <link src='fdf5dd'/>
 
