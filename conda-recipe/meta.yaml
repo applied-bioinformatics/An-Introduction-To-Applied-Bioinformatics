@@ -6,8 +6,6 @@ source:
   fn: An-Introduction-To-Applied-Bioinformatics-0.1.1.tar.gz
   url: https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/0.1.1.tar.gz
   md5: 1ff0b165d203b13d1f075ded72097c32
-  patches:
-    - ipython.patch
 
 requirements:
   build:
