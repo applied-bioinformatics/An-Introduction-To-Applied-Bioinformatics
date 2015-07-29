@@ -1,6 +1,6 @@
 # Check on http://lint.travis-ci.org/ after modifying! Taken and modified
 # from https://github.com/biocore/scikit-bio/blob/master/.travis.yml
-sudo: false
+#sudo: false
 language: python
 python:
   - "3.4"
