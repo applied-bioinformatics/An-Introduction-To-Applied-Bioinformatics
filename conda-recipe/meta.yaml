@@ -3,7 +3,7 @@ package:
   version: "0.1.1"
 
 source:
-  path: gregcaporaso/An-Introduction-To-Applied-Bioinformatics
+  path: ../
 
 requirements:
   build:
