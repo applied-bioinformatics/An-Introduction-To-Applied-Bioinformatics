@@ -17,6 +17,7 @@ requirements:
     - pandas <0.16.0,>=0.15.0
     - markdown2 >=2.3.0
     - networkx <2.0.0,>=1.9.1
+    - runipy
   run:
     - python >=3.4
     - numpy
