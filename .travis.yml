@@ -16,6 +16,8 @@ install:
   - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip nose
   - source activate env_name
   - pip install https://github.com/gregcaporaso/build-iab/archive/master.zip
+  - pwd
+  - ls
   # need gregcaporaso's conda channel for qiime-default-reference
   - conda build -c http://conda.binstar.org/gregcaporaso conda-recipe python=$TRAVIS_PYTHON_VERSION
   - conda install --yes iab --use-local
