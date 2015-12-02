@@ -161,9 +161,9 @@ Alignment score: 8
 
 **Complexities**: why this simple procedure is too simple
 
-1. We're scoring all matches as 1 and all mismatches as 0. This suggests that all substitutions are treated equally. What's a more biologically meaningful way to do this (e.g., in protein alignments)?
-2. Similarly, every gap that is introduced results in the same penalty being incurred. Based on what we know about how insertion/deletion events occur, it likely makes more sense to score *opening a new gap* differently from *extending an existing gap*.
-3. When searching a novel sequence against a database, you may have billions of bases to search against (which would correspond to billions of columns in these matrices). How can this be done efficiently? How can you determine if a hit is statistically meaningful or the result of chance?
+* We're scoring all matches as 1 and all mismatches as 0. This suggests that all substitutions are treated equally. What's a more biologically meaningful way to do this (e.g., in protein alignments)?
+* Similarly, every gap that is introduced results in the same penalty being incurred. Based on what we know about how insertion/deletion events occur, it likely makes more sense to score *opening a new gap* differently from *extending an existing gap*.
+* When searching a novel sequence against a database, you may have billions of bases to search against (which would correspond to billions of columns in these matrices). How can this be done efficiently? How can you determine if a hit is statistically meaningful or the result of chance?
 
 All scoring schemes have limitations, and you should consider alignments that come back from systems such as BLAST as hypotheses. You still need to do your due diligence to decide if you agree with the result that a computational system gives you. They are there to help you do your work, but their answers are based on models and the models are not perfect. Be skeptical!
 
