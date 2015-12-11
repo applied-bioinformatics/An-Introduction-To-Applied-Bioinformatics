@@ -583,7 +583,7 @@ Next, let's apply this to pairs of sequences where we vary the length. We don't 
 ...     alphabet = list(moltype.nondegenerate_chars)
 ...     for e in range(length):
 ...         result.append(choice(alphabet))
-...     return ''.join(result)
+...     return moltype(''.join(result))
 ```
 
 ```python
@@ -604,8 +604,8 @@ Next, let's define a loop where we align, randomly, pairs of sequences of increa
 ...
 >>> def get_time_function(seq_length):
 ...     def f():
-...         seq1 = DNA(random_sequence(DNA, seq_length))
-...         seq2 = DNA(random_sequence(DNA, seq_length))
+...         seq1 = random_sequence(DNA, seq_length)
+...         seq2 = random_sequence(DNA, seq_length)
 ...         local_pairwise_align_ssw(seq1, seq2)
 ...     return f
 ...

@@ -601,12 +601,11 @@ def local_alignment_search(query, reference_db, aligner=local_pairwise_align_ssw
     best_match = None
     best_a1 = None
     best_a2 = None
-    for seq_id, seq in reference_db:
-        alignment = aligner(query, seq)
-        score = alignment.score()
+    for seq in reference_db:
+        alignment, score, _ = aligner(query, seq)
         if score > best_score:
             best_score = score
-            best_match = seq_id
+            best_match = seq.metadata['id']
             best_a1 = str(alignment[0])
             best_a2 = str(alignment[1])
     return best_a1, best_a2, best_score, best_match
@@ -617,13 +616,12 @@ def approximated_local_alignment_search_random(
     best_match = None
     best_a1 = None
     best_a2 = None
-    for seq_id, seq in reference_db:
+    for seq in reference_db:
         if random() < p:
-            alignment = aligner(query, seq)
-            score = alignment.score()
+            alignment, score, _ = aligner(query, seq)
             if score > best_score:
                 best_score = score
-                best_match = seq_id
+                best_match = seq.metadata['id']
                 best_a1 = str(alignment[0])
                 best_a2 = str(alignment[1])
     return best_a1, best_a2, best_score, best_match
@@ -639,28 +637,31 @@ def approximated_local_alignment_search_gc(
     best_match = None
     best_a1 = None
     best_a2 = None
-    for seq_id, seq in reference_db:
-        ref_gc = reference_db_gc_contents[seq_id]
+    for seq in reference_db:
+        ref_gc = reference_db_gc_contents[seq.metadata['id']]
         if ref_gc - p < query_gc < ref_gc + p:
-            alignment = aligner(query, seq)
-            score = alignment.score()
+            alignment, score, _ = aligner(query, seq)
             if score > best_score:
                 best_score = score
-                best_match = seq_id
+                best_match = seq.metadata['id']
                 best_a1 = str(alignment[0])
                 best_a2 = str(alignment[1])
     return best_a1, best_a2, best_score, best_match
+
+def shuffle_sequence(sequence):
+    randomized_order = list(range(len(sequence)))
+    shuffle(randomized_order)
+    return sequence[randomized_order]
 
 def generate_random_score_distribution(query_sequence,
                                        subject_sequence,
                                        n=99,
                                        aligner=local_pairwise_align_ssw):
     result = []
-    random_sequence = list(query_sequence)
     for i in range(n):
-        shuffle(random_sequence)
-        alignment = aligner(random_sequence,subject_sequence)
-        result.append(alignment.score())
+        random_sequence = shuffle_sequence(query_sequence)
+        _, score, _ = aligner(random_sequence, subject_sequence)
+        result.append(score)
     return result
 
 def fraction_better_or_equivalent_alignments(query_sequence,
@@ -671,18 +672,18 @@ def fraction_better_or_equivalent_alignments(query_sequence,
                                                        subject_sequence,
                                                        n,
                                                        aligner=aligner)
-    alignment = aligner(query_sequence, subject_sequence)
+    _, score, _ = aligner(query_sequence, subject_sequence)
 
     count_better = 0
     for e in random_scores:
-        if e >= alignment.score():
+        if e >= score:
             count_better += 1
 
     return count_better / (n + 1)
 
 ## MSA notebook
 
-def kmer_distance(sequence1, sequence2, k=3, overlapping=True):
+def kmer_distance(sequence1, sequence2, k=3, overlap=True):
     """Compute the kmer distance between a pair of sequences
 
     Parameters
@@ -712,8 +713,8 @@ def kmer_distance(sequence1, sequence2, k=3, overlapping=True):
     k-mer counts are not incorporated in this distance metric.
 
     """
-    sequence1_kmers = set(sequence1.k_words(k, overlapping))
-    sequence2_kmers = set(sequence2.k_words(k, overlapping))
+    sequence1_kmers = set(map(str, sequence1.iter_kmers(k, overlap)))
+    sequence2_kmers = set(map(str, sequence2.iter_kmers(k, overlap)))
     all_kmers = sequence1_kmers | sequence2_kmers
     shared_kmers = sequence1_kmers & sequence2_kmers
     number_unique = len(all_kmers) - len(shared_kmers)
