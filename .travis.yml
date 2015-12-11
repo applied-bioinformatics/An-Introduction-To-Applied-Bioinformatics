@@ -12,7 +12,7 @@ before_install:
   # Update conda itself
   - conda update --yes conda
 install:
-  - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip numpy scipy matplotlib nose scikit-bio=0.2.3 "ipython <4.0.0" tornado
+  - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip numpy scipy matplotlib nose scikit-bio=0.2.3 "ipython <4.0.0" tornado jsonschema
   - source activate env_name
   - pip install https://github.com/gregcaporaso/build-iab/archive/master.zip
   - biab notebook -i book -o ipynb
