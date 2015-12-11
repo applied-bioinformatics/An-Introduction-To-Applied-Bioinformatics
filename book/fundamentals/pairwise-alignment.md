@@ -96,7 +96,7 @@ Now let's look at how to align these sequences.
 ```python
 >>> data = []
 >>> for p in seq2:
->>>     data.append(['-']*len(seq1))
+...     data.append(['-']*len(seq1))
 ...
 >>> print(format_matrix(seq1, seq2, data))
 ```
@@ -106,14 +106,14 @@ Now let's look at how to align these sequences.
 ```python
 >>> data = []
 >>> for b2 in seq2:
->>>     row = []
->>>     for b1 in seq1:
->>>         if b1 == b2:
->>>             row.append(1)
->>>         else:
->>>             row.append(0)
->>>     data.append(row)
->>>
+...     row = []
+...     for b1 in seq1:
+...         if b1 == b2:
+...             row.append(1)
+...         else:
+...             row.append(0)
+...     data.append(row)
+...
 >>> print(format_matrix(seq1, seq2, data, hide_zeros=True))
 ```
 
@@ -123,17 +123,17 @@ Now let's look at how to align these sequences.
 >>> line_format = "%3s" * (len(seq1) + 1)
 >>> scored_data = []
 >>> for i, drow in enumerate(data):
->>>     row = []
->>>     for j, value in enumerate(drow):
->>>         if value > 0:
->>>             if i == 0 or j == 0:
->>>                 row.append(value)
->>>             else:
->>>                 row.append(value + scored_data[i-1][j-1])
->>>         else:
->>>             row.append(0)
->>>     scored_data.append(row)
->>>
+...     row = []
+...     for j, value in enumerate(drow):
+...         if value > 0:
+...             if i == 0 or j == 0:
+...                 row.append(value)
+...             else:
+...                 row.append(value + scored_data[i-1][j-1])
+...         else:
+...             row.append(0)
+...     scored_data.append(row)
+...
 >>> print(format_matrix(seq1, seq2, scored_data, hide_zeros=True))
 ```
 
@@ -171,7 +171,7 @@ Over the next several sections we'll explore ways of addressing each of these co
 
 ## Substitution matrices <link src='9f5e71'/>
 
-The first of the limitations we identified above was that all matches and mismatches are scored equally, though we know that that isn't the most biologically meaningful way to score an alignment. We'll next explore a more general approach to the problem of *global sequence alignment* for protein sequences, or aligning a pair of protein sequences from beginning to end. We'll start by defining a **substitution matrix which defines the score associated with substitution of one amino acid for another**.  
+The first of the limitations we identified above was that all matches and mismatches are scored equally, though we know that that isn't the most biologically meaningful way to score an alignment. We'll next explore a more general approach to the problem of *global sequence alignment* for protein sequences, or aligning a pair of protein sequences from beginning to end. We'll start by defining a **substitution matrix which defines the score associated with substitution of one amino acid for another**.
 
 Early work on defining protein substitution matrices was performed by Dayhoff in the 1970s and by Henikoff and Henikoff in the early 1990s. We'll start by working with a substitution matrix known as the blosum 50 matrix, which was [presented in PNAS in 1992](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC50453/). Briefly, these matrices are defined empirically, by aligning sequences manually or through automated systems, and counting how frequent certain substitutions are. There is a good [wikipedia article on this topic](http://en.wikipedia.org/wiki/BLOSUM).
 
@@ -196,10 +196,10 @@ Here's a global view of the matrix.
 >>> aas.sort()
 >>> data = []
 >>> for aa1 in aas:
->>>     row = []
->>>     for aa2 in aas:
->>>         row.append(blosum50[aa1][aa2])
->>>     data.append(row)
+...     row = []
+...     for aa2 in aas:
+...         row.append(blosum50[aa1][aa2])
+...     data.append(row)
 ...
 >>> print(format_matrix(aas, aas, data))
 ```
@@ -213,14 +213,14 @@ Now let's get started on using this to align a pair of sequences.
 ```python
 >>> ## Example adapted from Biological Sequence Analysis Chapter 2.
 ...
->>> seq1 = "HEAGAWGHEE"
+... seq1 = "HEAGAWGHEE"
 >>> seq2 = "PAWHEAE"
 ```
 
 ```python
 >>> data = []
 >>> for p in seq2:
->>>     data.append(['-']*len(seq1))
+...     data.append(['-']*len(seq1))
 ...
 >>> print(format_matrix(seq1, seq2, data))
 ```
@@ -237,8 +237,8 @@ Now let's get started on using this to align a pair of sequences.
 >>> score_matrix = generate_score_matrix(seq1,seq2,blosum50)
 ...
 >>> print(format_matrix(seq1,
->>>                     seq2,
->>>                     score_matrix))
+...                     seq2,
+...                     score_matrix))
 ```
 
 **Step 3**: Generate the dynamic programming and traceback matrices.
@@ -262,13 +262,13 @@ For the sake of this exercise, define the gap penalty, $d$, as $d=8$.
 ```python
 >>> data = []
 >>> # This is a hack: to pad the matrix with an
->>> # extra row and column at the beginning I'm just prepending a
->>> # space to each sequence. Need to improve handling of that.
->>> padded_seq1 = " " + seq1
+... # extra row and column at the beginning I'm just prepending a
+... # space to each sequence. Need to improve handling of that.
+... padded_seq1 = " " + seq1
 >>> padded_seq2 = " " + seq2
 ...
 >>> for p in padded_seq2:
->>>     data.append(['-']*len(padded_seq1))
+...     data.append(['-']*len(padded_seq1))
 ...
 >>> print(format_matrix(padded_seq1, padded_seq2, data))
 ```
@@ -277,17 +277,16 @@ Initializing this would result in the following.
 
 ```python
 >>> # We'll define the gap penalty as 8.
->>> d = 8
+... d = 8
 ...
 >>> data[0][0] = 0
 >>> for i in range(1,len(padded_seq2)):
->>>     data[i][0] = data[i-1][0] - d
+...     data[i][0] = data[i-1][0] - d
 ...
 >>> for j in range(1,len(padded_seq1)):
->>>     data[0][j] = data[0][j-1] - d
+...     data[0][j] = data[0][j-1] - d
 ...
 >>> print(format_matrix(padded_seq1, padded_seq2, data, cell_width=4))
->>>
 ```
 
 Next, we'll compute the scores for all of the other cells in the matrix, starting at position $(1, 1)$.
@@ -319,13 +318,13 @@ You can now apply this function to `seq1` and `seq2` to compute the dynamic prog
 
 ```python
 >>> from skbio.sequence import Protein
->>> from skbio.alignment import Alignment
+>>> from skbio.alignment import TabularMSA
 ...
->>> seq1 = Alignment([Protein("HEAGAWGHEE")])
->>> seq2 = Alignment([Protein("PAWHEAE")])
+>>> seq1 = TabularMSA([Protein("HEAGAWGHEE")])
+>>> seq2 = TabularMSA([Protein("PAWHEAE")])
 ...
 >>> nw_matrix, traceback_matrix = _compute_score_and_traceback_matrices(
->>>     seq1, seq2, 8, 8, blosum50)
+...     seq1, seq2, 8, 8, blosum50)
 ...
 >>> print(format_dynamic_programming_matrix(seq1, seq2, nw_matrix))
 ```
@@ -336,7 +335,7 @@ You can now apply this function to `seq1` and `seq2` to compute the dynamic prog
 
 **Step 4**: Transcribe the alignment.
 
-We can now read the dynamic programming and traceback matrices to transcribe and score the alignment of sequences 1 and 2. To do this, we start at the bottom right of the matrices and traceback the arrows to cell $(0, 0)$.  
+We can now read the dynamic programming and traceback matrices to transcribe and score the alignment of sequences 1 and 2. To do this, we start at the bottom right of the matrices and traceback the arrows to cell $(0, 0)$.
 
 * Every time we hit a vertical arrow (represented by `|`), we consume a character from sequence 2 (the vertical sequence) and add a gap to sequence 1.
 * Every time we hit a horizontal arrow (represented by `-`), we consume a character from sequence 1 (the horizontal sequence) and add a gap to sequence 2.
@@ -371,9 +370,10 @@ You can then execute this as follows, and print out the resulting alignment.
 ```
 
 ```python
->>> alignment = global_pairwise_align("HEAGAWGHEE", "PAWHEAE", 8, 8, blosum50, penalize_terminal_gaps=True)
->>> print(str(alignment))
->>> print(alignment.score())
+>>> aln, score, _ = global_pairwise_align(Protein("HEAGAWGHEE"), Protein("PAWHEAE"), 8, 8, blosum50, penalize_terminal_gaps=True)
+...
+>>> print(aln)
+>>> print(score)
 ```
 
 ## Global versus local alignment <link src='c80f21'/>
@@ -396,13 +396,13 @@ $$
 ```python
 >>> data = []
 >>> # This is a hack: to pad the matrix with an
->>> # extra row and column at the beginning I'm just prepending a
->>> # space to each sequence. Need to improve handling of that.
->>> padded_seq1 = " " + str(seq1[0])
+... # extra row and column at the beginning I'm just prepending a
+... # space to each sequence. Need to improve handling of that.
+... padded_seq1 = " " + str(seq1[0])
 >>> padded_seq2 = " " + str(seq2[0])
 ...
 >>> for p in padded_seq2:
->>>     data.append(['-']*len(padded_seq1))
+...     data.append(['-']*len(padded_seq1))
 ...
 >>> print(format_matrix(padded_seq1, padded_seq2, data))
 ```
@@ -410,10 +410,10 @@ $$
 ```python
 >>> data[0][0] = 0
 >>> for i in range(1,len(padded_seq2)):
->>>     data[i][0] = 0
+...     data[i][0] = 0
 ...
 >>> for j in range(1,len(padded_seq1)):
->>>     data[0][j] = 0
+...     data[0][j] = 0
 ...
 >>> print(format_matrix(padded_seq1, padded_seq2, data))
 ```
@@ -429,7 +429,6 @@ F(i, j) = max \left(\begin{align}
 \end{align}\right)
 $$
 
-
 ```python
 >>> %psource _compute_score_and_traceback_matrices
 ```
@@ -438,7 +437,7 @@ $$
 >>> from skbio.alignment._pairwise import _init_matrices_sw
 ...
 >>> sw_matrix, traceback_matrix = \
->>>     _compute_score_and_traceback_matrices(seq1, seq2, 8, 8, blosum50, new_alignment_score=0.0, init_matrices_f=_init_matrices_sw)
+...     _compute_score_and_traceback_matrices(seq1, seq2, 8, 8, blosum50, new_alignment_score=0.0, init_matrices_f=_init_matrices_sw)
 ...
 >>> print(format_dynamic_programming_matrix(seq1, seq2, sw_matrix, 7))
 ```
@@ -458,10 +457,10 @@ And finally, during the traceback step, you begin in the cell with the highest v
 >>> max_i = 0
 >>> max_j = 0
 >>> for i in range(sw_matrix.shape[0]):
->>>     for j in range(sw_matrix.shape[1]):
->>>         if sw_matrix[i, j] > max_value:
->>>             max_i, max_j = i, j
->>>             max_value = sw_matrix[i, j]
+...     for j in range(sw_matrix.shape[1]):
+...         if sw_matrix[i, j] > max_value:
+...             max_i, max_j = i, j
+...             max_value = sw_matrix[i, j]
 ...
 >>> aln1, aln2, score, start_a1, start_a2 = _traceback(traceback_matrix, sw_matrix, seq1, seq2, max_i, max_j)
 >>> print(aln1[0])
@@ -481,20 +480,24 @@ And we can take the *convenience function* one step futher, and wrap `sw_align` 
 
 ```python
 >>> def align(sequence1, sequence2, gap_penalty, substitution_matrix, local):
->>>     if local:
->>>         return local_pairwise_align(sequence1, sequence2, gap_penalty, gap_penalty, substitution_matrix)
->>>     else:
->>>         return global_pairwise_align(sequence1, sequence2, gap_penalty, gap_penalty, substitution_matrix)
+...     if local:
+...         return local_pairwise_align(sequence1, sequence2, gap_penalty, gap_penalty, substitution_matrix)
+...     else:
+...         return global_pairwise_align(sequence1, sequence2, gap_penalty, gap_penalty, substitution_matrix)
 ```
 
 ```python
->>> result = align('HEAGAWGHEE', 'PAWHEAE', 8, blosum50, True)
->>> print(result)
+>>> aln, score, _ = align(Protein('HEAGAWGHEE'), Protein('PAWHEAE'), 8, blosum50, True)
+...
+>>> print(aln)
+>>> print(score)
 ```
 
 ```python
->>> result = align('HEAGAWGHEE', 'PAWHEAE', 8, blosum50, False)
->>> print(result)
+>>> aln, score, _ = align(Protein('HEAGAWGHEE'), Protein('PAWHEAE'), 8, blosum50, False)
+...
+>>> print(aln)
+>>> print(score)
 ```
 
 So there you have it: the basics of pairwise sequence alignment, which is easily the most fundamental algorithm in bioinformatics.
@@ -523,8 +526,8 @@ Here is our ``_compute_score_and_traceback_matrices`` function again for referen
 Take a look at how the scores differ with these additions.
 
 ```python
->>> seq1 = Alignment([Protein("HEAGAWGHEE")])
->>> seq2 = Alignment([Protein("PAWHEAE")])
+>>> seq1 = TabularMSA([Protein("HEAGAWGHEE")])
+>>> seq2 = TabularMSA([Protein("PAWHEAE")])
 ...
 >>> sw_matrix, traceback_matrix = _compute_score_and_traceback_matrices(seq1, seq2, 8, 1, blosum50)
 ...
@@ -542,22 +545,20 @@ The convenience functions we worked with above all take ``gap_open_penalty`` and
 ```
 
 ```python
->>> seq1 = Alignment([Protein("HEAGAWGFHEE")])
->>> seq2 = Alignment([Protein("PAWHEAE")])
+>>> seq1 = TabularMSA([Protein("HEAGAWGFHEE")])
+>>> seq2 = TabularMSA([Protein("PAWHEAE")])
 ```
 
 ```python
->>> alignment = global_pairwise_align(seq1, seq2, 8, 8, blosum50)
-...
->>> print(alignment)
->>> print(alignment.score())
+>>> aln, score, _ = global_pairwise_align(seq1, seq2, 8, 8, blosum50)
+>>> print(aln)
+>>> print(score)
 ```
 
 ```python
->>> alignment = global_pairwise_align(seq1, seq2, 8, 1, blosum50)
-...
->>> print(alignment)
->>> print(alignment.score())
+>>> aln, score, _ = global_pairwise_align(seq1, seq2, 8, 1, blosum50)
+>>> print(aln)
+>>> print(score)
 ```
 
 ## How long does pairwise sequence alignment take? <link src='ac446d'/>
@@ -577,20 +578,19 @@ Next, let's apply this to pairs of sequences where we vary the length. We don't 
 ```python
 >>> from random import choice
 ...
->>> def random_sequence(alphabet, length):
->>>     result = []
->>>     for e in range(length):
->>>         result.append(choice(alphabet))
->>>     return ''.join(result)
+>>> def random_sequence(moltype, length):
+...     result = []
+...     alphabet = list(moltype.nondegenerate_chars)
+...     for e in range(length):
+...         result.append(choice(alphabet))
+...     return ''.join(result)
 ```
 
 ```python
->>> aa_choices = list(blosum50.keys())
-...
->>> print(random_sequence(aa_choices, 10))
->>> print(random_sequence(aa_choices, 10))
->>> print(random_sequence(aa_choices, 25))
->>> print(random_sequence(aa_choices, 50))
+>>> print(random_sequence(DNA, 10))
+>>> print(random_sequence(DNA, 10))
+>>> print(random_sequence(DNA, 25))
+>>> print(random_sequence(DNA, 50))
 ```
 
 Next, let's define a loop where we align, randomly, pairs of sequences of increasing length, and compile the time it took to align the sequences. Here we're going to use a faster version of pairwise alignment that's implemented in scikit-bio, to faciliate testing with more alignments.
@@ -603,22 +603,21 @@ Next, let's define a loop where we align, randomly, pairs of sequences of increa
 >>> seq_lengths = range(50,100000,20000)
 ...
 >>> def get_time_function(seq_length):
->>>     def f():
->>>         seq1 = DNA([choice(aa_choices) for i in range(seq_length)])
->>>         seq2 = DNA([choice(aa_choices) for i in range(seq_length)])
->>>         local_pairwise_align_ssw(seq1, seq2)
->>>     return f
->>>
+...     def f():
+...         seq1 = DNA(random_sequence(DNA, seq_length))
+...         seq2 = DNA(random_sequence(DNA, seq_length))
+...         local_pairwise_align_ssw(seq1, seq2)
+...     return f
+...
 >>> for seq_length in seq_lengths:
->>>     times.append(min(timeit.Timer(get_time_function(seq_length)).repeat(repeat=3, number=3)))
->>>
+...     times.append(min(timeit.Timer(get_time_function(seq_length)).repeat(repeat=3, number=3)))
 ```
 
 If we look at the run times, we can see that they are increasing with increasing sequence lengths.
 
 ```python
 >>> for seq_length, t in zip(seq_lengths, times):
->>>     print("%d\t%1.4f sec" % (seq_length, t))
+...     print("%d\t%1.4f sec" % (seq_length, t))
 ```
 
 That's expected, but what we care about is how they're increasing. Can we use this information to project how well this alignment would work if our sequences were much longer? This is where plotting becomes useful.
@@ -635,8 +634,8 @@ That's expected, but what we care about is how they're increasing. Can we use th
 
 ```python
 >>> # if we could split this process over more processors (four, for example)
->>> # that would effectively reduce the runtime by 1/4
->>> times = [t / 4 for t in times]
+... # that would effectively reduce the runtime by 1/4
+... times = [t / 4 for t in times]
 ...
 ...
 >>> plt.plot(seq_lengths, times)

@@ -11,9 +11,9 @@ from random import choice, random, shuffle
 
 import numpy as np
 from scipy.cluster.hierarchy import average, dendrogram, to_tree
-from skbio.sequence import BiologicalSequence
+from skbio.sequence import Sequence, DNA
 from skbio.stats.distance import DistanceMatrix
-from skbio.alignment import local_pairwise_align_ssw, Alignment
+from skbio.alignment import local_pairwise_align_ssw, TabularMSA
 from skbio import TreeNode
 
 blosum50 = {'A': {'A': 5, 'C': -1, 'D': -2, 'E': -1, 'F': -3, 'G': 0, 'H': -2, 'I': -1, 'K': -1, 'L': -2, 'M': -1, 'N': -1, 'P': -1, 'Q': -1, 'R': -2, 'S': 1, 'T': 0, 'V': 0, 'W': -3, 'Y': -2},
@@ -49,8 +49,8 @@ traceback_decoding = {1: '\\', 2:'|', 3: '-', -1: 'E', 0: '*'}
 ###
 
 def hamming_distance(s1, s2):
-    s1 = BiologicalSequence(s1)
-    s2 = BiologicalSequence(s2)
+    s1 = Sequence(s1)
+    s2 = Sequence(s2)
     return s1.distance(s2)
 
 
@@ -82,9 +82,9 @@ def format_dynamic_programming_matrix(seq1, seq2, matrix, cell_width=6):
     """
     lines = []
 
-    if isinstance(seq1, Alignment):
+    if isinstance(seq1, TabularMSA):
         seq1 = str(seq1[0])
-    if isinstance(seq2, Alignment):
+    if isinstance(seq2, TabularMSA):
         seq2 = str(seq2[0])
     cell_format = "%" + str(cell_width) + "s"
     line_format = cell_format * (len(seq1) + 2)
@@ -107,9 +107,9 @@ def format_dynamic_programming_matrix(seq1, seq2, matrix, cell_width=6):
     return '\n'.join(lines)
 
 def format_traceback_matrix(seq1, seq2, matrix, cell_width=6):
-    if isinstance(seq1, Alignment):
+    if isinstance(seq1, TabularMSA):
         seq1 = str(seq1[0])
-    if isinstance(seq2, Alignment):
+    if isinstance(seq2, TabularMSA):
         seq2 = str(seq2[0])
     translated_m = np.chararray(matrix.shape)
     for i in range(matrix.shape[0]):
@@ -124,9 +124,9 @@ def format_dynamic_programming_matrix_subset(seq1,seq2,matrix, cell_width=6, num
     """ return first num_positions x num_positions of dynamic programming matrix
     """
     lines = []
-    if isinstance(seq1, Alignment):
+    if isinstance(seq1, TabularMSA):
         seq1 = str(seq1[0])
-    if isinstance(seq2, Alignment):
+    if isinstance(seq2, TabularMSA):
         seq2 = str(seq2[0])
     cell_format = "%" + str(cell_width) + "s"
     line_format = cell_format * (len(seq1[:num_positions]) + 1)
@@ -687,8 +687,8 @@ def kmer_distance(sequence1, sequence2, k=3, overlapping=True):
 
     Parameters
     ----------
-    sequence1 : BiologicalSequence
-    sequence2 : BiologicalSequence
+    sequence1 : skbio.Sequence
+    sequence2 : skbio.Sequence
     k : int, optional
         The word length.
     overlapping : bool, optional
@@ -760,12 +760,12 @@ def progressive_msa(sequences, guide_tree, pairwise_aligner):
     pairwise_aligner : function
         Function that should be used to perform the pairwise alignments,
         for example skbio.alignment.global_pairwise_align_nucleotide. Must
-        support skbio.BiologicalSequence objects or skbio.Alignment objects
+        support skbio.Sequence objects or skbio.TabularMSA objects
         as input.
 
     Returns
     -------
-    skbio.Alignment
+    skbio.TabularMSA
 
     """
     c1, c2 = guide_tree.children
@@ -794,8 +794,8 @@ def progressive_msa_and_tree(sequences,
         The sequences to be aligned.
     pairwise_aligner : function
         Function that should be used to perform the pairwise alignments,
-        for example skbio.Alignment.global_pairwise_align_nucleotide. Must
-        support skbio.BiologicalSequence objects or skbio.Alignment objects
+        for example skbio.alignment.global_pairwise_align_nucleotide. Must
+        support skbio.Sequence objects or skbio.TabularMSA objects
         as input.
     sequence_distance_fn : function
         Function that returns and skbio.DistanceMatrix given an
@@ -849,8 +849,8 @@ def iterative_msa_and_tree(sequences,
        perform. Must be greater than zero and less than five.
     pairwise_aligner : function
        Function that should be used to perform the pairwise alignments,
-       for example skbio.Alignment.global_pairwise_align_nucleotide. Must
-       support skbio.BiologicalSequence objects or skbio.Alignment objects
+       for example skbio.alignment.global_pairwise_align_nucleotide. Must
+       support skbio.Sequence objects or skbio.TabularMSA objects
        as input.
     sequence_distance_fn : function
        Function that returns and skbio.DistanceMatrix given an
