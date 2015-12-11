@@ -93,40 +93,11 @@ Let's start with something more similar than sequences. Let's compute the distan
 >>> ax.scatter(x_vals, y_vals)
 >>> ax.set_xlim(0)
 >>> ax.set_ylim(0)
-Populating the interactive namespace from numpy and matplotlib
-(0, 6.5)
 ```
 
 ```python
 >>> from scipy.spatial.distance import euclidean
 >>> %psource euclidean
-[0;32mdef[0m [0meuclidean[0m[0;34m([0m[0mu[0m[0;34m,[0m [0mv[0m[0;34m)[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m    [0;34m"""[0m
-[0;34m    Computes the Euclidean distance between two 1-D arrays.[0m
-[0;34m[0m
-[0;34m    The Euclidean distance between 1-D arrays `u` and `v`, is defined as[0m
-[0;34m[0m
-[0;34m    .. math::[0m
-[0;34m[0m
-[0;34m       {||u-v||}_2[0m
-[0;34m[0m
-[0;34m    Parameters[0m
-[0;34m    ----------[0m
-[0;34m    u : (N,) array_like[0m
-[0;34m        Input array.[0m
-[0;34m    v : (N,) array_like[0m
-[0;34m        Input array.[0m
-[0;34m[0m
-[0;34m    Returns[0m
-[0;34m    -------[0m
-[0;34m    euclidean : double[0m
-[0;34m        The Euclidean distance between vectors `u` and `v`.[0m
-[0;34m[0m
-[0;34m    """[0m[0;34m[0m
-[0;34m[0m    [0mu[0m [0;34m=[0m [0m_validate_vector[0m[0;34m([0m[0mu[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m    [0mv[0m [0;34m=[0m [0m_validate_vector[0m[0;34m([0m[0mv[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m    [0mdist[0m [0;34m=[0m [0mnorm[0m[0;34m([0m[0mu[0m [0;34m-[0m [0mv[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m    [0;32mreturn[0m [0mdist[0m[0;34m[0m[0m
 ```
 
 Does Euclidean distance appear to meet the above four requirements of a distance metric?
@@ -143,7 +114,6 @@ We can now compute the distances between all of these pairs of coordinates, and 
 ...     dm.append(row)
 ...
 >>> print(dm)
-[[0.0, 3.0, 3.1622776601683795], [3.0, 0.0, 3.6055512754639891], [3.1622776601683795, 3.6055512754639891, 0.0]]
 ```
 
 The [scikit-bio](https://github.com/biocore/scikit-bio) project defines defines a ``DistanceMatrix`` object that we can use to work with this.
@@ -158,18 +128,10 @@ One feature that this gets us is nicer printing.
 
 ```python
 >>> print(dm)
-3x3 distance matrix
-IDs:
-'0', '1', '2'
-Data:
-[[ 0.          3.          3.16227766]
- [ 3.          0.          3.60555128]
- [ 3.16227766  3.60555128  0.        ]]
 ```
 
 ```python
 >>> dm
-<skbio.stats.distance._base.DistanceMatrix at 0x10844e048>
 ```
 
 ```python
@@ -177,13 +139,6 @@ Data:
 >>> from skbio import DistanceMatrix
 >>> dm = DistanceMatrix(scipy.spatial.distance.pdist(coordinates, "euclidean"))
 >>> print(dm)
-3x3 distance matrix
-IDs:
-'0', '1', '2'
-Data:
-[[ 0.          3.          3.16227766]
- [ 3.          0.          3.60555128]
- [ 3.16227766  3.60555128  0.        ]]
 ```
 
 The conditions of a distance matrix listed above lead to a few specific features: the distance matrix is symmetric (if you flip the upper triangle over the diagonal, the values are the same as those in the lower triangle), the distance matrix is *hollow* (the diagonal is all zeros), and there are no negative values.
@@ -211,15 +166,6 @@ Let's load up some aligned sequences, and compute a distance matrix. For now, we
 ...
 >>> master_dm = DistanceMatrix.from_iterable(aln, metric=hamming, key='id')
 >>> print(master_dm)
-5x5 distance matrix
-IDs:
-'s1', 's2', 's3', 's4', 's5'
-Data:
-[[ 0.      0.25    0.125   0.3125  0.375 ]
- [ 0.25    0.      0.1875  0.375   0.3125]
- [ 0.125   0.1875  0.      0.1875  0.25  ]
- [ 0.3125  0.375   0.1875  0.      0.0625]
- [ 0.375   0.3125  0.25    0.0625  0.    ]]
 ```
 
 Once we have these distances, we can cluster the sequences based on their similiaries/dissimilarities. This is the first process that we'll explore for tree building.
@@ -229,15 +175,6 @@ Once we have these distances, we can cluster the sequences based on their simili
 ```python
 >>> master_dm = DistanceMatrix(master_dm.data*16, master_dm.ids)
 >>> print(master_dm)
-5x5 distance matrix
-IDs:
-'s1', 's2', 's3', 's4', 's5'
-Data:
-[[ 0.  4.  2.  5.  6.]
- [ 4.  0.  3.  6.  5.]
- [ 2.  3.  0.  3.  4.]
- [ 5.  6.  3.  0.  1.]
- [ 6.  5.  4.  1.  0.]]
 ```
 
 ## Hierarchical clustering with UPGMA <link src='73d028'/>
@@ -281,21 +218,18 @@ Step 1.3: We'll now fill in the values from the new clade to each of the existin
 >>> import numpy as np
 ...
 >>> np.mean([master_dm[0][3], master_dm[0][4]])
-5.5
 ```
 
 Step 1.3 (continued): Similarly, the distance between `s2` and `(s4, s5)` is the mean of the distance between `s2` and `s4` and `s2` and `s5`:
 
 ```python
 >>> np.mean([master_dm[1][3], master_dm[1][4]])
-5.5
 ```
 
 Step 1.3 (continued): And finally, the distance between `s3` and `(s4, s5)` is the mean of the distance between `s3` and `s4` and the distance between `s3` and `s5`:
 
 ```python
 >>> np.mean([master_dm[2][3], master_dm[2][4]])
-3.5
 ```
 
 Step 1.3 (continued): If we fill these values in (note that they will be the same above and below the diagonal) the post-iteration 1 distance matrix looks like the following:
@@ -308,14 +242,6 @@ Step 1.3 (continued): If we fill these values in (note that they will be the sam
 ...
 >>> iter1_dm = DistanceMatrix(iter1_dm, iter1_ids)
 >>> print(iter1_dm)
-4x4 distance matrix
-IDs:
-'s1', 's2', 's3', '(s4, s5)'
-Data:
-[[ 0.   4.   2.   5.5]
- [ 4.   0.   3.   5.5]
- [ 2.   3.   0.   3.5]
- [ 5.5  5.5  3.5  0. ]]
 ```
 
 Step 1.4: There is still more than one value below the diagonal, so we start a new iteration.
@@ -341,14 +267,12 @@ Step 2.3: We'll now fill in the values from the new clade to each of the existin
 
 ```python
 >>> np.mean([master_dm[1][0], master_dm[1][2]])
-3.5
 ```
 
 Step 2.3 (continued): Next, we need to find the distance between `(s1, s3)` and `(s4, s5)`. This is computed as the mean of the distance between `s1` and `s4`, the distance between `s1` and `s5`, the distance between `s3` and `s4`, and the distance between `s3` and `s5`. Note that we are going back to our master distance matrix here for these distances, **not** our iteration 1 distance matrix.
 
 ```python
 >>> np.mean([master_dm[0][3], master_dm[0][4], master_dm[2][3], master_dm[2][4]])
-4.5
 ```
 
 Step 2.3 (continued): We can now fill in all of the distances in our iteration 2 distance matrix.
@@ -360,13 +284,6 @@ Step 2.3 (continued): We can now fill in all of the distances in our iteration 2
 ...
 >>> iter2_dm = DistanceMatrix(iter2_dm, iter2_ids)
 >>> print(iter2_dm)
-3x3 distance matrix
-IDs:
-'(s1, s3)', 's2', '(s4, s5)'
-Data:
-[[ 0.   3.5  4.5]
- [ 3.5  0.   5.5]
- [ 4.5  5.5  0. ]]
 ```
 
 Step 2.4: There is still more than one value below the diagonal, so we start a new iteration.
@@ -391,7 +308,6 @@ Step 3.3: We'll now fill in the values from the new clade to each of the existin
 
 ```python
 >>> np.mean([master_dm[0][3], master_dm[0][4], master_dm[2][3], master_dm[2][4], master_dm[1][3], master_dm[1][4]])
-4.833333333333333
 ```
 
 Step 3.3 (continued): We can now fill in all of the distances in our iteration 3 distance matrix.
@@ -402,12 +318,6 @@ Step 3.3 (continued): We can now fill in all of the distances in our iteration 3
 ...
 >>> iter3_dm = DistanceMatrix(iter3_dm, iter3_ids)
 >>> print(iter3_dm)
-2x2 distance matrix
-IDs:
-'((s1, s3), s2)', '(s4, s5)'
-Data:
-[[ 0.   4.8]
- [ 4.8  0. ]]
 ```
 
 Step 3.4: At this stage, there is only one distance below the diagonal in our distance matrix. So, we can use that distance to draw the final branch in our tree, setting the total branch length to 4.8.
