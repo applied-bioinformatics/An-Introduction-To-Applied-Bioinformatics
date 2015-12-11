@@ -11,8 +11,9 @@ from random import choice, random, shuffle
 
 import numpy as np
 from scipy.cluster.hierarchy import average, dendrogram, to_tree
+import skbio
 from skbio.sequence import Sequence, DNA
-from skbio.stats.distance import DistanceMatrix
+from skbio import DistanceMatrix
 from skbio.alignment import local_pairwise_align_ssw, TabularMSA
 from skbio import TreeNode
 
@@ -722,17 +723,17 @@ def kmer_distance(sequence1, sequence2, k=3, overlap=True):
     return fraction_unique
 
 def guide_tree_from_sequences(sequences,
-                              distance_fn=kmer_distance,
+                              metric=kmer_distance,
                               display_tree = False):
-    """ Build a UPGMA tree by applying distance_fn to sequences
+    """ Build a UPGMA tree by applying metric to sequences
 
     Parameters
     ----------
     sequences : skbio.SequenceCollection
       The sequences to be represented in the resulting guide tree.
-    sequence_distance_fn : function
-      Function that returns and skbio.DistanceMatrix given an
-      skbio.SequenceCollection.
+    metric : function
+      Function that returns a single distance value when given a pair of
+      skbio.Sequence objects.
     display_tree : bool, optional
       Print the tree before returning.
 
@@ -741,7 +742,8 @@ def guide_tree_from_sequences(sequences,
     skbio.TreeNode
 
     """
-    guide_dm = sequences.distances(distance_fn)
+    guide_dm = DistanceMatrix.from_iterable(
+                    sequences, metric=metric, key='id')
     guide_lm = average(guide_dm.condensed_form())
     guide_tree = to_tree(guide_lm)
     if display_tree:
@@ -769,22 +771,40 @@ def progressive_msa(sequences, guide_tree, pairwise_aligner):
     skbio.TabularMSA
 
     """
+    seq_lookup = {s.metadata['id']: s for i, s in enumerate(sequences)}
     c1, c2 = guide_tree.children
     if c1.is_tip():
-        c1_aln = sequences[c1.name]
+        c1_aln = seq_lookup[c1.name]
     else:
         c1_aln = progressive_msa(sequences, c1, pairwise_aligner)
 
     if c2.is_tip():
-        c2_aln = sequences[c2.name]
+        c2_aln = seq_lookup[c2.name]
     else:
         c2_aln = progressive_msa(sequences, c2, pairwise_aligner)
 
-    return pairwise_aligner(c1_aln, c2_aln)
+    alignment, _, _ = pairwise_aligner(c1_aln, c2_aln)
+    # this is a temporary hack as the aligners in skbio 0.4.1 are dropping
+    # metadata - this makes sure that the right metadata is associated with
+    # the sequence after alignment
+    if isinstance(c1_aln, skbio.Sequence):
+        alignment[0].metadata = c1_aln.metadata
+        len_c1_aln = 1
+    else:
+        for i in range(len(c1_aln)):
+            alignment[i].metadata = c1_aln[i].metadata
+        len_c1_aln = len(c1_aln)
+    if isinstance(c2_aln, skbio.Sequence):
+        alignment[1].metadata = c2_aln.metadata
+    else:
+        for i in range(len(c2_aln)):
+            alignment[len_c1_aln + i].metadata = c2_aln[i].metadata
+
+    return alignment
 
 def progressive_msa_and_tree(sequences,
                              pairwise_aligner,
-                             sequence_distance_fn=kmer_distance,
+                             metric=kmer_distance,
                              guide_tree=None,
                              display_aln=False,
                              display_tree=False):
@@ -798,10 +818,10 @@ def progressive_msa_and_tree(sequences,
         for example skbio.alignment.global_pairwise_align_nucleotide. Must
         support skbio.Sequence objects or skbio.TabularMSA objects
         as input.
-    sequence_distance_fn : function
-        Function that returns and skbio.DistanceMatrix given an
-        skbio.SequenceCollection. This will be used to build a guide tree if
-        one is not provided.
+    metric : function, optional
+      Function that returns a single distance value when given a pair of
+      skbio.Sequence objects. This will be used to build a guide tree if one
+      is not provided.
     guide_tree : skbio.TreeNode, optional
         The tree that should be used to guide the alignment process.
     display_aln : bool, optional
@@ -816,16 +836,18 @@ def progressive_msa_and_tree(sequences,
 
     """
     if guide_tree is None:
-        guide_dm = sequences.distances(sequence_distance_fn)
+        guide_dm = DistanceMatrix.from_iterable(
+                        sequences, metric=metric, key='id')
         guide_lm = average(guide_dm.condensed_form())
         guide_tree = TreeNode.from_linkage_matrix(guide_lm, guide_dm.ids)
 
     msa = progressive_msa(sequences, guide_tree,
                           pairwise_aligner=pairwise_aligner)
+
     if display_aln:
         print(msa)
 
-    msa_dm = msa.distances()
+    msa_dm = DistanceMatrix.from_iterable(msa, metric=metric, key='id')
     msa_lm = average(msa_dm.condensed_form())
     msa_tree = TreeNode.from_linkage_matrix(msa_lm, msa_dm.ids)
     if display_tree:
@@ -837,7 +859,7 @@ def progressive_msa_and_tree(sequences,
 def iterative_msa_and_tree(sequences,
                            num_iterations,
                            pairwise_aligner,
-                           sequence_distance_fn=kmer_distance,
+                           metric=kmer_distance,
                            display_aln=False,
                            display_tree=False):
     """ Perform progressive msa of sequences and build a UPGMA tree
@@ -853,9 +875,10 @@ def iterative_msa_and_tree(sequences,
        for example skbio.alignment.global_pairwise_align_nucleotide. Must
        support skbio.Sequence objects or skbio.TabularMSA objects
        as input.
-    sequence_distance_fn : function
-       Function that returns and skbio.DistanceMatrix given an
-       skbio.SequenceCollection. This will be used to build a guide tree.
+    metric : function, optional
+      Function that returns a single distance value when given a pair of
+      skbio.Sequence objects. This will be used to build a guide tree if one
+      is not provided.
     display_aln : bool, optional
        Print the alignment before returning.
     display_tree : bool, optional
@@ -880,7 +903,7 @@ def iterative_msa_and_tree(sequences,
         previous_iter_msa, previous_iter_tree = \
             progressive_msa_and_tree(sequences,
              pairwise_aligner=pairwise_aligner,
-             sequence_distance_fn=sequence_distance_fn,
+             metric=metric,
              guide_tree=previous_iter_tree,
              display_aln=display_aln and display,
              display_tree=display_tree and display)
