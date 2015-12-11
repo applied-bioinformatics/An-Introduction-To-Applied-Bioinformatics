@@ -15,6 +15,7 @@ install:
   - conda create --yes -n env_name python=$TRAVIS_PYTHON_VERSION pip numpy scipy matplotlib nose scikit-bio=0.2.3 "ipython <4.0.0" tornado jsonschema
   - source activate env_name
   - pip install https://github.com/gregcaporaso/build-iab/archive/master.zip
+  - pip install .
   - biab notebook -i book -o ipynb
 script:
   # Running through all notebooks takes awhile, so bail if the unit tests fail.
