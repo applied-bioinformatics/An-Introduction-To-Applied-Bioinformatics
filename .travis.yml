@@ -5,12 +5,10 @@ language: python
 python:
   - "3.4"
 before_install:
-  - wget http://repo.continuum.io/miniconda/Miniconda3-3.7.3-Linux-x86_64.sh -O miniconda.sh
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
   - ./miniconda.sh -b
   - export PATH=/home/travis/miniconda3/bin:$PATH
-  # Update conda itself
-  - conda update --yes conda
 install:
   - conda create --yes -n iab python=$TRAVIS_PYTHON_VERSION -c https://conda.anaconda.org/biocore --file ci/conda_requirements.txt
   - source activate iab
