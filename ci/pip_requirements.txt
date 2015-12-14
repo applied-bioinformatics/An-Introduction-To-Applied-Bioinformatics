@@ -1,0 +1,4 @@
+ipymd
+runipy
+https://github.com/gregcaporaso/build-iab/archive/master.zip
+qiime-default-reference <0.2.0

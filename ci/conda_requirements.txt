@@ -1,0 +1,13 @@
+pip
+numpy
+scipy
+matplotlib
+nose
+scikit-bio =0.4.1
+ipython <4.0.0
+seaborn
+pandas
+markdown2
+tornado
+jsonschema
+networkx

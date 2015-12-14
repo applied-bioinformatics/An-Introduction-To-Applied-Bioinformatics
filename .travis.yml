@@ -12,10 +12,10 @@ before_install:
   # Update conda itself
   - conda update --yes conda
 install:
-  - conda create --yes -c https://conda.anaconda.org/biocore -n iab python=$TRAVIS_PYTHON_VERSION pip pandas=0.17.1 numpy scipy matplotlib nose scikit-bio=0.4.1 "ipython <4.0.0" tornado jsonschema
+  - conda create --yes -n iab python=$PYTHON_VERSION -c https://conda.anaconda.org/biocore --file ci/conda_requirements.txt
   - source activate iab
-  - pip install https://github.com/gregcaporaso/build-iab/archive/master.zip
-  - pip install .
+  - pip install -r ci/pip_requirements.txt
+  - pip install . --no-deps
   - pip freeze
   - biab notebook -i book -o ipynb
 script:
