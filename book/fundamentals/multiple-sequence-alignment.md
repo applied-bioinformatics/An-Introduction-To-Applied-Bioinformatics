@@ -137,23 +137,23 @@ Let's address the first of our outstanding questions. **I mentioned above that *
 Let's compute distances between the sequences based on their *word* composition. We'll define a *word* here as `k` adjacent characters in the sequence. We can then define a function that will return all of the words in a sequence as follows. These words can be defined as being overlapping, or non-overlapping. We'll go with overlapping for this example, as the more words we have, the better our guide tree should be.
 
 ```python
->>> from skbio import BiologicalSequence
->>> %psource BiologicalSequence.k_words
+>>> from skbio import DNA
+>>> %psource DNA.iter_kmers
 ```
 
 ```python
->>> for e in BiologicalSequence("ACCGGTGACCAGTTGACCAGTA").k_words(3):
->>>     print(e)
+>>> for e in DNA("ACCGGTGACCAGTTGACCAGTA").iter_kmers(3):
+...     print(e)
 ```
 
 ```python
->>> for e in BiologicalSequence("ACCGGTGACCAGTTGACCAGTA").k_words(7):
->>>     print(e)
+>>> for e in DNA("ACCGGTGACCAGTTGACCAGTA").iter_kmers(7):
+...     print(e)
 ```
 
 ```python
->>> for e in BiologicalSequence("ACCGGTGACCAGTTGACCAGTA").k_words(3, overlapping=False):
->>>     print(e)
+>>> for e in DNA("ACCGGTGACCAGTTGACCAGTA").iter_kmers(3, overlap=False):
+...     print(e)
 ```
 
 If we then have two sequences, we can compute the word counts for each and define a distance between the sequences as the fraction of words that are unique to either sequence.
@@ -166,9 +166,9 @@ If we then have two sequences, we can compute the word counts for each and defin
 We can then use this as a distance function...
 
 ```python
->>> s1 = BiologicalSequence("ACCGGTGACCAGTTGACCAGT")
->>> s2 = BiologicalSequence("ATCGGTACCGGTAGAAGT")
->>> s3 = BiologicalSequence("GGTACCAAATAGAA")
+>>> s1 = DNA("ACCGGTGACCAGTTGACCAGT")
+>>> s2 = DNA("ATCGGTACCGGTAGAAGT")
+>>> s3 = DNA("GGTACCAAATAGAA")
 ...
 >>> print(s1.distance(s2, kmer_distance))
 >>> print(s1.distance(s3, kmer_distance))
@@ -179,9 +179,9 @@ If we wanted to override the default to create (for example) a 5-mer distance fu
 ```python
 >>> fivemer_distance = partial(kmer_distance, k=5)
 ...
->>> s1 = BiologicalSequence("ACCGGTGACCAGTTGACCAGT")
->>> s2 = BiologicalSequence("ATCGGTACCGGTAGAAGT")
->>> s3 = BiologicalSequence("GGTACCAAATAGAA")
+>>> s1 = DNA("ACCGGTGACCAGTTGACCAGT")
+>>> s2 = DNA("ATCGGTACCGGTAGAAGT")
+>>> s3 = DNA("GGTACCAAATAGAA")
 ...
 >>> print(s1.distance(s2, fivemer_distance))
 >>> print(s1.distance(s3, fivemer_distance))
@@ -190,18 +190,17 @@ If we wanted to override the default to create (for example) a 5-mer distance fu
 We can now apply one of these functions to build a distance matrix for a set of sequences that we want to align.
 
 ```python
->>> from skbio import SequenceCollection
->>> query_sequences = SequenceCollection(
->>>                    [BiologicalSequence("ACCGGTGACCAGTTGACCAGT", "s1"),
->>>                     BiologicalSequence("ATCGGTACCGGTAGAAGT", "s2"),
->>>                     BiologicalSequence("GGTACCAAATAGAA", "s3"),
->>>                     BiologicalSequence("GGCACCAAACAGAA", "s4"),
->>>                     BiologicalSequence("GGCCCACTGAT", "s5")])
+>>> query_sequences = [DNA("ACCGGTGACCAGTTGACCAGT", {"id": "s1"}),
+...                    DNA("ATCGGTACCGGTAGAAGT", {"id": "s2"}),
+...                    DNA("GGTACCAAATAGAA", {"id": "s3"}),
+...                    DNA("GGCACCAAACAGAA", {"id": "s4"}),
+...                    DNA("GGCCCACTGAT", {"id": "s5"})]
 ```
 
 ```python
->>> guide_dm = query_sequences.distances(kmer_distance)
->>> print(guide_dm)
+>>> from skbio import DistanceMatrix
+...
+>>> guide_dm = DistanceMatrix.from_iterable(query_sequences, metric=kmer_distance, key='id')
 ```
 
 scikit-bio also has some basic visualization functionality for these objects. For example, we can easily visualize this object as a heatmap.
@@ -216,11 +215,11 @@ We can next use some functionality from SciPy to cluster the sequences with UPGM
 >>> from scipy.cluster.hierarchy import average, dendrogram, to_tree
 ...
 >>> for q in query_sequences:
->>>     print(q)
+...     print(q)
 ...
 >>> guide_lm = average(guide_dm.condensed_form())
 >>> guide_d = dendrogram(guide_lm, labels=guide_dm.ids, orientation='right',
->>>                      link_color_func=lambda x: 'black')
+...                      link_color_func=lambda x: 'black')
 >>> guide_tree = to_tree(guide_lm)
 ```
 
@@ -293,34 +292,28 @@ For the sake of the examples below, I'm going to override one of the ``global_pa
 For example, we can still use this code to align pairs of sequences (but note that we now need to pass those sequences in as a pair of one-item lists):
 
 ```python
->>> print(query_sequences[0])
->>> print(query_sequences[1])
-...
->>> aln1 = global_pairwise_align_nucleotide(query_sequences[0], query_sequences[1])
+>>> aln1, _, _ = global_pairwise_align_nucleotide(query_sequences[0], query_sequences[1])
 >>> print(aln1)
 ```
 
 We can align that alignment to one of our other sequences.
 
 ```python
-...
->>> print(query_sequences[2])
->>> print(global_pairwise_align_nucleotide(aln1, query_sequences[2]))
+>>> aln1, _, _ = global_pairwise_align_nucleotide(aln1, query_sequences[2])
+>>> print(aln1)
 ```
 
 Alternatively, we can align another pair of sequences:
 
 ```python
->>> aln2 = global_pairwise_align_nucleotide(query_sequences[2], query_sequences[3])
+>>> aln2, _, _ = global_pairwise_align_nucleotide(query_sequences[2], query_sequences[3])
 >>> print(aln2)
 ```
 
 And then align that alignment against our previous alignment:
 
 ```python
->>> print(aln1)
->>> print(aln2)
->>> aln3 = global_pairwise_align_nucleotide(aln1, aln2)
+>>> aln3, _, _  = global_pairwise_align_nucleotide(aln1, aln2)
 >>> print(aln3)
 ```
 
@@ -356,7 +349,7 @@ We can now build a (hopefully) improved tree from our multiple sequence alignmen
 ```
 
 ```python
->>> msa_dm = msa.distances()
+>>> msa_dm = DistanceMatrix.from_iterable(msa, metric=kmer_distance)
 >>> fig = msa_dm.plot(cmap='Greens')
 ```
 
@@ -364,13 +357,13 @@ The UPGMA trees that result from these alignments are very different. First we'l
 
 ```python
 >>> d = dendrogram(guide_lm, labels=guide_dm.ids, orientation='right',
->>>                link_color_func=lambda x: 'black')
+...                link_color_func=lambda x: 'black')
 ```
 
 ```python
 >>> msa_lm = average(msa_dm.condensed_form())
 >>> d = dendrogram(msa_lm, labels=msa_dm.ids, orientation='right',
->>>                link_color_func=lambda x: 'black')
+...                link_color_func=lambda x: 'black')
 ```
 
 And we can wrap this all up in a single convenience function:
@@ -381,7 +374,12 @@ And we can wrap this all up in a single convenience function:
 ```
 
 ```python
->>> msa, tree = progressive_msa_and_tree(query_sequences, pairwise_aligner=global_pairwise_align_nucleotide, display_tree=True, display_aln=True)
+>>> msa = progressive_msa(query_sequences, guide_tree, pairwise_aligner=global_pairwise_align_nucleotide)
+```
+
+```python
+>>> msa, tree = progressive_msa_and_tree(query_sequences, pairwise_aligner=global_pairwise_align_nucleotide,
+...                                      display_tree=True, display_aln=True)
 ```
 
 ## Progressive alignment versus iterative alignment <link src='7319bd'/>

@@ -74,7 +74,7 @@ Computing a UPGMA tree for a group of sequences relies on first computing *dista
 3. `d(x,y) = d(y,x)` (symmetry)
 4. `d(x,z) <= d(x,y) + d(y,z)` (triangle inequality)
 
-Let's start with something more similar than sequences. Let's compute the distances between points in a Cartesian plane, to explore what each of these mean.  
+Let's start with something more similar than sequences. Let's compute the distances between points in a Cartesian plane, to explore what each of these mean.
 
 ```python
 >>> %pylab inline
@@ -108,10 +108,10 @@ We can now compute the distances between all of these pairs of coordinates, and 
 >>> dm = []
 ...
 >>> for c1 in coordinates:
->>>     row = []
->>>     for c2 in coordinates:
->>>         row.append(euclidean(c1, c2))
->>>     dm.append(row)
+...     row = []
+...     for c2 in coordinates:
+...         row.append(euclidean(c1, c2))
+...     dm.append(row)
 ...
 >>> print(dm)
 ```
@@ -130,15 +130,14 @@ One feature that this gets us is nicer printing.
 >>> print(dm)
 ```
 
-[scikit-bio](https://github.com/biocore/scikit-bio) also provides a convenience wrapper that runs the SciPy *pairwise distance* measures for us and returns a ``DistanceMatrix`` object. We'll use that from here.
-
 ```python
->>> from skbio.diversity.beta import pw_distances
->>> help(pw_distances)
+>>> dm
 ```
 
 ```python
->>> dm = pw_distances(coordinates, metric="euclidean")
+>>> import scipy.spatial.distance
+>>> from skbio import DistanceMatrix
+>>> dm = DistanceMatrix(scipy.spatial.distance.pdist(coordinates, "euclidean"))
 >>> print(dm)
 ```
 
@@ -151,20 +150,21 @@ Most often, distances between pairs of sequences are derived from a multiple seq
 Let's load up some aligned sequences, and compute a distance matrix. For now, we'll compute distances between the sequences using the ``hamming`` function that we worked with in the pairwise alignment chapter.
 
 ```python
->>> from skbio import Alignment, DNA
->>> aln = Alignment([DNA('ACCGTGAAGCCAATAC', 's1'),
->>>                  DNA('A-CGTGCAACCATTAC', 's2'),
->>>                  DNA('AGCGTGCAGCCAATAC', 's3'),
->>>                  DNA('AGGGTGCCGC-AATAC', 's4'),
->>>                  DNA('AGGGTGCCAC-AATAC', 's5')])
+>>> from skbio import TabularMSA, DNA
+>>> import scipy.spatial.distance
+...
+>>> aln = TabularMSA([DNA('ACCGTGAAGCCAATAC', {'id': 's1'}),
+...                   DNA('A-CGTGCAACCATTAC', {'id': 's2'}),
+...                   DNA('AGCGTGCAGCCAATAC', {'id': 's3'}),
+...                   DNA('AGGGTGCCGC-AATAC', {'id': 's4'}),
+...                   DNA('AGGGTGCCAC-AATAC', {'id': 's5'})])
 ```
 
 ```python
->>> %psource aln.distances
-```
-
-```python
->>> master_dm = aln.distances()
+>>> def hamming(seq1, seq2):
+...     return float(scipy.spatial.distance.hamming(seq1.values, seq2.values))
+...
+>>> master_dm = DistanceMatrix.from_iterable(aln, metric=hamming, key='id')
 >>> print(master_dm)
 ```
 
@@ -207,9 +207,9 @@ Step 1.2: Next, we'll create a new, smaller distance matrix where the sequences 
 ```python
 >>> iter1_ids = ['s1', 's2', 's3', '(s4, s5)']
 >>> iter1_dm = [[0.0,   4.0,  2.0, None],
->>>             [4.0,   0.0,  3.0, None],
->>>             [2.0,   3.0,  0.0, None],
->>>             [None, None, None, None]]
+...             [4.0,   0.0,  3.0, None],
+...             [2.0,   3.0,  0.0, None],
+...             [None, None, None, None]]
 ```
 
 Step 1.3: We'll now fill in the values from the new clade to each of the existing sequences (or clades). The distance will be the mean between each pre-existing clade, and each of the sequences in the new clade. For example, the distance between `s1` and `(s4, s5)` is the mean of the distance between `s1` and `s4` and `s1` and `s5`:
@@ -236,9 +236,9 @@ Step 1.3 (continued): If we fill these values in (note that they will be the sam
 
 ```python
 >>> iter1_dm = [[0.0, 4.0, 2.0, 5.5],
->>>       [4.0, 0.0, 3.0, 5.5],
->>>       [2.0, 3.0, 0.0, 3.5],
->>>       [5.5, 5.5, 3.5, 0.0]]
+...       [4.0, 0.0, 3.0, 5.5],
+...       [2.0, 3.0, 0.0, 3.5],
+...       [5.5, 5.5, 3.5, 0.0]]
 ...
 >>> iter1_dm = DistanceMatrix(iter1_dm, iter1_ids)
 >>> print(iter1_dm)
@@ -259,8 +259,8 @@ Step 2.2: Next, we'll create a new, smaller distance matrix where the sequences 
 >>> iter2_ids = ['(s1, s3)', 's2', '(s4, s5)']
 ...
 >>> iter2_dm = [[None, None, None],
->>>       [None,  0.0, 5.5],
->>>       [None,  5.5, 0.0]]
+...       [None,  0.0, 5.5],
+...       [None,  5.5, 0.0]]
 ```
 
 Step 2.3: We'll now fill in the values from the new clade to each of the existing sequences (or clades). The distance will be the mean between each pre-existing clade, and each of the sequences in the new clade. For example, the distance between `s2` and `(s1, s3)` is the mean of the distance between `s2` and `s1` and `s2` and `s3`:
@@ -279,8 +279,8 @@ Step 2.3 (continued): We can now fill in all of the distances in our iteration 2
 
 ```python
 >>> iter2_dm = [[0.0, 3.5, 4.5],
->>>             [3.5, 0.0, 5.5],
->>>             [4.5, 5.5, 0.0]]
+...             [3.5, 0.0, 5.5],
+...             [4.5, 5.5, 0.0]]
 ...
 >>> iter2_dm = DistanceMatrix(iter2_dm, iter2_ids)
 >>> print(iter2_dm)
@@ -301,7 +301,7 @@ Step 3.2: Next, we'll create a new, smaller distance matrix where the clade `(s1
 >>> iter3_ids = ['((s1, s3), s2)', '(s4, s5)']
 ...
 >>> iter3_dm = [[None, None],
->>>             [None,  0.0]]
+...             [None,  0.0]]
 ```
 
 Step 3.3: We'll now fill in the values from the new clade to each of the existing sequences (or clades). This is computed as the mean of the distance between `s1` and `s4`, the distance between `s1` and `s5`, the distance between `s3` and `s4`, the distance between `s3` and `s5`, the distance between `s2` and `s4`, and the distance between `s2` and `s5`. Again, note that we are going back to our master distance matrix here for these distances, **not** our iteration 1 or iteration 2 distance matrix.
@@ -314,7 +314,7 @@ Step 3.3 (continued): We can now fill in all of the distances in our iteration 3
 
 ```python
 >>> iter3_dm = [[0.0, 4.8],
->>>             [4.8, 0.0]]
+...             [4.8, 0.0]]
 ...
 >>> iter3_dm = DistanceMatrix(iter3_dm, iter3_ids)
 >>> print(iter3_dm)
@@ -324,14 +324,14 @@ Step 3.4: At this stage, there is only one distance below the diagonal in our di
 
 <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-final.png">
 
-[SciPy](http://www.scipy.org/) contains support for running UPGMA and generating *dendrograms* (or basic tree visualizations). We can apply this to our distance matrix as follows. You can explore other options for hierarchical clustering in SciPy [here](http://docs.scipy.org/doc/scipy/reference/cluster.hierarchy.html) (see the *routines for agglomerative clustering*).  
+[SciPy](http://www.scipy.org/) contains support for running UPGMA and generating *dendrograms* (or basic tree visualizations). We can apply this to our distance matrix as follows. You can explore other options for hierarchical clustering in SciPy [here](http://docs.scipy.org/doc/scipy/reference/cluster.hierarchy.html) (see the *routines for agglomerative clustering*).
 
 ```python
 >>> # scipy.cluster.hierarchy.average is an implementation of UPGMA
->>> from scipy.cluster.hierarchy import average, dendrogram
+... from scipy.cluster.hierarchy import average, dendrogram
 >>> lm = average(master_dm.condensed_form())
 >>> d = dendrogram(lm, labels=master_dm.ids, orientation='right',
->>>                link_color_func=lambda x: 'black')
+...                link_color_func=lambda x: 'black')
 ```
 
 ## Acknowledgements <link src='99ad11'/>
