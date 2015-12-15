@@ -475,12 +475,11 @@ First, let's look at the analysis presented in panels E and F. Instead of genera
 ```
 
 ```python
->>> from skbio.draw import boxplots
->>> plot = boxplots([within_category_distances, between_category_distances],
-...                 x_tick_labels=['same body habitat', 'different body habitat'],
-...                 x_tick_labels_orientation='horizontal',
-...                 y_label="Unweighted UniFrac distance",
-...                 y_min=0.0, y_max=1.0)
+>>> import seaborn as sns
+>>> ax = sns.boxplot(data=[within_category_distances, between_category_distances])
+>>> ax.set_xticklabels(['same body habitat', 'different body habitat'])
+>>> ax.set_ylabel('Unweighted UniFrac Distance')
+>>> _ = ax.set_ylim(0.0, 1.0)
 ```
 
 ```python
@@ -498,11 +497,10 @@ If we run through these same steps, but base our analysis on a different metadat
 ```
 
 ```python
->>> plot = boxplots([within_category_distances, between_category_distances],
-...                 x_tick_labels=['same person', 'different person'],
-...                 x_tick_labels_orientation='horizontal',
-...                 y_label="Unweighted UniFrac distance",
-...                 y_min=0.0, y_max=1.0)
+>>> ax = sns.boxplot(data=[within_category_distances, between_category_distances])
+>>> ax.set_xticklabels(['same person', 'different person'])
+>>> ax.set_ylabel('Unweighted UniFrac Distance')
+>>> _ = ax.set_ylim(0.0, 1.0)
 ```
 
 ```python

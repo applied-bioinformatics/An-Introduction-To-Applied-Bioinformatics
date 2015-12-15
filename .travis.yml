@@ -2,19 +2,18 @@
 # from https://github.com/biocore/scikit-bio/blob/master/.travis.yml
 sudo: false
 language: python
-python:
-  - "3.5"
+env:
+  - PYTHON_VERSION=3.5
 before_install:
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
   - ./miniconda.sh -b
   - export PATH=/home/travis/miniconda3/bin:$PATH
 install:
-  - conda create --yes -n iab -c https://conda.anaconda.org/biocore python=3.5 --file ci/conda_requirements.txt
+  - conda create --yes -n iab -c https://conda.anaconda.org/biocore python=$PYTHON_VERSION --file ci/conda_requirements.txt
   - source activate iab
   - pip install -r ci/pip_requirements.txt
   - pip install . --no-deps
-  - pip freeze
   - biab notebook -i book -o ipynb
 script:
   # Running through all notebooks takes awhile, so bail if the unit tests fail.
