@@ -10,9 +10,8 @@ before_install:
   - ./miniconda.sh -b
   - export PATH=/home/travis/miniconda3/bin:$PATH
 install:
-  - conda create --yes -n iab -c https://conda.anaconda.org/biocore python=$TRAVIS_PYTHON_VERSION scikit-bio=0.4.1 # --file ci/conda_requirements.txt
+  - conda create --yes -n iab -c https://conda.anaconda.org/biocore python=$TRAVIS_PYTHON_VERSION numpy # --file ci/conda_requirements.txt
   - source activate iab
-  - python -c 'import skbio; print(skbio.motto)'
   # - pip install -r ci/pip_requirements.txt
   - pip install .
   - pip install https://github.com/gregcaporaso/build-iab/archive/master.zip
