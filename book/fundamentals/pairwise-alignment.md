@@ -180,7 +180,7 @@ ACCGGT--------TAACACCCAC
 
 **As an exercise**, go back to where we defined `seq1` and `seq2` and re-define one or both of those as other sequences. Execute the code through here and see how the matrices change.
 
-### Why this simple procedure is too simplistic
+### Why this simple procedure is too simplistic <link src="jzshiO"/>
 
 I suggested above that you keep a list of assumptions that are made by this approach. Here are a couple of the very problematic ones.
 

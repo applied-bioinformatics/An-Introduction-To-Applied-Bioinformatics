@@ -86,7 +86,7 @@ We'll inspect a lot of source code in IAB as we explore bioinformatics algorithm
 
 The documentation for scikit-bio is also very extensive (though the package itself is still in early development). You can view the documentation for the `TabularMSA` object, for example, [here](http://scikit-bio.org/docs/latest/generated/skbio.alignment.TabularMSA.html). These documents will be invaluable for learning how to use the objects.
 
-## Reading list
+## Reading list <link src="22AJOO"/>
 
 ### Getting started with Biology <link src='cf88ac'/>
 
@@ -112,7 +112,7 @@ If you're new to Computer Science and programming, these are some books and reso
 
 * [The Pragmatic Programmer](http://amzn.to/1P0dl6i) by Andrew Hunt. *A more advanced book on becoming a better programmer. This book is excellent, and I highly recommend it for anyone developing bioinformatics software. You should know how to program and have done some software development before jumping into this.*
 
-### Philosophy of biology and popular science books
+### Philosophy of biology and popular science books <link src="bwMyRz"/>
 
 These are some books that I've enjoyed, and which helped get me thinking about biological systems. These are generally written for a more popular audience, so should be accessible to any readers of *An Introduction to Applied Bioinformatics*.
 
