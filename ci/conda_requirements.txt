@@ -4,7 +4,7 @@ scipy
 matplotlib
 nose
 scikit-bio =0.4.1
-ipython <4.0.0
+ipython
 seaborn
 pandas =0.17.1
 markdown2
