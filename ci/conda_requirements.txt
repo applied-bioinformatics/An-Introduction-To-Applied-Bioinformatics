@@ -1,0 +1,11 @@
+pip
+numpy
+scipy
+matplotlib
+nose
+scikit-bio
+jupyter
+seaborn
+pandas
+markdown2
+networkx
