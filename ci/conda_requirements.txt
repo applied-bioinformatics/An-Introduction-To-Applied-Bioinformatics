@@ -1,12 +1,12 @@
 pip
-numpy
+numpy =1.9.2
 scipy
 matplotlib
 nose
 scikit-bio =0.4.1
 ipython <4.0.0
 seaborn
-pandas
+pandas =0.17.1
 markdown2
 tornado
 jsonschema
