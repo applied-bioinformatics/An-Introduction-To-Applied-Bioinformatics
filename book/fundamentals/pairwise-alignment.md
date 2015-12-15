@@ -318,7 +318,7 @@ Initializing this would result in the following.
 >>> for j in range(1,len(padded_seq1)):
 ...     data[0][j] = data[0][j-1] - d
 ...
->>> HTML(show_table(padded_seq1, padded_seq2, data, cell_width=4))
+>>> HTML(show_table(padded_seq1, padded_seq2, data))
 ```
 
 Next, we'll compute the scores for all of the other cells in the matrix, starting at position $(1, 1)$.
