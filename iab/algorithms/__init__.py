@@ -729,7 +729,7 @@ def guide_tree_from_sequences(sequences,
 
     Parameters
     ----------
-    sequences : skbio.SequenceCollection
+    sequences : list of skbio.Sequence objects (or subclasses)
       The sequences to be represented in the resulting guide tree.
     metric : function
       Function that returns a single distance value when given a pair of
