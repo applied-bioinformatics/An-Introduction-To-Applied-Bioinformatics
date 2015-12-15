@@ -14,9 +14,8 @@ install:
   - source activate iab
   - pip freeze
   - pip install -r ci/pip_requirements.txt
+  - pip install numpy --update # hard-coded to get 1.10.2 as it's not on conda yet
   - pip install . --no-deps
-  - pip freeze
-  - conda update numpy pandas
   - biab notebook -i book -o ipynb
 script:
   # Running through all notebooks takes awhile, so bail if the unit tests fail.
