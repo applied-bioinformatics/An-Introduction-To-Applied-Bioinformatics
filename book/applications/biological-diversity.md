@@ -136,11 +136,12 @@ PD is relatively simple to calculate. It is computed simply as the sum of the br
 First, let's define a phylogenetic tree using the newick format (which is described [here](http://evolution.genetics.washington.edu/phylip/newicktree.html), and more formally defined [here](http://evolution.genetics.washington.edu/phylip/newick_doc.html)). We'll then load that up with using [scikit-bio](http://scikit-bio.org)'s [TreeNode](http://scikit-bio.org/generated/skbio.core.tree.TreeNode.html#skbio.core.tree.TreeNode) object.
 
 ```python
->>> newick_tree = '(((B1:0.2,B2:0.3):0.3,((B3:0.5,B4:0.3):0.2,B5:0.9):0.3):0.35,(((A1:0.2,A2:0.3):0.3,(E1:0.3,E2:0.4):0.7):0.2):0.05)root;'
+>>> from io import StringIO
+>>> newick_tree = StringIO('(((B1:0.2,B2:0.3):0.3,((B3:0.5,B4:0.3):0.2,B5:0.9):0.3):0.35,(((A1:0.2,A2:0.3):0.3,(E1:0.3,E2:0.4):0.7):0.2):0.05)root;')
 ...
 >>> from skbio.tree import TreeNode
 ...
->>> tree = TreeNode.from_newick(newick_tree)
+>>> tree = TreeNode.read(newick_tree)
 >>> tree = tree.root_at_midpoint()
 ```
 
@@ -383,8 +384,8 @@ As an exercise, now compute the UniFrac distances between samples $B$ and $C$, a
 ```python
 >>> ## This is untested!! I'm not certain that it's exactly right, just a quick test.
 ...
->>> newick_tree1 = '(((((OTU1:0.5,OTU2:0.5):0.5,OTU3:1.0):1.0),(OTU4:0.75,OTU5:0.75):1.25))root;'
->>> tree1 = TreeNode.from_newick(newick_tree1)
+... newick_tree1 = StringIO('(((((OTU1:0.5,OTU2:0.5):0.5,OTU3:1.0):1.0),(OTU4:0.75,OTU5:0.75):1.25))root;')
+>>> tree1 = TreeNode.read(newick_tree1)
 ...
 >>> def unweighted_unifrac(tree, table, sample_id1, sample_id2, verbose=False):
 ...     observed_nodes1 = get_observed_nodes(tree, table, sample_id1, verbose=verbose)
@@ -714,26 +715,23 @@ Next we'll load our distance matrix. This is similar to ``human_microbiome_dm_da
 Does this visualization help you to interpret the results? Probably not. Generally we'll need to apply some approaches that will help us with interpretation. Let's use ordination here. We'll run Principal Coordinates Analysis on our ``DistanceMatrix`` object. This gives us a matrix of coordinate values for each sample, which we can then plot. We can use ``scikit-bio``'s implementation of PCoA as follows:
 
 ```python
->>> from skbio.stats.ordination import PCoA
+>>> from skbio.stats.ordination import pcoa
 ...
->>> # Create the PCoA object...
->>> lauber_soil_unweighted_unifrac_pcoa = PCoA(lauber_soil_unweighted_unifrac_dm)
->>> # ... and run PCoA
->>> lauber_soil_unweighted_unifrac_result = lauber_soil_unweighted_unifrac_pcoa.scores()
+>>> lauber_soil_unweighted_unifrac_pc = pcoa(lauber_soil_unweighted_unifrac_dm)
 ```
 
 What does the following ordination plot tell you about the relationship between the similarity of microbial communities taken from similar and dissimilar latitudes?
 
 ```python
->>> _ = lauber_soil_unweighted_unifrac_result.plot(lauber_soil_sample_md, 'Latitude', cmap='Greens', title="Samples colored by Latitude", axis_labels=('PC1', 'PC2', 'PC3'))
+>>> _ = lauber_soil_unweighted_unifrac_pc.plot(lauber_soil_sample_md, 'Latitude', cmap='Greens', title="Samples colored by Latitude", axis_labels=('PC1', 'PC2', 'PC3'))
 ```
 
 If the answer to the above question is that there doesn't seem to be much association, you're on the right track. We can qualtify this, for example, by testing for correlation between pH and value on PC 1.
 
 ```python
 >>> from scipy.stats import spearmanr
->>> spearman_rho, spearman_p = spearmanr(lauber_soil_unweighted_unifrac_result.site.T[0],
->>>                                      [lauber_soil_sample_md['Latitude'][sample_id] for sample_id in lauber_soil_unweighted_unifrac_result.site_ids])
+>>> spearman_rho, spearman_p = spearmanr(lauber_soil_unweighted_unifrac_pc.samples['PC1'],
+...                                      lauber_soil_sample_md['Latitude'][lauber_soil_unweighted_unifrac_pc.samples.index])
 >>> print('rho: %1.3f' % spearman_rho)
 >>> print('p-value: %1.1e' % spearman_p)
 ```
@@ -741,12 +739,13 @@ If the answer to the above question is that there doesn't seem to be much associ
 In the next plot, we'll color the points by the pH of the soil sample they represent. What does this plot suggest about the relationship between the similarity of microbial communities taken from similar and dissimilar pH?
 
 ```python
->>> _ = lauber_soil_unweighted_unifrac_result.plot(lauber_soil_sample_md, 'pH', cmap='Greens', title="Samples colored by pH", axis_labels=('PC1', 'PC2', 'PC3'))
+>>> _ = lauber_soil_unweighted_unifrac_pc.plot(lauber_soil_sample_md, 'pH', cmap='Greens', title="Samples colored by pH", axis_labels=('PC1', 'PC2', 'PC3'))
 ```
 
 ```python
->>> spearman_rho, spearman_p = spearmanr(lauber_soil_unweighted_unifrac_result.site.T[0],
-...                                      [lauber_soil_sample_md['pH'][sample_id] for sample_id in lauber_soil_unweighted_unifrac_result.site_ids])
+>>> from scipy.stats import spearmanr
+>>> spearman_rho, spearman_p = spearmanr(lauber_soil_unweighted_unifrac_pc.samples['PC1'],
+...                                      lauber_soil_sample_md['pH'][lauber_soil_unweighted_unifrac_pc.samples.index])
 >>> print('rho: %1.3f' % spearman_rho)
 >>> print('p-value: %1.1e' % spearman_p)
 ```
@@ -764,7 +763,7 @@ A question that comes up frequently, often in method comparison, is whether two 
 Imagine you ran three different beta diversity metrics on your BIOM table: unweighted UniFrac, Bray-Curtis, and weighted UniFrac (the quantitative analog of unweighted UniFrac), and then generated the following PCoA plots.
 
 ```python
->>> _ = lauber_soil_unweighted_unifrac_result.plot(lauber_soil_sample_md, 'pH', cmap='Greens',
+>>> _ = lauber_soil_unweighted_unifrac_pc.plot(lauber_soil_sample_md, 'pH', cmap='Greens',
 ...                                                title="Unweighted UniFrac, samples colored by pH",
 ...                                                axis_labels=('PC1', 'PC2', 'PC3'))
 ```
@@ -772,10 +771,9 @@ Imagine you ran three different beta diversity metrics on your BIOM table: unwei
 ```python
 >>> from iab.data import lauber_soil_bray_curtis_dm
 ...
->>> lauber_soil_bray_curtis_pcoa = PCoA(lauber_soil_bray_curtis_dm)
->>> lauber_soil_bray_curtis_result = lauber_soil_bray_curtis_pcoa.scores()
+>>> lauber_soil_bray_curtis_pcoa = pcoa(lauber_soil_bray_curtis_dm)
 ...
->>> _ = lauber_soil_bray_curtis_result.plot(lauber_soil_sample_md, 'pH', cmap='Greens',
+>>> _ = lauber_soil_bray_curtis_pcoa.plot(lauber_soil_sample_md, 'pH', cmap='Greens',
 ...                                         title="Bray-Curtis, samples colored by pH",
 ...                                         axis_labels=('PC1', 'PC2', 'PC3'))
 ```
@@ -783,10 +781,9 @@ Imagine you ran three different beta diversity metrics on your BIOM table: unwei
 ```python
 >>> from iab.data import lauber_soil_weighted_unifrac_dm
 ...
->>> lauber_soil_weighted_unifrac_pcoa = PCoA(lauber_soil_weighted_unifrac_dm)
->>> lauber_soil_weighted_unifrac_result = lauber_soil_weighted_unifrac_pcoa.scores()
+>>> lauber_soil_weighted_unifrac_pcoa = pcoa(lauber_soil_weighted_unifrac_dm)
 ...
->>> _ = lauber_soil_weighted_unifrac_result.plot(lauber_soil_sample_md, 'pH', cmap='Greens',
+>>> _ = lauber_soil_weighted_unifrac_pcoa.plot(lauber_soil_sample_md, 'pH', cmap='Greens',
 ...                                              title="Weighted UniFrac, samples colored by pH",
 ...                                              axis_labels=('PC1', 'PC2', 'PC3'))
 ```

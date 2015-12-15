@@ -80,11 +80,11 @@ We can then access functions, variables, and classes from these modules.
 We'll inspect a lot of source code in IAB as we explore bioinformatics algorithms. If you're ever interested in seeing the source code for some functionality that we're using, you can do that using IPython's ``psource`` magic.
 
 ```python
->>> from skbio.alignment import Alignment
->>> %psource Alignment.position_entropies
+>>> from skbio.alignment import TabularMSA
+>>> %psource TabularMSA.conservation
 ```
 
-The documentation for scikit-bio is also very extensive (though the package itself is still in early development). You can view the documentation for the `Alignment` object, for example, [here](http://scikit-bio.org/docs/0.2.3/generated/skbio.alignment.Alignment.html). These documents will be invaluable for learning how to use the objects.
+The documentation for scikit-bio is also very extensive (though the package itself is still in early development). You can view the documentation for the `TabularMSA` object, for example, [here](http://scikit-bio.org/docs/latest/generated/skbio.alignment.TabularMSA.html). These documents will be invaluable for learning how to use the objects.
 
 ## Getting started with Biology <link src='cf88ac'/>
 

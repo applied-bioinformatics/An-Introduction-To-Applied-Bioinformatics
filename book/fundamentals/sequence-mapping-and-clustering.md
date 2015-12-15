@@ -20,13 +20,12 @@ We have learned the key tools we need for both sequence mapping and clustering i
 >>> page.page = print
 >>> import networkx as nx
 >>> import pandas as pd
->>> from skbio import BiologicalSequence, DNA, Alignment
->>> from skbio.alignment import SequenceCollection
->>> from skbio.parse.sequences import parse_fasta
+>>> from skbio import DNA, TabularMSA
+>>> import skbio.io
 >>> from skbio.alignment import local_pairwise_align_ssw, global_pairwise_align_nucleotide
 ```
 
-## De novo clustering of sequences by similarity  <link src='e2c048'/> 
+## De novo clustering of sequences by similarity  <link src='e2c048'/>
 
 The algorithm at the core of *de novo* clustering is sequence alignment. In an ideal world, we would perform a full multiple sequence alignment of all of our sequences, compute their pairwise similarities (or dissimilarities), and use those values to group sequences that are above some *similarity threshold* into *OTU clusters* (just *OTUs* from here). As we discussed in the mutliple sequence alignment chapter however, that is infeasible for more than a few tens of sequences due to computational and memory requirements. Even progressive alignment can't typically handle more than a few tens of thousands of sequences (at least with the currently available implementations, that I am aware of), so OTU clustering is generally acheived by picking pairs of sequences to align. You'll notice in this section that many of the heuristics that have been applied for speeding up database searching are similar to the heuristics applied for OTU clustering.
 
@@ -36,19 +35,18 @@ In the figures that follow, points (or nodes) represent sequences, and line (or 
 
 Let's define a collection of sequences to work with. These are derived from the [Greengenes](http://greengenes.secondgenome.com/) [13_8](ftp://greengenes.microbio.me/greengenes_release/gg_13_5/) database, and we're pulling them from the [QIIME default reference project](https://github.com/biocore/qiime-default-reference). We can load these as a list of sequences using ``skbio.parse.sequences.parse_fasta``, and count them by taking the length of the list. For the sake of runtime, we'll work with only a small random subset these sequences.
 
-**Our goal here will be to group these sequences into OTUs based on some similarity threshold that we define.** If we set this similarity threshold at 70%, meaning that the sequences within that OTU are 70% identicial (either to each other, or maybe to some representative of that cluster - we'll explore some variants on that definition below), we'd call these *70% OTUs*.  
+**Our goal here will be to group these sequences into OTUs based on some similarity threshold that we define.** If we set this similarity threshold at 70%, meaning that the sequences within that OTU are 70% identicial (either to each other, or maybe to some representative of that cluster - we'll explore some variants on that definition below), we'd call these *70% OTUs*.
 
 ```python
 >>> from qiime_default_reference import get_reference_sequences
->>> from random import random
+>>> import random
 ...
 >>> seqs_16s = []
 >>> fraction_to_keep = 0.001
->>> for e in list(parse_fasta(get_reference_sequences())):
->>>     if random() < fraction_to_keep:
->>>         seqs_16s.append(BiologicalSequence(e[1], id=e[0]))
->>> seqs_16s = SequenceCollection(seqs_16s)
->>> print(seqs_16s.sequence_count())
+>>> for e in skbio.io.read(get_reference_sequences(), format='fasta', constructor=DNA):
+...     if random.random() < fraction_to_keep:
+...         seqs_16s.append(e)
+>>> print(len(seqs_16s))
 ```
 
 ### Furthest neighbor clustering <link src='f2f8fb'/>
@@ -66,85 +64,86 @@ Let's implement this, and then try it out on some test sequences.
 >>> from functools import partial
 ...
 >>> def cluster(seqs, similarity_threshold, cluster_fn, aligner=local_pairwise_align_ssw, verbose=False):
->>>     clusters = []
->>>     num_alignments = 0
->>>     for query_seq in seqs:
->>>         if verbose: print(query_seq.id)
->>>         clustered = False
->>>         for i, cluster in enumerate(clusters, start=1):
->>>             if verbose: print(" OTU %d" % i)
->>>             clustered, alignment_results = cluster_fn(
->>>                 query_seq, cluster, similarity_threshold, aligner, verbose=verbose)
->>>             num_alignments += len(alignment_results)
->>>             if clustered:
->>>                 break
->>>         if clustered:
->>>             for n, s in alignment_results:
->>>                 cluster.add_edge(query_seq, n, percent_similarity=s)
->>>                 # this is very inefficient, but need a way to retain order
->>>                 # for centroid clustering.
->>>                 # will come back to this...
->>>                 cluster.graph['node-order'].append(query_seq)
->>>             if verbose: print("Added to OTU")
->>>         else:
->>>             # create a new cluster containing only this node
->>>             new_cluster = nx.Graph(id="OTU %d" % (len(clusters) + 1))
->>>             new_cluster.add_node(query_seq)
->>>             # this is very inefficient, but need a way to retain order
->>>             # for centroid clustering.
->>>             # will come back to this...
->>>             new_cluster.graph['node-order'] = [query_seq]
->>>             clusters.append(new_cluster)
->>>             if verbose: print("Created OTU")
->>>     return clusters, num_alignments
+...     clusters = []
+...     num_alignments = 0
+...     for query_seq in seqs:
+...         if verbose: print(query_seq.metadata['id'])
+...         clustered = False
+...         for i, cluster in enumerate(clusters, start=1):
+...             if verbose: print(" OTU %d" % i)
+...             clustered, alignment_results = cluster_fn(
+...                 query_seq, cluster, similarity_threshold, aligner, verbose=verbose)
+...             num_alignments += len(alignment_results)
+...             if clustered:
+...                 break
+...         if clustered:
+...             for n, s in alignment_results:
+...                 cluster.add_node(query_seq.metadata['id'], seq=query_seq)
+...                 cluster.add_edge(query_seq.metadata['id'], n, percent_similarity=s)
+...                 # this is very inefficient, but need a way to retain order
+...                 # for centroid clustering.
+...                 # will come back to this...
+...                 cluster.graph['node-order'].append(query_seq.metadata['id'])
+...             if verbose: print("Added to OTU")
+...         else:
+...             # create a new cluster containing only this node
+...             new_cluster = nx.Graph(id="OTU %d" % (len(clusters) + 1))
+...             new_cluster.add_node(query_seq.metadata['id'], seq=query_seq)
+...             # this is very inefficient, but need a way to retain order
+...             # for centroid clustering.
+...             # will come back to this...
+...             new_cluster.graph['node-order'] = [query_seq.metadata['id']]
+...             clusters.append(new_cluster)
+...             if verbose: print("Created OTU")
+...     return clusters, num_alignments
 ...
 ...
 >>> def furthest_neighbor(seq, cluster, similarity_threshold, aligner, verbose=False):
->>>     alignment_results = []
->>>     for node in cluster.nodes_iter():
->>>         aln = aligner(seq, node)
->>>         percent_similarity = aln[0].fraction_same(aln[1])
->>>         alignment_results.append((node, percent_similarity))
->>>         if verbose: print("  ", node.id, percent_similarity)
->>>         if percent_similarity < similarity_threshold:
->>>             return False, alignment_results
->>>     return True, alignment_results
+...     alignment_results = []
+...     for node in cluster.nodes_iter():
+...         aln, _, _ = aligner(seq, cluster.node[node]['seq'])
+...         percent_similarity = 1. - aln[0].distance(aln[1])
+...         alignment_results.append((node, percent_similarity))
+...         if verbose: print("  ", node, percent_similarity)
+...         if percent_similarity < similarity_threshold:
+...             return False, alignment_results
+...     return True, alignment_results
 ...
 >>> def show_clusters(clusters, print_clusters=True, plot_clusters=True, plot_labels=False):
->>>     G = nx.Graph()
->>>     for c in clusters:
->>>         G = nx.union(G, c)
->>>         if print_clusters: print("%s: %s" % (c.graph['id'], [s.id for s in c.graph['node-order']]))
->>>     if plot_clusters:
->>>         pos=nx.spring_layout(G)
->>>         nx.draw_networkx_nodes(G, pos, node_color='w')
->>>         if G.number_of_edges() > 0:
->>>             nx.draw_networkx_edges(G, pos)
->>>         if plot_labels: nx.draw_networkx_labels(G, pos, labels={d:d.id for d in G.nodes()})
->>>         _ = plt.axis('off')
+...     G = nx.Graph()
+...     for c in clusters:
+...         G = nx.union(G, c)
+...         if print_clusters: print("%s: %s" % (c.graph['id'], [s for s in c.graph['node-order']]))
+...     if plot_clusters:
+...         pos=nx.spring_layout(G)
+...         nx.draw_networkx_nodes(G, pos, node_color='w')
+...         if G.number_of_edges() > 0:
+...             nx.draw_networkx_edges(G, pos)
+...         if plot_labels: nx.draw_networkx_labels(G, pos, labels={d:G.node[d]['seq'].metadata['id'] for d in G.nodes()})
+...         _ = plt.axis('off')
 ...
 >>> # For our toy example, we want our sequences to align from beginning to end
->>> # so we'll penalize terminal gaps.
->>> global_pairwise_align_nucleotide = partial(global_pairwise_align_nucleotide, penalize_terminal_gaps=True)
+... # so we'll penalize terminal gaps.
+... global_pairwise_align_nucleotide = partial(global_pairwise_align_nucleotide, penalize_terminal_gaps=True)
 ```
 
 ```python
->>> s1 = DNA('AAAAAAAAAA', 's1')
->>> s2 = DNA('AAAAATTTTT', 's2')
->>> s3 = DNA('AAAAAAACCA', 's3')
->>> s4 = DNA('CCCCAATTTT', 's4')
->>> s5 = DNA('ACCAAATTTT', 's5')
->>> s6 = DNA('AGGAAAAAAA', 's6')
+>>> s1 = DNA('AAAAAAAAAA', {'id': 's1'})
+>>> s2 = DNA('AAAAATTTTT', {'id': 's2'})
+>>> s3 = DNA('AAAAAAACCA', {'id': 's3'})
+>>> s4 = DNA('CCCCAATTTT', {'id': 's4'})
+>>> s5 = DNA('ACCAAATTTT', {'id': 's5'})
+>>> s6 = DNA('AGGAAAAAAA', {'id': 's6'})
 ...
->>> aln1 = SequenceCollection([s1, s2, s3, s4, s5, s6])
->>> print(aln1.to_fasta())
+>>> aln1 = TabularMSA([s1, s2, s3, s4, s5, s6])
+>>> print(aln1)
 ```
 
 Our first sequence, ``s1``, will define a new OTU. We'll call that OTU ``OTU 1``. Our second sequence, ``s2`` falls outside of the similarity threshold to ``S1``, it will also define a new OTU. We'll call that OTU ``OTU 2``.
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2], 0.70,
->>>                                    furthest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    furthest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -152,7 +151,7 @@ Now imagine that our third sequence, ``s3`` falls within the range of ``s1``. We
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3], 0.70,
->>>                                    furthest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    furthest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -160,7 +159,7 @@ Now let's cluster a fourth sequence, ``s4``. We find that this falls outside the
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4], 0.70,
->>>                                    furthest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    furthest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -175,7 +174,7 @@ There are many other options as well. Let's choose the option 1 here, as it requ
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4, s5], 0.70,
->>>                                    furthest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    furthest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -183,7 +182,7 @@ Finally, let's cluster our last sequence, ``s6``. In this case, it falls within 
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4, s5, s6], 0.70,
->>>                                    furthest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    furthest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -200,18 +199,18 @@ Let's define a function that will be useful for exploring different clustering a
 >>> from time import time
 ...
 >>> def evaluate_cluster_fn(cluster_fn, seqs, similarity_threshold, display=True):
->>>     start_time = time()
->>>     clusters, num_alignments = cluster(seqs, similarity_threshold, cluster_fn)
->>>     end_time = time()
->>>     run_time = end_time - start_time
->>>     num_clusters = len(clusters)
->>>     if display:
->>>         print("Number of alignments performed: %d" % num_alignments)
->>>         print("Runtime: %1.3fs" % run_time)
->>>         print("Number of clusters: %d" % num_clusters)
->>>         print("Clusters:")
->>>         show_clusters(clusters, plot_clusters=False, plot_labels=False)
->>>     return num_alignments, run_time, num_clusters
+...     start_time = time()
+...     clusters, num_alignments = cluster(seqs, similarity_threshold, cluster_fn)
+...     end_time = time()
+...     run_time = end_time - start_time
+...     num_clusters = len(clusters)
+...     if display:
+...         print("Number of alignments performed: %d" % num_alignments)
+...         print("Runtime: %1.3fs" % run_time)
+...         print("Number of clusters: %d" % num_clusters)
+...         print("Clusters:")
+...         show_clusters(clusters, plot_clusters=False, plot_labels=False)
+...     return num_alignments, run_time, num_clusters
 ```
 
 Now let's apply that:
@@ -228,19 +227,19 @@ Let's implement nearest neighbor clustering and look at the same six toy sequenc
 
 ```python
 >>> def nearest_neighbor(seq, cluster, similarity_threshold, aligner, verbose=False):
->>>     alignment_results = []
->>>     for node in cluster.nodes_iter():
->>>         aln = aligner(seq, node)
->>>         percent_similarity = aln[0].fraction_same(aln[1])
->>>         alignment_results.append((node, percent_similarity))
->>>         if verbose: print(" ", node.id, percent_similarity)
->>>         if percent_similarity >= similarity_threshold:
->>>             return True, alignment_results
->>>     return False, alignment_results
+...     alignment_results = []
+...     for node in cluster.nodes_iter():
+...         aln, _, _ = aligner(seq, cluster.node[node]['seq'])
+...         percent_similarity = 1. - aln[0].distance(aln[1])
+...         alignment_results.append((node, percent_similarity))
+...         if verbose: print(" ", node, percent_similarity)
+...         if percent_similarity >= similarity_threshold:
+...             return True, alignment_results
+...     return False, alignment_results
 ```
 
 ```python
->>> print(aln1.to_fasta())
+>>> print(aln1)
 ```
 
 Our first sequence, ``s1``, will again define a new OTU, ``OTU 1``.
@@ -249,7 +248,7 @@ Our second sequence, ``s2``, still falls outside of the similarity threshold to 
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2], 0.70,
->>>                                    nearest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    nearest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -257,7 +256,7 @@ Now imagine that our third sequence, $S3$ falls within the range of $OTU1$. We'd
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3], 0.70,
->>>                                    nearest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    nearest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -265,7 +264,7 @@ Now let's cluster a fourth sequence, $S4$. We find that this falls outside the r
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4], 0.70,
->>>                                    nearest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    nearest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -273,7 +272,7 @@ Next, let's cluster our fifth sequence, $S5$. We find that this falls outside th
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4, s5], 0.70,
->>>                                    nearest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    nearest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -281,7 +280,7 @@ Finally, let's cluster our last sequence, $S6$. Remember that $S6$ falls within 
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4, s5, s6], 0.70,
->>>                                    nearest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    nearest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -289,7 +288,7 @@ Finally, let's cluster our last sequence, $S6$. Remember that $S6$ falls within 
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s3, s4, s5, s6, s2], 0.70,
->>>                                    nearest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    nearest_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -311,20 +310,20 @@ Let's implement this and apply the process to our six sequences.
 
 ```python
 >>> def centroid_neighbor(seq, cluster, similarity_threshold, aligner, verbose=False):
->>>     alignment_results = []
->>>     centroid_node = cluster.graph['node-order'][0]
->>>     aln = aligner(seq, centroid_node)
->>>     percent_similarity = aln[0].fraction_same(aln[1])
->>>     if verbose: print(" ", centroid_node.id, percent_similarity)
->>>     alignment_results.append((centroid_node, percent_similarity))
->>>     return percent_similarity >= similarity_threshold, alignment_results
+...     alignment_results = []
+...     centroid_node = cluster.graph['node-order'][0]
+...     aln, _, _ = aligner(seq, cluster.node[centroid_node]['seq'])
+...     percent_similarity = 1. - aln[0].distance(aln[1])
+...     if verbose: print(" ", centroid_node, percent_similarity)
+...     alignment_results.append((centroid_node, percent_similarity))
+...     return percent_similarity >= similarity_threshold, alignment_results
 ```
 
 ``s1`` will again define ``OTU 1`` and ``s2`` still falls outside of the similarity threshold to ``s1``, so will define ``OTU 2``.
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2], 0.70,
->>>                                    centroid_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    centroid_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -332,7 +331,7 @@ Next, ``s3`` falls within the range of ``OTU 1``. We'd cluster ``s3`` into ``OTU
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3], 0.70,
->>>                                    centroid_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    centroid_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -340,7 +339,7 @@ Now let's cluster a fourth sequence, $S4$. We find that this falls outside the r
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4], 0.70,
->>>                                    centroid_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    centroid_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -348,7 +347,7 @@ Next, let's cluster our fifth sequence, $S5$. We find that this falls outside th
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4, s5], 0.70,
->>>                                    centroid_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    centroid_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -356,7 +355,7 @@ Finally, let's cluster our last sequence, ``s6``. Remember that ``s6`` falls wit
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4, s5, s6], 0.70,
->>>                                    centroid_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    centroid_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -364,7 +363,7 @@ Again, let's think about order dependence here. How would this differ if ``s3`` 
 
 ```python
 >>> clusters, num_alignments = cluster([s3, s1, s2, s4, s5, s6], 0.70,
->>>                                    centroid_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
+...                                    centroid_neighbor, aligner=global_pairwise_align_nucleotide, verbose=True)
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
@@ -418,44 +417,44 @@ For the sake of runtime, I'm only looking at few settings for each of the input 
 >>> fraction_to_keep = 0.002
 >>> similarity_thresholds = [0.60, 0.70, 0.80]
 >>> cluster_fns = [("furthest neighbor", furthest_neighbor),
->>>                ("nearest neighbor", nearest_neighbor),
->>>                ("centroid neighbor", centroid_neighbor)]
+...                ("nearest neighbor", nearest_neighbor),
+...                ("centroid neighbor", centroid_neighbor)]
 >>> sizes = [20, 30, 45]
 ...
 >>> def get_random_sequence_collection(input_seqs, fraction_to_keep):
->>>     result = []
->>>     for e in input_seqs:
->>>         if random() < fraction_to_keep:
->>>             result.append(BiologicalSequence(e[1], id=e[0]))
->>>     return SequenceCollection(result)
+...     result = []
+...     for e in input_seqs:
+...         if random.random() < fraction_to_keep:
+...             result.append(e)
+...     return result
 ...
 >>> data = []
 >>> # first, sweep over different random sequence collections
->>> for i in range(n):
->>>     random_sc = get_random_sequence_collection(parse_fasta(get_reference_sequences()),
->>>                                                fraction_to_keep)
->>>     # then, sweep over clustering functions
->>>     for cluster_fn in cluster_fns:
->>>         # then, sweep over data set sizes
->>>         similarity_threshold = 0.70
->>>         for size in sizes:
->>>             current_sc = random_sc[:size]
->>>             alignment_count, run_time, cluster_count = evaluate_cluster_fn(
->>>                 cluster_fn[1], current_sc, similarity_threshold, display=False)
->>>             current_result = [cluster_fn[0], size, alignment_count, run_time,
->>>                               cluster_count, similarity_threshold]
->>>             data.append(current_result)
->>>
->>>         current_sc = random_sc[:sizes[-1]]
->>>         # finally, sweep over similarity thresholds
->>>         for similarity_threshold in similarity_thresholds:
->>>             alignment_count, run_time, cluster_count = evaluate_cluster_fn(
->>>                 cluster_fn[1], current_sc, similarity_threshold, display=False)
->>>             current_result = [cluster_fn[0], size, alignment_count, run_time,
->>>                               cluster_count, similarity_threshold]
->>>             data.append(current_result)
+... for i in range(n):
+...     random_sc = get_random_sequence_collection(skbio.io.read(get_reference_sequences(), format='fasta', constructor=DNA),
+...                                                fraction_to_keep)
+...     # then, sweep over clustering functions
+...     for cluster_fn in cluster_fns:
+...         # then, sweep over data set sizes
+...         similarity_threshold = 0.70
+...         for size in sizes:
+...             current_sc = random_sc[:size]
+...             alignment_count, run_time, cluster_count = evaluate_cluster_fn(
+...                 cluster_fn[1], current_sc, similarity_threshold, display=False)
+...             current_result = [cluster_fn[0], size, alignment_count, run_time,
+...                               cluster_count, similarity_threshold]
+...             data.append(current_result)
+...
+...         current_sc = random_sc[:sizes[-1]]
+...         # finally, sweep over similarity thresholds
+...         for similarity_threshold in similarity_thresholds:
+...             alignment_count, run_time, cluster_count = evaluate_cluster_fn(
+...                 cluster_fn[1], current_sc, similarity_threshold, display=False)
+...             current_result = [cluster_fn[0], size, alignment_count, run_time,
+...                               cluster_count, similarity_threshold]
+...             data.append(current_result)
 >>> df = pd.DataFrame(data, columns=["Cluster method", "Number of sequences", "Number of alignments",
->>>                                  "Run time (s)", "Number of clusters", "Similarity threshold"])
+...                                  "Run time (s)", "Number of clusters", "Similarity threshold"])
 ```
 
 Remember that above I said that most of the time in each of these clustering algorithms is spent doing pairwise alignment. Let's plot the run time of each clustering method as a function of the number of alignments computed in the cluster process so I can prove that to you.
@@ -471,16 +470,16 @@ Next, we can see how each of these methods scale with the similarity threshold.
 
 ```python
 >>> g = sns.lmplot("Similarity threshold", "Run time (s)",
->>>                hue="Cluster method",
->>>                data=df[df["Number of sequences"] == max(sizes)])
+...                hue="Cluster method",
+...                data=df[df["Number of sequences"] == max(sizes)])
 ```
 
 Next let's look at run time as a function of the number of sequences to be clustered.
 
 ```python
 >>> g = sns.lmplot("Number of sequences", "Run time (s)",
->>>                hue="Cluster method",
->>>                data=df[df['Similarity threshold'] == 0.70])
+...                hue="Cluster method",
+...                data=df[df['Similarity threshold'] == 0.70])
 ```
 
 **Which of these methods do you think will scale best** to continuosuly increasing numbers of sequences (e.g., as is currently the trend in microbiomics)?
@@ -488,14 +487,14 @@ Next let's look at run time as a function of the number of sequences to be clust
 Finally, let's look at the number of clusters (or OTUs) that are generated with each method at each similarity threshold.
 
 ```python
->>> g = sns.factorplot("Similarity threshold", "Number of clusters",
->>>                    "Cluster method", df[df["Number of sequences"] == max(sizes)],
->>>                    kind="box")
+>>> g = sns.factorplot(x="Similarity threshold", y="Number of clusters",
+...                    hue="Cluster method", data=df[df["Number of sequences"] == max(sizes)],
+...                    kind="bar")
 ```
 
 ## Reference-based clustering to assist with parallelization <link src='e96c31'/>
 
-Up until this point we have focused our discussion on *de novo* OTU clustering, meaning that sequences are clustered only against each other, with no external reference. This is a very widely applied protocol, and the primary function of popular bioinformatics tools such as [cdhit](http://bioinformatics.oxfordjournals.org/content/28/23/3150.long) and [uclust](http://bioinformatics.oxfordjournals.org/content/26/19/2460.long). Another category of OTU clustering protocols is also popular however: reference-based OTU clustering, where a external reference database of sequences is used to aid in cluster defintion.  
+Up until this point we have focused our discussion on *de novo* OTU clustering, meaning that sequences are clustered only against each other, with no external reference. This is a very widely applied protocol, and the primary function of popular bioinformatics tools such as [cdhit](http://bioinformatics.oxfordjournals.org/content/28/23/3150.long) and [uclust](http://bioinformatics.oxfordjournals.org/content/26/19/2460.long). Another category of OTU clustering protocols is also popular however: reference-based OTU clustering, where a external reference database of sequences is used to aid in cluster defintion.
 
 Reference-based clustering is typically a centroid-based approach, where cluster centroids are pre-defined based on sequences in a database. From here, reference-based clustering is performed in one of two ways. In *closed-reference* OTU clustering, the set of centroids is static, and sequenences that don't match a centroid are not clustered. In *open-reference* OTU clustering, the set of centroids can expand: sequences that don't match an existing centroid can become new centroid sequences.
 
