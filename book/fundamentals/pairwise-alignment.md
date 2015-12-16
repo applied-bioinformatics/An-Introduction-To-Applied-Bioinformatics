@@ -158,40 +158,42 @@ We can identify the longest diagonals as follows:
 
 **Step 4**: Next, we'd want to transcribe some of the possible alignments that arise from this process.
 
-We're going to gloss over how to do this algorithmically for the moment, as we'll come back to that in a lot of detail later in this chapter. Briefly, what we want to do is start with the longest diagonal and work bacwards to transcribe the alignment by writing down the matching characters. When we encounter a break in the diagonal, we find the next highest score diagonal that starts in a cell that is up and/or to the left of the cell when the previous diagonal you were following ends. For every cell that you move upwards, you'd insert a gap in the sequence on the horizontal axis of your matrix. For every cell that you move leftwards, you'd insert a gap in the sequence on the vertical axis of your matrix.
+We're going to gloss over how to do this algorithmically for the moment, as we'll come back to that in a lot of detail later in this chapter. Briefly, what we want to do is start with the longest diagonal and trace it backwards to transcribe the alignment by writing down the characters from each of the two sequences at every row and column corresponding to the diagonal that you're following. When we encounter a break in the diagonal, we find the next longest diagonal that starts in a cell that is up and/or to the left of the cell when the previous diagonal you were following ends. For every cell that you move straight upwards (non-diagonally), you'd insert a gap in the sequence on the horizontal axis of your matrix. For every cell that you move straight leftwards, you'd insert a gap in the sequence on the vertical axis of your matrix.
 
-If this is confusing, don't worry about it for the moment. We'll be back to this in a lot more detail soon.
+We'd also generally compute a score for an alignment to help us figure out which alignments are better than others. For now, let's add one for every match, and subtract one for every mismatch.
+
+If this step is confusing, don't worry about it for the now. We'll be back to this in a lot more detail soon.
 
 Here are two possible alignments:
 
-Alignment 1:
+Alignment 1 (score: 19)
 ```
 ACCGGTGGAACCGG-TAACACCCAC
 ACCGGT--AACCGGTTAACACCCAC
 ```
 
-Alignment 2:
+Alignment 2 (score: 8)
 ```
 ACCGGTGGAACCGGTAACACCCAC
 ACCGGT--------TAACACCCAC
 ```
 
-**Remember that an alignment represents a hypothesis about the evolutionary history of a sequence.  Which of these hypotheses do you think is more likely to be true based on what you know about sequence evolution?** Why might the first alignment be the more biologically relevant one? Why might the second?
+Why might the first alignment be the more biologically relevant one (meaning the one that is more likely to represent that true evolutionary history of this pair of molecules)? Why might the second be the more biologically relevant one?
 
 **As an exercise**, go back to where we defined `seq1` and `seq2` and re-define one or both of those as other sequences. Execute the code through here and see how the matrices change.
 
 ### Why this simple procedure is too simplistic <link src="jzshiO"/>
 
-I suggested above that you keep a list of assumptions that are made by this approach. Here are a couple of the very problematic ones.
+I suggested above that you keep a list of assumptions that are made by this approach. Here are a couple of the very problematic ones (I'll leave it to you to think about why they're problematic for the moment).
 
 1. We're scoring all matches as 1 and all mismatches as 0. This suggests that all matches are equally likely, and all mismatches are equally unlikely. What's a more biologically meaningful way to do this (think about protein sequences here)?
-2. Similarly, every gap that is introduced results in the same penalty being incurred. Based on what we know about how insertion/deletion events occur, it likely makes more sense to score *opening a new gap* differently from *extending an existing gap*.
+2. Similarly, every gap that is introduced results in the same penalty being incurred. Based on what we know about how insertion/deletion events occur, what do you think is a more biologically meaningful way to do this?
 
-All scoring schemes have limitations, and you should consider alignments that you get (e.g., from systems such as [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi)) as hypotheses. You'll need to determine if you agree with the result that a computational system gives you. Algorithms such as the one we just explored are there to help you do your work, but their answers are based on models (for example, how we model matches, mismatches and gaps here) and as we're learning here, the models are not perfect. Be skeptical!
+All scoring schemes have limitations, and you should remember that when you're working with software that generates alignments for you (e.g., systems such as [BLAST](http://blast.ncbi.nlm.nih.gov/Blast.cgi)). Especially as you're getting started in bioinformatics, it's easy to forget that and just accept the result from computer software as "the right answer". You'll need to determine if you agree with the result that a computational system gives you, which will involve examining the result in the context of what you know about the biology of the systems your studying. Algorithms such as the one we just explored are there to help you do your work, but they won't do your work for you. Their answers are based on models (for example, how we model matches, mismatches and gaps here) and as you're learning here, the models are not perfect. Be skeptical!
 
-Another important consideration as we think about algorithms for aligning pairs of sequences is how long this will take to run (or in technical terminology, the [computational complexity](http://bigocheatsheet.com/) of the algorithm). When searching a novel sequence against a database, you may have billions of bases to search against (which would correspond to billions of columns in these matrices). How can this be done efficiently?
+Another important consideration as we think about algorithms for aligning pairs of sequences is how long an algorithm will take to run as a function of the input it's provided (or in technical terminology, the [computational complexity](http://bigocheatsheet.com/) of the algorithm). When searching a sequence against a database (for example, to get an idea of what its function is), you may have billions of bases to search against, which would correspond to billions of columns in one of the matrices we just computed. Computers are fast, but the data sets you're going to be working with are very large and in many cases growing exponentially in size over time. Working in bioinformatics, it's inevitable that you're going to begin to discover the limitations of the algorithms and software you use. Runtime and memory requirements are the usual culprits. Because the data sets are getting bigger more quickly than computers are getting faster (at least as of this writing), just waiting for computers to get faster won't work. We need smart people who understand some computer science and some biology to design clever algorithms, software, and analytic techniques to enable the next generation of advances that technologies like high-throughput DNA sequencing are promising. (And there are a lot of people who want to spend good money to pay people who can do these things, so keep reading!)
 
-Over the next several sections we'll explore ways of addressing the two issues noted above. We'll introduce the problem of the computational complexity at the end of this chapter, and explore approaches for addressing that (i.e., making database searching faster) in the next chapter.
+Over the next several sections we'll explore ways of addressing the two issues noted above. We'll introduce the problem of the computational complexity of pairwise sequence alignment at the end of this chapter, and explore approaches for addressing that (i.e., making database searching faster) in the next chapter.
 
 ## Substitution matrices <link src='9f5e71'/>
 
