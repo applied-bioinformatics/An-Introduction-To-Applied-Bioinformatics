@@ -49,7 +49,7 @@ What we'd really want to do is have a way to indicate that a deletion seems to h
 >>> print(hamming(r1, q3))
 ```
 
-What we've done here is create a pairwise alignment of ``r1`` and ``q3``. In other words, we've **aligned** the positions that minimize the similarity of the two sequences, using the ``-`` to fill in spaces where one character is missing with respect to the other sequence. We refer to ``-`` characters in aligned sequences as **gap characters**, or gaps.
+What we've done here is create a pairwise alignment of ``r1`` and ``q3``. In other words, we've **aligned** positions to maximize the similarity of the two sequences, using the ``-`` to fill in spaces where one character is missing with respect to the other sequence. We refer to ``-`` characters in aligned sequences as **gap characters**, or gaps.
 
 The *alignment* is of these two sequences is clear if we print them  out, one on top of the other:
 
@@ -62,7 +62,7 @@ Scanning through these two sequences, we can see that they are largely identical
 
 ## What is a sequence alignment? <link src='e63a4f'/>
 
-Let's take a minute to think about sequence evolution and what a biological sequence alignment actually is. Over the course of evolution, the sequence will likely change, most frequently due to random errors in replication (or the copying of a DNA sequence), or **mutations**. Some of the types of mutation events that can occur are:
+Let's take a minute to think about sequence evolution and what a biological sequence alignment actually is. Over the course of biological evolution, a DNA sequence changes, most frequently due to random errors in replication (or the copying of a DNA sequence). These replications errors are referred to as **mutations**. Some types of mutation events that can occur are:
 
 * **substitutions**, where one base (or amino acid, in protein sequences) is replaced with another;
 * **insertions**, where one or more contiguous bases are inserted into a sequence;
@@ -82,7 +82,9 @@ Figure 1 illustrates how one ancestral DNA sequence (Figure 1a), over time, migh
 
 In nearly all cases, the only sequences we have to work with are the modern (derived) sequences, as illustrated in Figure 1c. The ancestral sequence is not something we have access to (for example, because the organism whose genome it was present in went extinct 100 million years ago).
 
-Figure 1d illustrates one possible alignment of these two sequences. Just as the notes you made about which types of mutation events may have happened where represents your *hypothesis* about the evolutionary events that took place, a sequence alignment that you might get from a computer program such as BLAST is also only a hypothesis. You can think of an alignment as a table, where the rows are sequences and the columns are positions in those sequences. When you have two or more aligned sequences, there will, by definition, always be the same number of columns in each row. Each column in your alignment represents a hypothesis about the evolutionary events that occurred at that position since the last ancestor of the aligned sequences (the sequence in Figure 1a in our example).
+Figure 1d illustrates one possible alignment of these two sequences. Just as the notes you made about which types of mutation events may have happened where represents your *hypothesis* about the evolutionary events that took place, a sequence alignment that you might get from a computer program such as BLAST is also only a hypothesis.
+
+You can think of an alignment as a table, where the rows are sequences and the columns are positions in those sequences. When you have two or more aligned sequences, there will, by definition, always be the same number of columns in each row. Each column in your alignment represents a hypothesis about the evolutionary events that occurred at that position since the last ancestor of the aligned sequences (the sequence in Figure 1a in our example).
 
 One thing that's worth pointing out at this point is that because we don't know what the ancestral sequence was, when we encounter a gap in a pairwise alignment, we generally won't know whether a deletion occurred in one sequence, or an insertion occurred in the other. For that reason, you will often see the term **indel** used to refer to these either an insertion or deletion events.
 
@@ -97,7 +99,7 @@ Lets define two sequences, ``seq1`` and ``seq2``, and develop an approach for al
 >>> seq2 = "ACCGGTAACCGGTTAACACCCAC"
 ```
 
-I'm going to use a function in the following cells called ``show_table`` to display a table that we're going to use to develop our alignment. Once a function has been imported, you can view the source code for that function. This will be useful as we begin to explore some of the algorithms that are in use throughout these notebooks, and you should spend time reading the source code until you're sure that you understand what's happening.
+I'm going to use a function in the following cells called ``show_table`` to display a table that we're going to use to develop our alignment. Once a function has been imported, you can view the source code for that function. This will be useful as we begin to explore some of the algorithms that are in use throughout these notebooks. You should spend time reading the source code examples in this book until you're sure that you understand what's happening, especially if your goal is to develop bioinformatics software. Reading other people's code is a good way to improve your own.
 
 Here's how you'd import a function and then view its source code:
 
@@ -162,7 +164,7 @@ We're going to gloss over how to do this algorithmically for the moment, as we'l
 
 We'd also generally compute a score for an alignment to help us figure out which alignments are better than others. For now, let's add one for every match, and subtract one for every mismatch.
 
-If this step is confusing, don't worry about it for the now. We'll be back to this in a lot more detail soon.
+If this step is confusing, don't worry about it for now. We'll be back to this in a lot more detail soon.
 
 Here are two possible alignments:
 
@@ -184,7 +186,7 @@ Why might the first alignment be the more biologically relevant one (meaning the
 
 ### Why this simple procedure is too simplistic <link src="jzshiO"/>
 
-I suggested above that you keep a list of assumptions that are made by this approach. Here are a couple of the very problematic ones (I'll leave it to you to think about why they're problematic for the moment).
+I suggested above that you keep a list of assumptions that are made by this approach. Here are a couple of the very problematic ones.
 
 1. We're scoring all matches as 1 and all mismatches as 0. This suggests that all matches are equally likely, and all mismatches are equally unlikely. What's a more biologically meaningful way to do this (think about protein sequences here)?
 2. Similarly, every gap that is introduced results in the same penalty being incurred. Based on what we know about how insertion/deletion events occur, what do you think is a more biologically meaningful way to do this?
@@ -195,37 +197,26 @@ Another important consideration as we think about algorithms for aligning pairs 
 
 Over the next several sections we'll explore ways of addressing the two issues noted above. We'll introduce the problem of the computational complexity of pairwise sequence alignment at the end of this chapter, and explore approaches for addressing that (i.e., making database searching faster) in the next chapter.
 
-## Substitution matrices <link src='9f5e71'/>
+## Differential scoring of matches and mismatches <link src='9f5e71'/>
 
-**TODO: pick up here! I started editing this section before realizing that I needed to update some stuff above.**
+When aligning nucleotide sequences, using a simple two-value scoring scheme (where  all matches are scored with one value and all mismatches with another value) is common, but this approach is overly simplistic for protein sequences. In this section, we're going to switch gears to talking about protein alignment. The most commonly used algorithms are the same for nucleotides and proteins, so most of the ideas that we'll discuss here are general to both. With protein sequences, we're aligning amino acid residues (or *residues*, for short) to one another, instead of nucleotides.
 
-The first of the limitations we identified above was that all matches and mismatches were scored equally when aligning a pair of sequences. To understand why this is a problem, let's think about the meaning of match and mismatches.
+First, let's talk about why two-value scoring schemes are too simplistic for protein alignment. In a protein, each amino acid residue is contributing to the structure and/or function of the protein. A given amino acid residue may contribute a charge to an enzyme that helps it to bind its substrate, it may introduce structural stability or instability in a protein, or provide spacing between different functional domains of the protein. Substitutions between amino acids that have similar chemical or physical properties tend to better tolerated (i.e., less detrimental to the function of the protein) than substitutions between amino acids with different chemical or physical properties. It therefore makes sense to account for the chemical and physical properties of the amino acids being aligned when scoring matches and mismatches.
 
-When we align a pair of
+Let's take the sodium-potassium pump as an example. This molecule is described in the Protein Data Bank's (PDB) *Molecule of the Month* series. Spend a couple of minutes reading about it  [here](http://pdb101.rcsb.org/motm/118).
 
- though we know that that isn't the most biologically meaningful way to score an alignment. This is particularly the case for protein sequences, where each amino acid residue has different chemical properties, that impact the structure and function of the protein.
+<figure>
+  <img src="http://cdn.rcsb.org/pdb101/motm/images/2zxe_composite.jpg" height="400">
+  <figcaption>Figure 2: Structure of a sodium-potassium pump, as illustrated in the PDB <i>Molecule of the Month</i> series. To learn more about protein structure, you can start with the <a href="http://pdb101.rcsb.org/">PDB Educational Portal</a>.</figcaption>
+</figure>
+<p>
 
-We'll next explore a more general approach to the problem of *global sequence alignment* for protein sequences, or aligning a pair of protein sequences from beginning to end. We'll start by defining a **substitution matrix which defines the score associated with substitution of one amino acid for another**.
+Because the sodium-potassium pump is a membrane-bound protein, it has regions that are composed of long stretches of polar or charged residues, which facilitate being positioned inside or outside of the cell, and regions that are composed of long stretches of non-polar residues, which facilitate being positioned within the cell membrane. If a mutation occurs in a gene encoding a sodium-potassium pump that substitutes a non-polar residue for another non-polar residue, that will likely be less disruptive to the protein's function than if a polar residue is substituted for a non-polar residue. This is because the non-polar residue is likely to be in the membrane-bound region of the protein (since that's where most of the non-polar residues are in this protein), and polar residues destabilize membrane-bound proteins when they are present within the membrane (a highly non-polar environment). Given this knowledge of amino acids and proteins, when aligning a pair of protein sequences, we probably want to score the alignment of a non-polar residue with a polar residue as less likely than with another non-polar residue.
 
-Early work on defining protein substitution matrices was performed by Dayhoff in the 1970s and by Henikoff and Henikoff in the early 1990s. We'll start by working with a substitution matrix known as the blosum 50 matrix, which was [presented in PNAS in 1992](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC50453/). There are many different criteria that can be used to define how likely the substitution of Briefly, these matrices are defined empirically, by aligning sequences manually or through automated systems, and counting how frequent certain substitutions are. There is a good [wikipedia article on this topic](http://en.wikipedia.org/wiki/BLOSUM).
-
-We can import this from the ``iab`` support module, and then look up scores for substitutions of amino acids. Based on these scores and the biochemistry of the amino acids ([see the molecular structures on Wikipedia](http://en.wikipedia.org/wiki/Amino_acid)), does a positive score represent a more or less favorable substitution?
+To score matches and mismatches differently based on which pair of amino acid residues are being aligned, our alignment algorithm is redefined to incorporate a **substitution matrix**, which defines the score associated with substitution of one amino acid for another. A widely used substitution matrix is referred to as BLOSUM 50. Let's take a look at this matrix:
 
 ```python
 >>> from iab.algorithms import blosum50
-...
->>> print(blosum50['A']['G'])
->>> print(blosum50['G']['A'])
-...
->>> print(blosum50['W']['K'])
-...
->>> print(blosum50['A']['A'])
->>> print(blosum50['W']['W'])
-```
-
-Here's a global view of the matrix.
-
-```python
 >>> aas = list(blosum50.keys())
 >>> aas.sort()
 >>> data = []
@@ -235,10 +226,30 @@ Here's a global view of the matrix.
 ...         row.append(blosum50[aa1][aa2])
 ...     data.append(row)
 ...
->>> HTML(show_table(aas, aas, data))
+>>> aa_labels = ''.join(aas)
+>>> HTML(show_table(aa_labels, aa_labels, data))
 ```
 
+Look at the scores in this matrix in the context of details about the biochemistry of the amino acids (see the molecular structures [on Wikipedia](http://en.wikipedia.org/wiki/Amino_acid) or in any general microbiology or biochemistry text). Does a positive score represent a more or less favorable substitution? Confirm that the scores match your intuition for some similar and dissimilar amino acids.
+
+You can look up individual substitution scores as follows:
+
+```python
+>>> print(blosum50['A']['G'])
+>>> print(blosum50['G']['A'])
+...
+>>> print(blosum50['W']['K'])
+...
+>>> print(blosum50['A']['A'])
+>>> print(blosum50['W']['W'])
+```
+
+Early work on defining protein substitution matrices was performed by Margeret Dayhoff in the 1970s (Dayhoff, Schwartz, Orcutt (1978) <i>A Model of Evolutionary Change in Proteins.</i> Atlas of Protein Sequence and Structure) and by [Henikoff and Henikoff](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC50453/) in the early 1990s. Briefly, these matrices are often defined empirically, by aligning sequences manually or through automated systems, and counting how frequent certain substitutions are. [This](https://www.ncbi.nlm.nih.gov/pubmed/15286655) is a good article on the source of the widely used substitution matrices by Sean Eddy. We'll work with BLOSUM 50 here for the remainder of this chapter.
+
+
 ## Needleman-Wunsch global pairwise sequence alignment <link src='15efc2'/>
+
+**TODO: pick up here!**
 
 Now let's get started on using this to align a pair of sequences.
 
@@ -360,7 +371,7 @@ You can now apply this function to `seq1` and `seq2` to compute the dynamic prog
 >>> nw_matrix, traceback_matrix = _compute_score_and_traceback_matrices(
 ...     seq1, seq2, 8, 8, blosum50)
 ...
->>> print(format_dynamic_programming_matrix(seq1, seq2, nw_matrix))
+>>> HTML(show_table(seq1, seq2, nw_matrix))
 ```
 
 ```python
