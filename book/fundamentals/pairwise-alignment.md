@@ -207,7 +207,7 @@ Let's take the sodium-potassium pump as an example. This molecule is described i
 
 <figure>
   <img src="http://cdn.rcsb.org/pdb101/motm/images/2zxe_composite.jpg" height="400">
-  <figcaption>Figure 2: Structure of a sodium-potassium pump, as illustrated in the PDB <i>Molecule of the Month</i> series. To learn more about protein structure, you can start with the <a href="http://pdb101.rcsb.org/">PDB Educational Portal</a>.</figcaption>
+  <figcaption>Figure 2: Structure of a sodium-potassium pump, as illustrated in the PDB <i>Molecule of the Month</i> series. To learn more about protein structure, a good place to start is the <a href="http://pdb101.rcsb.org/">PDB Educational Portal</a>.</figcaption>
 </figure>
 <p>
 
@@ -247,20 +247,25 @@ You can look up individual substitution scores as follows:
 Early work on defining protein substitution matrices was performed by Margeret Dayhoff in the 1970s (Dayhoff, Schwartz, Orcutt (1978) <i>A Model of Evolutionary Change in Proteins.</i> Atlas of Protein Sequence and Structure) and by [Henikoff and Henikoff](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC50453/) in the early 1990s. Briefly, these matrices are often defined empirically, by aligning sequences manually or through automated systems, and counting how frequent certain substitutions are. [This](https://www.ncbi.nlm.nih.gov/pubmed/15286655) is a good article on the source of the widely used substitution matrices by Sean Eddy. We'll work with BLOSUM 50 here for the remainder of this chapter.
 
 
-## Needleman-Wunsch global pairwise sequence alignment <link src='15efc2'/>
+## A better approach for global pairwise alignment using the Needleman-Wunsch algorithm <link src='15efc2'/>
 
-**TODO: pick up here!**
+We're next going to work through the standard algorithm for aligning a pair of biological sequences. This algorithm was originally published by [Saul B. Needleman and Christian D. Wunsch in 1970](https://www.ncbi.nlm.nih.gov/pubmed/5420325), and is therefore referred to as *Needleman-Wunsch alignment*. This performs what is known as *global alignment*, meaning that both sequences are aligned from their first residue (or base) through their last residue (or base). We'll contrast this later in this chapter with local alignment.
 
-Now let's get started on using this to align a pair of sequences.
+### Stepwise Needleman-Wunsch alignment <link src="Gn3Vj6"/>
 
-**Step 1.** Create a matrix, where the columns represent the positions in ``seq1`` and the rows represent the positions in ``seq2``.
+Needleman-Wunsch alignment is similar to the approach that we explored above. We'll work through the steps of the algorithm first, and then automate the process by defining Python functions that perform the steps for us given a pair of sequences.
+
+We'll define two protein sequences to work with in this section. After working through this section, come back to this cell and change these protein sequences to explore how it changes the process. Make some small changes and some large changes to the protein sequences. The sequences that we're starting with are the same that are used in Chapter 2 of [Biological Sequence Analysis](http://amzn.to/1IYUEz2).
 
 ```python
->>> ## Example adapted from Biological Sequence Analysis Chapter 2.
-...
-... seq1 = "HEAGAWGHEE"
->>> seq2 = "PAWHEAE"
+>>> from skbio import Protein
+>>> seq1 = Protein("HEAGAWGHEE")
+>>> seq2 = Protein("PAWHEAE")
 ```
+
+#### Step 1: Create a blank scoring matrix. <link src="hVbAxT"/>
+
+As above, we'll create a matrix where the columns represent the positions in ``seq1`` and the rows represent the positions in ``seq2``.
 
 ```python
 >>> data = []
@@ -270,7 +275,9 @@ Now let's get started on using this to align a pair of sequences.
 >>> HTML(show_table(seq1, seq2, data))
 ```
 
-**Step 2**:  Using a substitution matrix, score each cell in the matrix.
+#### Step 2: Fill in scoring matrix. <link src="SyHOVJ"/>
+
+This is the first time we'll differ from the steps we performed above. We'll now score all subsitutions using a substitution matrix, instead of scoring all matches with one value and all mismatches with another value. We'll do this by looking up the pair of residues corresponding to each matrix cell in the BLOSUM 50 matrix, and then storing that value in the blank matrix that we created in Step 1.
 
 ```python
 >>> from iab.algorithms import generate_score_matrix
@@ -286,11 +293,19 @@ Now let's get started on using this to align a pair of sequences.
 ...                     score_matrix))
 ```
 
-**Step 3**: Generate the dynamic programming and traceback matrices.
+#### Step 3: Compute the dynamic programming and traceback matrices. <link src="Tma9ea"/>
 
-In the next step we determine the best alignment given the sequences and scoring scheme in what we'll call the **dynamic programming matrix**, and then define programmatically how to transcribe the alignment in what we'll call the **traceback matrix** to yield a pair of aligned sequences.
+As we discussed earlier in this chapter, a pair of sequences can be aligned in different ways. Needleman-Wunsh provides the best alignment, as defined by its score. Here we'll compute two new matrices that together allow us to determine the highest alignment score given the sequences and the substitution matrix, and to transcribe the aligned sequences. These matrices are
+ * the *dynamic programming matrix*, or $F$
+ * and the *traceback matrix*, or $T$.
 
-For the convenience of coding this algorithm, it helps to define the dynamic programming matrix with one extra row and one extra column relative to the score matrix, and make these the first column and row of the matrix. These then represent the beginning of the alignment position $(0, 0)$. The score $F$ for cell $(i, j)$, where $i$ represents the row number and $j$ represents the column number, is defined for the first row and column as follows:
+$F$ looks a lot like the scoring matrix we defined in the previous step, but it has one extra row and column, corresponding to the start of each of the sequences (a *state* that is independent of the first residue of the sequences that is important for our algorithm). $F$ keeps track of the best score of the alignment for each pair of positions, if the alignment were to terminate at that pair of positions.
+
+Because there are multiple possible alignments that a score in $F$ can be derived from, we use our second matrix, $T$, to track which single alignment lead to each score in $F$. $T$ has the same shape (i.e., number of rows and columns) as $F$, and its values encode information about how the sequences were aligned to result in the score in the corresponding cell in $F$.
+
+Some applications of global alignment use both the alignment score and the aligned sequences, and some only use one or the other. As a result, some applications optimize this process by only keeping track of the information they need. For example, if you're working on a database search algorithm, you might only care about the score of the alignment. In this case you might not need to keep track of $T$, and could reduce the amount of memory that your software requires by not keeping track of it. Since we're generally defining this algorithm right now, we'll keep track of all of the information we need to get the aligned sequences and the corresponding score for the alignment.
+
+$F$ and $T$ are defined at the same time. The first row and column of $F$ are initialized using the following formulas. $d$ is a value referred to as the *gap penalty*. This is a constant penalty that reduces the score of the alignment every time a gap character has to be introduced to align the sequences. We'll use a constant value of $d=8$ for now, and explore its use more shortly.
 
 $$
 \begin{align}
@@ -300,39 +315,46 @@ $$
 \end{align}
 $$
 
-This matrix, pre-initialization, would look like the following. As an exercise, try computing the values for the cells in the first four rows in column zero, and the first four columns in row zero. As you fill in the value for a cell, for all cells with a score based on another score in the matrix (i.e., everything except for $F(0, 0)$), draw an arrow from that cell to the cell whose score it depends on.
-
-For the sake of this exercise, define the gap penalty, $d$, as $d=8$.
+Prior to initialization, $F$ would look like the following.
 
 ```python
->>> data = []
->>> # This is a hack: to pad the matrix with an
-... # extra row and column at the beginning I'm just prepending a
-... # space to each sequence. Need to improve handling of that.
-... padded_seq1 = " " + seq1
->>> padded_seq2 = " " + seq2
-...
->>> for p in padded_seq2:
-...     data.append(['-']*len(padded_seq1))
-...
->>> HTML(show_table(padded_seq1, padded_seq2, data))
+>>> num_rows = len(seq2) + 1
+>>> num_cols = len(seq1) + 1
+>>> F = np.zeros(shape=(num_rows, num_cols), dtype=np.int)
+>>> HTML(show_table([" "] + seq1.values, [" "] + seq1.values, F))
 ```
 
-Initializing this would result in the following.
+As an exercise, try computing the values for the cells in the first four rows in column zero, and the first four columns in row zero. What you'll notice is that the score that you compute for most of the cells (i.e., all of them except for $F(0, 0)$), that score depends on the score at another position in $F$. In a second matrix, $T$, draw an arrow from the cell that you're currently defining the score for in $F$ to the cell whose score it depends on. If the score depends on the cell above, you'd draw an up arrow (↑). If the score depends on the cell to the left, you'd draw a left arrow (←). If the score doesn't depend on any other cell, indicate that with a bullet (•).
+
+Initializing $F$ would result in the following.
 
 ```python
->>> # We'll define the gap penalty as 8.
-... d = 8
+>>> d = 8
+>>> F[0][0] = 0
+>>> for i in range(1, num_rows):
+...     F[i][0] = F[i-1][0] - d
 ...
->>> data[0][0] = 0
->>> for i in range(1,len(padded_seq2)):
-...     data[i][0] = data[i-1][0] - d
+>>> for j in range(1, num_cols):
+...     F[0][j] = F[0][j-1] - d
 ...
->>> for j in range(1,len(padded_seq1)):
-...     data[0][j] = data[0][j-1] - d
-...
->>> HTML(show_table(padded_seq1, padded_seq2, data))
+>>> HTML(show_table([" "] + seq1.values, [" "] + seq1.values, F))
 ```
+
+Initializing $T$ would result in the following.
+
+```python
+>>> T = np.full(shape=(num_rows, num_cols), fill_value="•", dtype=np.str)
+>>> T[0][0] = "•"
+>>> for i in range(1, num_rows):
+...     T[i][0] = "↑"
+...
+>>> for j in range(1, num_cols):
+...     T[0][j] = "←"
+...
+>>> HTML(show_table([" "] + seq1.values, [" "] + seq1.values, T))
+```
+
+** PICK UP HERE, TEST THE ABOVE CODE**
 
 Next, we'll compute the scores for all of the other cells in the matrix, starting at position $(1, 1)$.
 
@@ -407,7 +429,13 @@ You can then execute this as follows, and print out the resulting alignment.
 >>> print(score)
 ```
 
-**Next steps**: All of those steps are a bit ugly, so as a developer you'd want to make this functionality generally accessible to users. To do that, you'd want to define a function that takes all of the necessary input and provides the aligned sequences and the score as output, without requiring the user to make several function calls. What are the required inputs? What steps would this function need to perform?
+### Automating Needleman-Wunsch alignment with Python <link src="B8xI7Y"/>
+
+Calling the steps we just described is labor-intensive, and they don't change regardless of the protein sequences that we provide. So, as a bioinformatics software developer, you'd want to make this functionality more easily accessible to users. To do that, you'd define a function that takes all of the necessary input and provides the aligned sequences and the score as output, without requiring the user to make several function calls.
+
+Think for a minute about how you'd define this function. What are the required inputs? What would the function provide as output? What would be a good name for the function? (Naming functions is hard: you want the name to be self-documenting, so users know what the function does, but you also want it to be concise because you and your users will be typing it often.) Write your answers to these questions down. What you're doing here is sketching an *Application Programmer Interface, or API* for a function. Defining APIs is a bit of an art and a bit of a science. It's hard, and it's something that you get better at with practice. Spending time thinking about APIs is important, as it's how your users will interact with your code. There is a lot of good code out there that no one uses because it has a bad API.
+
+Here's the scikit-bio implementation of Needleman-Wunsch alignment. How is its API different from the interface you sketched out above?
 
 ```python
 >>> from skbio.alignment import global_pairwise_align
