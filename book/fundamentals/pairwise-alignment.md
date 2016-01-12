@@ -263,37 +263,7 @@ We'll define two protein sequences to work with in this section. After working t
 >>> seq2 = Protein("PAWHEAE")
 ```
 
-#### Step 1: Create a blank scoring matrix. <link src="hVbAxT"/>
-
-As above, we'll create a matrix where the columns represent the positions in ``seq1`` and the rows represent the positions in ``seq2``.
-
-```python
->>> data = []
->>> for p in seq2:
-...     data.append(['-']*len(seq1))
-...
->>> HTML(show_table(seq1, seq2, data))
-```
-
-#### Step 2: Fill in scoring matrix. <link src="SyHOVJ"/>
-
-This is the first time we'll differ from the steps we performed above. We'll now score all subsitutions using a substitution matrix, instead of scoring all matches with one value and all mismatches with another value. We'll do this by looking up the pair of residues corresponding to each matrix cell in the BLOSUM 50 matrix, and then storing that value in the blank matrix that we created in Step 1.
-
-```python
->>> from iab.algorithms import generate_score_matrix
-...
->>> %psource generate_score_matrix
-```
-
-```python
->>> score_matrix = generate_score_matrix(seq1,seq2,blosum50)
-...
->>> HTML(show_table(seq1,
-...                     seq2,
-...                     score_matrix))
-```
-
-#### Step 3: Compute the dynamic programming and traceback matrices. <link src="Tma9ea"/>
+#### Step 1: Create blank matrices. <link src="hVbAxT"/>
 
 As we discussed earlier in this chapter, a pair of sequences can be aligned in different ways. Needleman-Wunsh provides the best alignment, as defined by its score. Here we'll compute two new matrices that together allow us to determine the highest alignment score given the sequences and the substitution matrix, and to transcribe the aligned sequences. These matrices are
  * the *dynamic programming matrix*, or $F$
@@ -305,6 +275,22 @@ $F$ looks a lot like the scoring matrix we defined in the previous step, but it 
 
 Because there are multiple possible alignments that a score in $F$ can be derived from, we use our second matrix, $T$, to track which single alignment led to each score in $F$. $T$ has the same shape (i.e., number of rows and columns) as $F$, and its values encode information about how the sequences were aligned to result in the score in the corresponding cell in $F$.
 
+Prior to initialization, $F$ and $T$ would look like the following.
+
+```python
+>>> num_rows = len(seq2) + 1
+>>> num_cols = len(seq1) + 1
+>>> F = np.zeros(shape=(num_rows, num_cols), dtype=np.int)
+>>> HTML(show_table(seq1, seq2, F))
+```
+
+```python
+>>> T = np.full(shape=(num_rows, num_cols), fill_value=" ", dtype=np.str)
+>>> HTML(show_table(seq1, seq2, T))
+```
+
+#### Step 2: Compute $F$ and $T$. <link src="Tma9ea"/>
+
 The first row and column of $F$ are initialized using the following formulas. $d$ in these formulas is a value referred to as the *gap penalty*. This is a constant penalty that reduces the score of the alignment every time a gap character has to be introduced to align the sequences. We'll use a constant value of $d=8$ for now, and explore its use more shortly. $i$ is the row number in $F$, and $j$ is the column number in $F$.
 
 $$
@@ -314,15 +300,6 @@ $$
 & F(0, j) = F(0, j-1) - d\\
 \end{align}
 $$
-
-Prior to initialization, $F$ would look like the following.
-
-```python
->>> num_rows = len(seq2) + 1
->>> num_cols = len(seq1) + 1
->>> F = np.zeros(shape=(num_rows, num_cols), dtype=np.int)
->>> HTML(show_table([" "] + seq1.values, [" "] + seq1.values, F))
-```
 
 As an exercise, try computing the values for the cells in the first four rows in column zero and the first four columns in row zero of $F$. What you'll notice is that the score that you compute for most of the cells (all of them except for $F(0, 0)$) depends on the score at another position in $F$. In a second matrix, $T$, draw an arrow from the cell that you're currently defining the score for in $F$ to the cell whose score it depends on. If the score depends on the cell above, you'd draw an up arrow (↑). If the score depends on the cell to the left, you'd draw a left arrow (←). If the score doesn't depend on any other cell, indicate that with a bullet (•).
 
@@ -337,13 +314,12 @@ Initializing $F$ would result in the following.
 >>> for j in range(1, num_cols):
 ...     F[0][j] = F[0][j-1] - d
 ...
->>> HTML(show_table([" "] + seq1.values, [" "] + seq1.values, F))
+>>> HTML(show_table(seq1, seq2, F))
 ```
 
 Initializing $T$ would result in the following.
 
 ```python
->>> T = np.full(shape=(num_rows, num_cols), fill_value="•", dtype=np.str)
 >>> T[0][0] = "•"
 >>> for i in range(1, num_rows):
 ...     T[i][0] = "↑"
@@ -351,7 +327,7 @@ Initializing $T$ would result in the following.
 >>> for j in range(1, num_cols):
 ...     T[0][j] = "←"
 ...
->>> HTML(show_table([" "] + seq1.values, [" "] + seq1.values, T))
+>>> HTML(show_table(seq1, seq2, T))
 ```
 
 Next, we'll compute the scores for all of the other cells in $F$, starting at position $(1, 1)$. In Needleman-Wunsch alignment, the score $F$ for cell $(i, j)$ (when $i > 0$ and $j > 0$) is computed as the maximum of three possible values. $s$ refers to the substitution matrix, $c_i$ and $c_j$ refers to characters in `seq1` and `seq2`.
@@ -391,14 +367,14 @@ You can now apply this function to `seq1` and `seq2` to compute the dynamic prog
 >>> nw_matrix, traceback_matrix = _compute_score_and_traceback_matrices(
 ...     seq1, seq2, 8, 8, blosum50)
 ...
->>> HTML(show_table(seq1, seq2, nw_matrix))
+>>> HTML(show_table(seq1[0], seq2[0], nw_matrix))
 ```
 
 ```python
->>> print(format_traceback_matrix(seq1, seq2, traceback_matrix))
+>>> HTML(show_table(seq1[0], seq2[0], traceback_matrix))
 ```
 
-#### Step 4: Transcribe the alignment. <link src="AFAVLt"/>
+#### Step 3: Transcribe the alignment. <link src="AFAVLt"/>
 
 We can now use the $F$ and $T$ to transcribe and score the alignment of sequences 1 and 2. To do this, we start at the bottom-right of the matrices and follow the arrows to cell $(0, 0)$.
 
@@ -459,7 +435,7 @@ This is in contrast to local alignment, where we have a pair of sequences that w
 
 ## Smith-Waterman local sequence alignment <link src='c9656e'/>
 
-**PICK UP HERE**
+**PICK UP HERE** The formatting code needs to be cleaned up - should have a format_traceback to encode the ints as the corresponding arrows. The padding is also messed up in both F and T, so the tracing back by hand currently wouldn't work. 
 
 The Smith-Waterman algorithm is used for performing pairwise local alignment. It is nearly identical to Needleman-Wunsch, with three small important differences.
 

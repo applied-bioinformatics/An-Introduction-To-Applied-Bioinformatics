@@ -57,7 +57,9 @@ def hamming_distance(s1, s2):
 
 def show_table(row_headers, col_headers, data, hide_zeros=False, nonzero_val=None):
     rows = []
-    for h, d in zip(str(col_headers), data):
+    col_headers = col_headers.values.decode('UTF-8')
+    row_headers = row_headers.values.decode('UTF-8')
+    for h, d in zip(col_headers, data):
         current_row = ["<b>%s</b>" % h]
         for e in d:
             if e == 0:
