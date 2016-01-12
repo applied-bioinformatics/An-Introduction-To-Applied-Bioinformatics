@@ -299,13 +299,13 @@ As we discussed earlier in this chapter, a pair of sequences can be aligned in d
  * the *dynamic programming matrix*, or $F$
  * and the *traceback matrix*, or $T$.
 
+$F$ and $T$ are defined at the same time.
+
 $F$ looks a lot like the scoring matrix we defined in the previous step, but it has one extra row and column, corresponding to the start of each of the sequences (a *state* that is independent of the first residue of the sequences that is important for our algorithm). $F$ keeps track of the best score of the alignment for each pair of positions, if the alignment were to terminate at that pair of positions.
 
-Because there are multiple possible alignments that a score in $F$ can be derived from, we use our second matrix, $T$, to track which single alignment lead to each score in $F$. $T$ has the same shape (i.e., number of rows and columns) as $F$, and its values encode information about how the sequences were aligned to result in the score in the corresponding cell in $F$.
+Because there are multiple possible alignments that a score in $F$ can be derived from, we use our second matrix, $T$, to track which single alignment led to each score in $F$. $T$ has the same shape (i.e., number of rows and columns) as $F$, and its values encode information about how the sequences were aligned to result in the score in the corresponding cell in $F$.
 
-Some applications of global alignment use both the alignment score and the aligned sequences, and some only use one or the other. As a result, some applications optimize this process by only keeping track of the information they need. For example, if you're working on a database search algorithm, you might only care about the score of the alignment. In this case you might not need to keep track of $T$, and could reduce the amount of memory that your software requires by not keeping track of it. Since we're generally defining this algorithm right now, we'll keep track of all of the information we need to get the aligned sequences and the corresponding score for the alignment.
-
-$F$ and $T$ are defined at the same time. The first row and column of $F$ are initialized using the following formulas. $d$ is a value referred to as the *gap penalty*. This is a constant penalty that reduces the score of the alignment every time a gap character has to be introduced to align the sequences. We'll use a constant value of $d=8$ for now, and explore its use more shortly.
+The first row and column of $F$ are initialized using the following formulas. $d$ in these formulas is a value referred to as the *gap penalty*. This is a constant penalty that reduces the score of the alignment every time a gap character has to be introduced to align the sequences. We'll use a constant value of $d=8$ for now, and explore its use more shortly. $i$ is the row number in $F$, and $j$ is the column number in $F$.
 
 $$
 \begin{align}
@@ -324,7 +324,7 @@ Prior to initialization, $F$ would look like the following.
 >>> HTML(show_table([" "] + seq1.values, [" "] + seq1.values, F))
 ```
 
-As an exercise, try computing the values for the cells in the first four rows in column zero, and the first four columns in row zero. What you'll notice is that the score that you compute for most of the cells (i.e., all of them except for $F(0, 0)$), that score depends on the score at another position in $F$. In a second matrix, $T$, draw an arrow from the cell that you're currently defining the score for in $F$ to the cell whose score it depends on. If the score depends on the cell above, you'd draw an up arrow (↑). If the score depends on the cell to the left, you'd draw a left arrow (←). If the score doesn't depend on any other cell, indicate that with a bullet (•).
+As an exercise, try computing the values for the cells in the first four rows in column zero and the first four columns in row zero of $F$. What you'll notice is that the score that you compute for most of the cells (all of them except for $F(0, 0)$) depends on the score at another position in $F$. In a second matrix, $T$, draw an arrow from the cell that you're currently defining the score for in $F$ to the cell whose score it depends on. If the score depends on the cell above, you'd draw an up arrow (↑). If the score depends on the cell to the left, you'd draw a left arrow (←). If the score doesn't depend on any other cell, indicate that with a bullet (•).
 
 Initializing $F$ would result in the following.
 
@@ -354,11 +354,7 @@ Initializing $T$ would result in the following.
 >>> HTML(show_table([" "] + seq1.values, [" "] + seq1.values, T))
 ```
 
-** PICK UP HERE, TEST THE ABOVE CODE**
-
-Next, we'll compute the scores for all of the other cells in the matrix, starting at position $(1, 1)$.
-
-In a Needleman-Wunsch alignment, the score $F$ for cell $(i, j)$ (where $i$ is the row number and $j$ is the column number, and $i > 0$ and $j > 0$) is computed as the maximum of three possible values.
+Next, we'll compute the scores for all of the other cells in $F$, starting at position $(1, 1)$. In Needleman-Wunsch alignment, the score $F$ for cell $(i, j)$ (when $i > 0$ and $j > 0$) is computed as the maximum of three possible values. $s$ refers to the substitution matrix, $c_i$ and $c_j$ refers to characters in `seq1` and `seq2`.
 
 $$
 F(i, j) = max \left(\begin{align}
@@ -368,9 +364,11 @@ F(i, j) = max \left(\begin{align}
 \end{align}\right)
 $$
 
-In this notation, $s$ refers to the substitution matrix, $c_i$ and $c_j$ refers to characters in `seq1` and `seq2`, and $d$ again is the gap penalty. Describing the scoring function in English, we score a cell with the maximum of three values: either the value of the cell up and to the left plus the score for the substitution taking place in the current cell (which you find by looking up the substitution in the substitution matrix); the value of the cell above minus the gap penalty; or the value of the cell to the left minus the gap penalty. In this way, you're determining whether the best (highest) score is obtained by inserting a gap in sequence 1 (corresponding to $F(i-1, j) - d$), inserting a gap in sequence 2 (corresponding to $F(i, j-1) - d$), or aligning the characters in sequence 1 and sequence 2 (corresponding to $F(i-1, j-1) + s(c_i, c_j)$).
+ Describing the scoring function in English, we score a cell with the maximum of three values: either the value of the cell up and to the left plus the score for the substitution taking place in the current cell (which you find by looking up the substitution in the substitution matrix); the value of the cell above minus the gap penalty; or the value of the cell to the left minus the gap penalty. In this way, you're determining whether the best (highest) score is obtained by inserting a gap in sequence 1 (corresponding to $F(i-1, j) - d$), inserting a gap in sequence 2 (corresponding to $F(i, j-1) - d$), or aligning the characters in sequence 1 and sequence 2 (corresponding to $F(i-1, j-1) + s(c_i, c_j)$).
 
-As an exercise, fill in the values of cells $(1, 1)$, $(1, 2)$, and $(2, 1)$ by hand. Remember to insert arrows indicating which cell each score was derived from as you fill in the matrix, and notice the situation that you encounter when computing the value for $(2, 1)$. Which arrow do you draw there? Keep this issue in mind, and think about how it might affect your final result.
+As an exercise, fill in the values of cells $(1, 1)$, $(1, 2)$, and $(2, 1)$ in $F$ and $T$. Remember to insert arrows indicating which cell each score was derived from as you fill in the matrix. If you're deriving the score for a given cell in $F$ from the cell diagonally up and to the left, you should put a diagonal arrow in $T$ (↖).
+
+Notice the situation that you encounter when computing the value for $F(2, 1)$. Which arrow do you draw there? Keep this question in mind, and think about how it might affect your final result.
 
 The function in the next cell generates the dynamic programming and traceback matrices for us. You should review this code to understand exactly how it's working.
 
@@ -400,26 +398,26 @@ You can now apply this function to `seq1` and `seq2` to compute the dynamic prog
 >>> print(format_traceback_matrix(seq1, seq2, traceback_matrix))
 ```
 
-**Step 4**: Transcribe the alignment.
+#### Step 4: Transcribe the alignment. <link src="AFAVLt"/>
 
-We can now read the dynamic programming and traceback matrices to transcribe and score the alignment of sequences 1 and 2. To do this, we start at the bottom right of the matrices and traceback the arrows to cell $(0, 0)$.
+We can now use the $F$ and $T$ to transcribe and score the alignment of sequences 1 and 2. To do this, we start at the bottom-right of the matrices and follow the arrows to cell $(0, 0)$.
 
-* Every time we hit a vertical arrow (represented by `|`), we consume a character from sequence 2 (the vertical sequence) and add a gap to sequence 1.
-* Every time we hit a horizontal arrow (represented by `-`), we consume a character from sequence 1 (the horizontal sequence) and add a gap to sequence 2.
-* Every time we hit a diagonal arrow (represented by `\`), we consume a character from sequence 1 and sequence 2.
+* Every time we encounter a vertical arrow (represented by `|`), we consume a character from sequence 2 (the vertical sequence) and add a gap to sequence 1.
+* Every time we encounter a horizontal arrow (represented by `-`), we consume a character from sequence 1 (the horizontal sequence) and add a gap to sequence 2.
+* Every time we encounter a diagonal arrow (represented by `\`), we consume a character from sequence 1 and sequence 2.
 
 As you transcribe the alignment, write sequence 1 on top of sequence 2, and work from right to left (since you are working backwards through the matrix).
 
-The score in the bottom right cell of the matrix is the score for the alignment.
+The score in the cell that you started in (the bottom-right in this case) is the score for the alignment.
 
-Work through this process on paper, and then review the function in the next cell to see how this looks in python.
+Work through this process on paper, and then review the function in the next cell to see how this looks in Python.
 
 ```python
 >>> from skbio.alignment._pairwise import _traceback
 >>> %psource _traceback
 ```
 
-You can then execute this as follows, and print out the resulting alignment.
+You can then execute this as follows, and print out the resulting alignment. Compare the result that you obtained with the result of calling this function.
 
 ```python
 >>> aln1, aln2, score, _, _ = _traceback(traceback_matrix,nw_matrix,seq1,seq2, nw_matrix.shape[0]-1, nw_matrix.shape[1]-1)
@@ -431,9 +429,9 @@ You can then execute this as follows, and print out the resulting alignment.
 
 ### Automating Needleman-Wunsch alignment with Python <link src="B8xI7Y"/>
 
-Calling the steps we just described is labor-intensive, and they don't change regardless of the protein sequences that we provide. So, as a bioinformatics software developer, you'd want to make this functionality more easily accessible to users. To do that, you'd define a function that takes all of the necessary input and provides the aligned sequences and the score as output, without requiring the user to make several function calls.
+Calling the steps we just described is labor-intensive, and they don't change regardless of the protein sequences that we want to align. So, as a bioinformatics software developer, you'd want to make this functionality more easily accessible to users. To do that, you'd define a function that takes all of the necessary input and provides the aligned sequences and the score as output, without requiring the user to make several function calls.
 
-Think for a minute about how you'd define this function. What are the required inputs? What would the function provide as output? What would be a good name for the function? (Naming functions is hard: you want the name to be self-documenting, so users know what the function does, but you also want it to be concise because you and your users will be typing it often.) Write your answers to these questions down. What you're doing here is sketching an *Application Programmer Interface, or API* for a function. Defining APIs is a bit of an art and a bit of a science. It's hard, and it's something that you get better at with practice. Spending time thinking about APIs is important, as it's how your users will interact with your code. There is a lot of good code out there that no one uses because it has a bad API.
+Think for a minute about how you'd define this function. What are the required inputs? What would the function provide as output? What would be a good name for the function? (Naming functions is hard: you want the name to be self-documenting, so users know what the function does, but you also want it to be concise because you and your users will be typing it often.) Write your answers to these questions down. What you're doing here is sketching an *Application Programmer Interface*, or *API* for a function. Defining APIs is a bit of an art and a bit of a science, and there are great APIs and horrible APIs. API definition is hard, and it's something that you get better at with practice. Spending time thinking about APIs is important for developers, as it's how your users will interact with your code. There is a lot of good code out there that no one uses because it has a bad API.
 
 Here's the scikit-bio implementation of Needleman-Wunsch alignment. How is its API different from the interface you sketched out above?
 
@@ -449,11 +447,19 @@ Here's the scikit-bio implementation of Needleman-Wunsch alignment. How is its A
 >>> print(score)
 ```
 
+### A note on computing $F$ and $T$ <link src="QRabtd"/>
+
+Some applications of global alignment use both the alignment score and the aligned sequences, and some only use one or the other. As a result, some applications optimize this process by only keeping track of the information they need. For example, if you're working on a database search algorithm, you might only care about the score of the alignment. In this case you might not need to keep track of $T$, and could reduce the amount of memory that your software requires by not keeping track of it. Since we're generally defining this algorithm right now, we'll keep track of all of the information we need to get the aligned sequences and the corresponding score for the alignment.
+
 ## Global versus local alignment <link src='c80f21'/>
 
-The alignment we just constructed is what's known as a *global alignment*, meaning we align both sequences from the beginning through the end. This has some important specific applications: for example, if we have two full-length protein sequences, and we have a crystal structure for one of them, we may want to have a direct mapping between all positions in both sequences. Probably more common however, is local alignment: where we have a pair of sequences that we suspect may partially overlap each other, and we want to know what the best possible alignment of all or part of one sequence is with all or part of the other sequences. Perhaps the most widely used application of this is in the BLAST search algorithm, where we have a query sequence and we want to find the closest match (or matches) in a reference database containing many different gene sequences. In this case, the whole reference database could be represented as a single sequence, as we could perform a local alignment against it to find the region that contains the highest scoring match.
+The alignment we just constructed is a *global alignment*, meaning we align both sequences from the beginning through the end. This has some important specific applications: for example, if we have two full-length protein sequences, and we have a crystal structure for one of them, we may want to have a direct mapping between all positions in both sequences.
+
+This is in contrast to local alignment, where we have a pair of sequences that we suspect may partially overlap each other, and we want to know what the best possible alignment of all or part of one sequence is with all or part of the other sequences. Perhaps the most widely used application of this is in sequence database searching (e.g., [the BLAST web server](http://blast.ncbi.nlm.nih.gov/Blast.cgi)), where we have a query sequence and we want to find the closest match (or matches) in a reference database containing many different gene sequences. In this case, the whole reference database could be represented as a single sequence, as we could perform a local alignment against it to find the region that contains the highest scoring match.
 
 ## Smith-Waterman local sequence alignment <link src='c9656e'/>
+
+**PICK UP HERE**
 
 The Smith-Waterman algorithm is used for performing pairwise local alignment. It is nearly identical to Needleman-Wunsch, with three small important differences.
 
