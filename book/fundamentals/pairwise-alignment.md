@@ -95,8 +95,8 @@ In the next section we'll work through our first bioinformatics algorithm, in th
 Lets define two sequences, ``seq1`` and ``seq2``, and develop an approach for aligning them.
 
 ```python
->>> seq1 = "ACCGGTGGAACCGGTAACACCCAC"
->>> seq2 = "ACCGGTAACCGGTTAACACCCAC"
+>>> seq1 = DNA("ACCGGTGGAACCGGTAACACCCAC")
+>>> seq2 = DNA("ACCGGTAACCGGTTAACACCCAC")
 ```
 
 I'm going to use a function in the following cells called ``show_table`` to display a table that we're going to use to develop our alignment. Once a function has been imported, you can view the source code for that function. This will be useful as we begin to explore some of the algorithms that are in use throughout these notebooks. You should spend time reading the source code examples in this book until you're sure that you understand what's happening, especially if your goal is to develop bioinformatics software. Reading other people's code is a good way to improve your own.
@@ -104,11 +104,11 @@ I'm going to use a function in the following cells called ``show_table`` to disp
 Here's how you'd import a function and then view its source code:
 
 ```python
->>> from iab.algorithms import show_table
+>>> from iab.algorithms import show_F
 ```
 
 ```python
->>> %psource show_table
+>>> %psource show_F
 ```
 
 Now let's look at how to align these sequences.
@@ -120,7 +120,7 @@ Now let's look at how to align these sequences.
 >>> num_cols = len(seq1)
 >>> data = np.zeros(shape=(num_rows, num_cols), dtype=np.int)
 ...
->>> HTML(show_table(seq1, seq2, data))
+>>> HTML(show_F(seq1, seq2, data))
 ```
 
 **Step 2.** Score the cells so if the characters at the corresponding row and column are the same the value is changed from zero to one. We can then revew the resulting matrix. For clarity, we'll have ``show_table`` hide the zero values.
@@ -131,7 +131,7 @@ Now let's look at how to align these sequences.
 ...         if row_character == col_character:
 ...             data[row_number, col_number] = 1
 ...
->>> HTML(show_table(seq1, seq2, data, hide_zeros=True))
+>>> HTML(show_F(seq1, seq2, data, hide_zeros=True))
 ```
 
 **Step 3**: Identify the longest diagonal stretches of non-zero characters (we'll call these *diagonals*). Diagonals indicate segments of the two sequences that are identical and uninterrupted by mismatched characters (substitution events) or indel events.
@@ -155,7 +155,7 @@ We can identify the longest diagonals as follows:
 ...
 >>> # Identify the longest diagonal
 ... print("The longest diagonal is %d characters long." % summed_data.max())
->>> HTML(show_table(seq1, seq2, summed_data, hide_zeros=True))
+>>> HTML(show_F(seq1, seq2, summed_data, hide_zeros=True))
 ```
 
 **Step 4**: Next, we'd want to transcribe some of the possible alignments that arise from this process.
@@ -216,7 +216,7 @@ Because the sodium-potassium pump is a membrane-bound protein, it has regions th
 To score matches and mismatches differently based on which pair of amino acid residues are being aligned, our alignment algorithm is redefined to incorporate a **substitution matrix**, which defines the score associated with substitution of one amino acid for another. A widely used substitution matrix is referred to as BLOSUM 50. Let's take a look at this matrix:
 
 ```python
->>> from iab.algorithms import blosum50
+>>> from iab.algorithms import blosum50, show_substitution_matrix
 >>> aas = list(blosum50.keys())
 >>> aas.sort()
 >>> data = []
@@ -227,7 +227,7 @@ To score matches and mismatches differently based on which pair of amino acid re
 ...     data.append(row)
 ...
 >>> aa_labels = ''.join(aas)
->>> HTML(show_table(aa_labels, aa_labels, data))
+>>> HTML(show_substitution_matrix(aa_labels, data))
 ```
 
 Look at the scores in this matrix in the context of details about the biochemistry of the amino acids (see the molecular structures [on Wikipedia](http://en.wikipedia.org/wiki/Amino_acid) or in any general microbiology or biochemistry text). Does a positive score represent a more or less favorable substitution? Confirm that the scores match your intuition for some similar and dissimilar amino acids.
@@ -281,12 +281,14 @@ Prior to initialization, $F$ and $T$ would look like the following.
 >>> num_rows = len(seq2) + 1
 >>> num_cols = len(seq1) + 1
 >>> F = np.zeros(shape=(num_rows, num_cols), dtype=np.int)
->>> HTML(show_table(seq1, seq2, F))
+>>> HTML(show_F(seq1, seq2, F))
 ```
 
 ```python
+>>> from iab.algorithms import show_T
+...
 >>> T = np.full(shape=(num_rows, num_cols), fill_value=" ", dtype=np.str)
->>> HTML(show_table(seq1, seq2, T))
+>>> HTML(show_T(seq1, seq2, T))
 ```
 
 #### Step 2: Compute $F$ and $T$. <link src="Tma9ea"/>
@@ -314,7 +316,7 @@ Initializing $F$ would result in the following.
 >>> for j in range(1, num_cols):
 ...     F[0][j] = F[0][j-1] - d
 ...
->>> HTML(show_table(seq1, seq2, F))
+>>> HTML(show_F(seq1, seq2, F))
 ```
 
 Initializing $T$ would result in the following.
@@ -327,7 +329,7 @@ Initializing $T$ would result in the following.
 >>> for j in range(1, num_cols):
 ...     T[0][j] = "←"
 ...
->>> HTML(show_table(seq1, seq2, T))
+>>> HTML(show_T(seq1, seq2, T))
 ```
 
 Next, we'll compute the scores for all of the other cells in $F$, starting at position $(1, 1)$. In Needleman-Wunsch alignment, the score $F$ for cell $(i, j)$ (when $i > 0$ and $j > 0$) is computed as the maximum of three possible values. $s$ refers to the substitution matrix, $c_i$ and $c_j$ refers to characters in `seq1` and `seq2`.
@@ -367,11 +369,11 @@ You can now apply this function to `seq1` and `seq2` to compute the dynamic prog
 >>> nw_matrix, traceback_matrix = _compute_score_and_traceback_matrices(
 ...     seq1, seq2, 8, 8, blosum50)
 ...
->>> HTML(show_table(seq1[0], seq2[0], nw_matrix))
+>>> HTML(show_F(seq1[0], seq2[0], nw_matrix))
 ```
 
 ```python
->>> HTML(show_table(seq1[0], seq2[0], traceback_matrix))
+>>> HTML(show_T(seq1[0], seq2[0], traceback_matrix))
 ```
 
 #### Step 3: Transcribe the alignment. <link src="AFAVLt"/>
@@ -435,7 +437,7 @@ This is in contrast to local alignment, where we have a pair of sequences that w
 
 ## Smith-Waterman local sequence alignment <link src='c9656e'/>
 
-**PICK UP HERE** The formatting code needs to be cleaned up - should have a format_traceback to encode the ints as the corresponding arrows. The padding is also messed up in both F and T, so the tracing back by hand currently wouldn't work. 
+**PICK UP HERE** The formatting code needs to be cleaned up - should have a format_traceback to encode the ints as the corresponding arrows. The padding is also messed up in both F and T, so the tracing back by hand currently wouldn't work.
 
 The Smith-Waterman algorithm is used for performing pairwise local alignment. It is nearly identical to Needleman-Wunsch, with three small important differences.
 

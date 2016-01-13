@@ -55,11 +55,15 @@ def hamming_distance(s1, s2):
     s2 = Sequence(s2)
     return s1.distance(s2)
 
-def show_table(row_headers, col_headers, data, hide_zeros=False, nonzero_val=None):
+def show_F(h_sequence, v_sequence, data, hide_zeros=False, nonzero_val=None):
     rows = []
-    col_headers = col_headers.values.decode('UTF-8')
-    row_headers = row_headers.values.decode('UTF-8')
-    for h, d in zip(col_headers, data):
+    col_headers = [c.decode('UTF-8') for c in h_sequence.values]
+    row_headers = [c.decode('UTF-8') for c in v_sequence.values]
+    pad_headers = data.shape == (len(row_headers) + 1, len(col_headers) + 1)
+    if pad_headers:
+        row_headers = [" "] + row_headers
+        col_headers = [" "] + col_headers
+    for h, d in zip(row_headers, data):
         current_row = ["<b>%s</b>" % h]
         for e in d:
             if e == 0:
@@ -73,7 +77,27 @@ def show_table(row_headers, col_headers, data, hide_zeros=False, nonzero_val=Non
                 else:
                     current_row.append(e)
         rows.append(current_row)
-    return tabulate.tabulate(rows, headers=row_headers, tablefmt='html')
+    return tabulate.tabulate(rows, headers=col_headers, tablefmt='html')
+
+def show_T(h_sequence, v_sequence, data):
+    if data.dtype == np.int:
+        data_ = T = np.full(shape=data.shape, fill_value=" ", dtype=np.str)
+        translation_table = {0: "•", 1: "↖", 2: "↑", 3: "←"}
+        for i, row in enumerate(data):
+            for j, value in enumerate(row):
+                data_[i, j] =  translation_table[value]
+    else:
+        data_ = data
+    return show_F(h_sequence, v_sequence, data_)
+
+def show_substitution_matrix(headers, data):
+    rows = []
+    for h, d in zip(headers, data):
+        current_row = ["<b>%s</b>" % h]
+        for e in d:
+            current_row.append(e)
+        rows.append(current_row)
+    return tabulate.tabulate(rows, headers=headers, tablefmt='html')
 
 def format_dynamic_programming_matrix(seq1, seq2, matrix, cell_width=6):
     """ define a function for formatting dynamic programming matrices
