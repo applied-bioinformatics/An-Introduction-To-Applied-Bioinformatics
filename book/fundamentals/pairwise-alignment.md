@@ -271,9 +271,9 @@ As we discussed earlier in this chapter, a pair of sequences can be aligned in d
 
 $F$ and $T$ are defined at the same time.
 
-$F$ looks a lot like the scoring matrix we defined in the previous step, but it has one extra row and column, corresponding to the start of each of the sequences (a *state* that is independent of the first residue of the sequences that is important for our algorithm). $F$ keeps track of the best score of the alignment for each pair of positions, if the alignment were to terminate at that pair of positions.
+$F$ looks a lot like the matrix we defined in our simplistic example above, but it has one extra row and column, corresponding to the start of each of the sequences (a *state* that is independent of the first residue of the sequences that is important for our algorithm). $F$ keeps track of the best score of the alignment through the corresponding pair of positions, if the alignment were to terminate at that pair of positions.
 
-Because there are multiple possible alignments that a score in $F$ can be derived from, we use our second matrix, $T$, to track which single alignment led to each score in $F$. $T$ has the same shape (i.e., number of rows and columns) as $F$, and its values encode information about how the sequences were aligned to result in the score in the corresponding cell in $F$.
+Because there are multiple possible alignments that a score in $F$ can be derived from, we use our second matrix, $T$, to track which single alignment led to each score in $F$. $T$ has the same shape (i.e., numbers of rows and columns) as $F$, and its values encode information about how the sequences were aligned to result in the score in the corresponding cell in $F$.
 
 Prior to initialization, $F$ and $T$ would look like the following.
 
@@ -293,7 +293,7 @@ Prior to initialization, $F$ and $T$ would look like the following.
 
 #### Step 2: Compute $F$ and $T$. <link src="Tma9ea"/>
 
-The first row and column of $F$ are initialized using the following formulas. $d$ in these formulas is a value referred to as the *gap penalty*. This is a constant penalty that reduces the score of the alignment every time a gap character has to be introduced to align the sequences. We'll use a constant value of $d=8$ for now, and explore its use more shortly. $i$ is the row number in $F$, and $j$ is the column number in $F$.
+The first row and column of $F$ are initialized using the following formulas. $d$ in these formulas is a value referred to as the *gap penalty*. This is a constant value that is subtracted from the score of the alignment every time a gap character has to be introduced to align the sequences. We'll use a constant value of $d=8$ (it's positive because we subtract it) for now, and explore its use more shortly. $i$ is the row number in $F$, and $j$ is the column number in $F$.
 
 $$
 \begin{align}
@@ -303,7 +303,7 @@ $$
 \end{align}
 $$
 
-As an exercise, try computing the values for the cells in the first four rows in column zero and the first four columns in row zero of $F$. What you'll notice is that the score that you compute for most of the cells (all of them except for $F(0, 0)$) depends on the score at another position in $F$. In a second matrix, $T$, draw an arrow from the cell that you're currently defining the score for in $F$ to the cell whose score it depends on. If the score depends on the cell above, you'd draw an up arrow (↑). If the score depends on the cell to the left, you'd draw a left arrow (←). If the score doesn't depend on any other cell, indicate that with a bullet (•).
+As an exercise, try computing the values for the cells in the first four rows in column zero and the first four columns in row zero of $F$. What you'll notice is that the score that you compute for most of the cells (all of them except for $F(0, 0)$) depends on the score at another position in $F$. In a second matrix, $T$, draw an arrow from the cell that you're currently defining the score for in $F$ to the cell whose score it depends on. If the score depends on the cell above, you'd draw an up arrow (↑). If the score depends on the cell to the left, you'd draw a left arrow (←). If the score doesn't depend on any other cell (you should have only one of these), indicate that with a bullet (•).
 
 Initializing $F$ would result in the following.
 
@@ -332,7 +332,7 @@ Initializing $T$ would result in the following.
 >>> HTML(show_T(seq1, seq2, T))
 ```
 
-Next, we'll compute the scores for all of the other cells in $F$, starting at position $(1, 1)$. In Needleman-Wunsch alignment, the score $F$ for cell $(i, j)$ (when $i > 0$ and $j > 0$) is computed as the maximum of three possible values. $s$ refers to the substitution matrix, $c_i$ and $c_j$ refers to characters in `seq1` and `seq2`.
+Next, we'll compute the scores for all of the other cells in $F$, starting at position $(1, 1)$. In Needleman-Wunsch alignment, the score $F$ for cell $(i, j)$ (when $i > 0$ and $j > 0$) is computed as the maximum of three possible values. $s$ refers to the substitution matrix, and $c_i$ and $c_j$ refer to characters in `seq1` and `seq2`.
 
 $$
 F(i, j) = max \left(\begin{align}
@@ -344,9 +344,9 @@ $$
 
  Describing the scoring function in English, we score a cell with the maximum of three values: either the value of the cell up and to the left plus the score for the substitution taking place in the current cell (which you find by looking up the substitution in the substitution matrix); the value of the cell above minus the gap penalty; or the value of the cell to the left minus the gap penalty. In this way, you're determining whether the best (highest) score is obtained by inserting a gap in sequence 1 (corresponding to $F(i-1, j) - d$), inserting a gap in sequence 2 (corresponding to $F(i, j-1) - d$), or aligning the characters in sequence 1 and sequence 2 (corresponding to $F(i-1, j-1) + s(c_i, c_j)$).
 
-As an exercise, fill in the values of cells $(1, 1)$, $(1, 2)$, and $(2, 1)$ in $F$ and $T$. Remember to insert arrows indicating which cell each score was derived from as you fill in the matrix. If you're deriving the score for a given cell in $F$ from the cell diagonally up and to the left, you should put a diagonal arrow in $T$ (↖).
+As an exercise, fill in the values of cells $(1, 1)$, $(1, 2)$, and $(2, 1)$ in $F$ and $T$. Remember to insert arrows in $T$ indicating which cell each score was derived from as you fill in the matrix. If you're deriving the score for a given cell in $F$ from the cell diagonally up and to the left, you should put a diagonal arrow in $T$ (↖).
 
-Notice the situation that you encounter when computing the value for $F(2, 1)$. Which arrow do you draw there? Keep this question in mind, and think about how it might affect your final result.
+Notice the situation that you encounter when computing the value for $F(2, 1)$. Which arrow do you draw there? Keep this question in mind, and think about how it might impact your final result.
 
 The function in the next cell generates the dynamic programming and traceback matrices for us. You should review this code to understand exactly how it's working.
 
@@ -357,7 +357,7 @@ The function in the next cell generates the dynamic programming and traceback ma
 >>> %psource _compute_score_and_traceback_matrices
 ```
 
-You can now apply this function to `seq1` and `seq2` to compute the dynamic programming and traceback matrices. Based on the arrows in your traceback matrix, what do you think the four different values used in this traceback matrix represent?
+You can now apply this function to `seq1` and `seq2` to compute the dynamic programming and traceback matrices.
 
 ```python
 >>> from skbio.sequence import Protein
@@ -378,11 +378,12 @@ You can now apply this function to `seq1` and `seq2` to compute the dynamic prog
 
 #### Step 3: Transcribe the alignment. <link src="AFAVLt"/>
 
-We can now use the $F$ and $T$ to transcribe and score the alignment of sequences 1 and 2. To do this, we start at the bottom-right of the matrices and follow the arrows to cell $(0, 0)$.
+We can now use $F$ and $T$ to transcribe and score the alignment of sequences 1 and 2. To do this, we start at the bottom-right of the matrices and follow the arrows to cell $(0, 0)$.
 
-* Every time we encounter a vertical arrow (represented by `|`), we consume a character from sequence 2 (the vertical sequence) and add a gap to sequence 1.
-* Every time we encounter a horizontal arrow (represented by `-`), we consume a character from sequence 1 (the horizontal sequence) and add a gap to sequence 2.
-* Every time we encounter a diagonal arrow (represented by `\`), we consume a character from sequence 1 and sequence 2.
+* Every time we encounter a vertical arrow, we consume a character from sequence 2 (the vertical sequence) and add a gap to sequence 1.
+* Every time we encounter a horizontal arrow, we consume a character from sequence 1 (the horizontal sequence) and add a gap to sequence 2.
+* Every time we encounter a diagonal arrow, we consume a character from sequence 1 and sequence 2.
+* When we encounter a bullet, we've reached the end of the alignment so we're done.
 
 As you transcribe the alignment, write sequence 1 on top of sequence 2, and work from right to left (since you are working backwards through the matrix).
 
@@ -427,17 +428,19 @@ Here's the scikit-bio implementation of Needleman-Wunsch alignment. How is its A
 
 ### A note on computing $F$ and $T$ <link src="QRabtd"/>
 
-Some applications of global alignment use both the alignment score and the aligned sequences, and some only use one or the other. As a result, some applications optimize this process by only keeping track of the information they need. For example, if you're working on a database search algorithm, you might only care about the score of the alignment. In this case you might not need to keep track of $T$, and could reduce the amount of memory that your software requires by not keeping track of it. Since we're generally defining this algorithm right now, we'll keep track of all of the information we need to get the aligned sequences and the corresponding score for the alignment.
+Some applications of global alignment use both the alignment score and the aligned sequences, and some only use one or the other. As a result, some applications optimize this process by only keeping track of the information they need. For example, if you're working on a database search algorithm, you might only care about the score of the alignment. In this case you might not need to keep track of $T$, and could reduce the amount of memory that your software requires by not keeping track of it.
 
 ## Global versus local alignment <link src='c80f21'/>
 
-The alignment we just constructed is a *global alignment*, meaning we align both sequences from the beginning through the end. This has some important specific applications: for example, if we have two full-length protein sequences, and we have a crystal structure for one of them, we may want to have a direct mapping between all positions in both sequences.
+The alignment we just constructed is a *global alignment*, meaning we align both sequences from their beginning through their end. This has some important specific applications: for example, if we have two full-length protein sequences, and we have a crystal structure for one of them, we can use global alignment to give us a direct mapping between all positions in both sequences.
 
 This is in contrast to local alignment, where we have a pair of sequences that we suspect may partially overlap each other, and we want to know what the best possible alignment of all or part of one sequence is with all or part of the other sequences. Perhaps the most widely used application of this is in sequence database searching (e.g., [the BLAST web server](http://blast.ncbi.nlm.nih.gov/Blast.cgi)), where we have a query sequence and we want to find the closest match (or matches) in a reference database containing many different gene sequences. In this case, the whole reference database could be represented as a single sequence, as we could perform a local alignment against it to find the region that contains the highest scoring match.
 
+Global and local alignment are both used for different applications. We'll next look at an algorithm for computing local alignments. You'll see that this is very similar to Needleman-Wunsch alignment.
+
 ## Smith-Waterman local sequence alignment <link src='c9656e'/>
 
-**PICK UP HERE** The formatting code needs to be cleaned up - should have a format_traceback to encode the ints as the corresponding arrows. The padding is also messed up in both F and T, so the tracing back by hand currently wouldn't work.
+**PICK UP HERE**
 
 The Smith-Waterman algorithm is used for performing pairwise local alignment. It is nearly identical to Needleman-Wunsch, with three small important differences.
 
