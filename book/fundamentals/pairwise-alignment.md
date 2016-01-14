@@ -363,8 +363,8 @@ You can now apply this function to `seq1` and `seq2` to compute the dynamic prog
 >>> from skbio.sequence import Protein
 >>> from skbio.alignment import TabularMSA
 ...
->>> seq1 = TabularMSA([Protein("HEAGAWGHEE")])
->>> seq2 = TabularMSA([Protein("PAWHEAE")])
+>>> seq1 = TabularMSA([seq1])
+>>> seq2 = TabularMSA([seq2])
 ...
 >>> nw_matrix, traceback_matrix = _compute_score_and_traceback_matrices(
 ...     seq1, seq2, 8, 8, blosum50)
@@ -440,11 +440,38 @@ Global and local alignment are both used for different applications. We'll next 
 
 ## Smith-Waterman local sequence alignment <link src='c9656e'/>
 
-**PICK UP HERE**
+The algorithm that is most commonly used for performing local alignment was originally published by [Temple F. Smith and Michael S. Waterman in 1981](https://www.ncbi.nlm.nih.gov/pubmed/7265238), and is therefore referred to as Smith-Waterman alignment. In terms of the resulting alignment, the difference between Smith-Waterman and Needleman-Wuncsh is that the aligned sequences in Smith-Waterman can be a subsequences of one or both of the unaligned (input) sequences. In Needleman-Wunsch alignment, the aligned sequences will be full-length with respect to the unaligned sequences.
 
-The Smith-Waterman algorithm is used for performing pairwise local alignment. It is nearly identical to Needleman-Wunsch, with three small important differences.
+Algorithmically, Smith-Waterman is nearly identical to Needleman-Wunsch, with three small important differences. We'll now work through Smith-Waterman alignment following the same steps that we followed for Needleman-Wunsch, and look at the differences as we go. We'll redefine our two sequences to align here. As you did for Needleman-Wunsch, after working through this example with these sequences, come back here and experiment with different sequences.
 
-First, initialization is easier:
+```python
+>>> from skbio import Protein
+>>> seq1 = Protein("HEAGAWGHEE")
+>>> seq2 = Protein("PAWHEAE")
+```
+
+### Step 1: Create blank matrices.
+
+$F$ and $T$ are created in the same way for Smith-Waterman as for Needleman-Wunsch so prior to initialization, $F$ and $T$ would again look like the following.
+
+```python
+>>> num_rows = len(seq2) + 1
+>>> num_cols = len(seq1) + 1
+>>> F = np.zeros(shape=(num_rows, num_cols), dtype=np.int)
+>>> HTML(show_F(seq1, seq2, F))
+```
+
+```python
+>>> from iab.algorithms import show_T
+...
+>>> T = np.full(shape=(num_rows, num_cols), fill_value=" ", dtype=np.str)
+>>> HTML(show_T(seq1, seq2, T))
+```
+
+### Step 2: Compute $F$ and $T$.
+
+Computing $F$ and $T$ is slightly different for Smith-Waterman than for Needleman-Wunsch. First, initialization is easier. The following formulas are used for computing the first row and column of $F$.
+
 $$
 \begin{align}
 & F(0, 0) = 0\\
@@ -453,32 +480,34 @@ $$
 \end{align}
 $$
 
-```python
->>> data = []
->>> # This is a hack: to pad the matrix with an
-... # extra row and column at the beginning I'm just prepending a
-... # space to each sequence. Need to improve handling of that.
-... padded_seq1 = " " + str(seq1[0])
->>> padded_seq2 = " " + str(seq2[0])
-...
->>> for p in padded_seq2:
-...     data.append(['-']*len(padded_seq1))
-...
->>> HTML(show_table(padded_seq1, padded_seq2, data))
-```
+Initializing $F$ would therefore result in the following.
 
 ```python
->>> data[0][0] = 0
->>> for i in range(1,len(padded_seq2)):
-...     data[i][0] = 0
+>>> d = 8
+>>> F[0][0] = 0
+>>> for i in range(1, num_rows):
+...     F[i][0] = 0
 ...
->>> for j in range(1,len(padded_seq1)):
-...     data[0][j] = 0
+>>> for j in range(1, num_cols):
+...     F[0][j] = 0
 ...
->>> HTML(show_table(padded_seq1, padded_seq2, data))
+>>> HTML(show_F(seq1, seq2, F))
 ```
 
-Next, there is one additional term in the scoring function:
+Because none of the values that were just added to $F$ depend on any other cells in $F$, initializing $T$ would result in the following.
+
+```python
+>>> T[0][0] = "•"
+>>> for i in range(1, num_rows):
+...     T[i][0] = "•"
+...
+>>> for j in range(1, num_cols):
+...     T[0][j] = "•"
+...
+>>> HTML(show_T(seq1, seq2, T))
+```
+
+We'd next want to compute the remaining cells in $F$ and $T$. This proceeds exactly the same as for Needleman-Wunsch, except that there is one additional term in the scoring function:
 
 $$
 F(i, j) = max \left(\begin{align}
@@ -489,28 +518,29 @@ F(i, j) = max \left(\begin{align}
 \end{align}\right)
 $$
 
-```python
->>> %psource _compute_score_and_traceback_matrices
-```
+Go back to the final $F$ matrix that you computed with Needleman-Wunsch earlier in the chapter. How would this new scoring term change that matrix? As you did before, compute the values for the first few cells of $F$ and $T$, this time using the Smith-Waterman scoring function. Remember that when you add a score to $F$ that does not depend on other cells in $F$ (which in this case corresponds to $0$ being the max value from the scoring function), you should add a bullet (•) to the corresponding cell in $T$.
+
+We'll use the same function that we used above to compute the full $F$ and $T$ matrices. To indicate that we now want to compute this using Smith-Waterman, we pass some additional parameters.
 
 ```python
 >>> from skbio.alignment._pairwise import _init_matrices_sw
+>>> seq1 = TabularMSA([seq1])
+>>> seq2 = TabularMSA([seq2])
 ...
->>> sw_matrix, traceback_matrix = \
-...     _compute_score_and_traceback_matrices(seq1, seq2, 8, 8, blosum50, new_alignment_score=0.0, init_matrices_f=_init_matrices_sw)
+>>> sw_matrix, traceback_matrix = _compute_score_and_traceback_matrices(
+...     seq1, seq2, 8, 8, blosum50, new_alignment_score=0.0,
+...     init_matrices_f=_init_matrices_sw)
 ...
->>> print(format_dynamic_programming_matrix(seq1, seq2, sw_matrix, 7))
+>>> HTML(show_F(seq1[0], seq2[0], sw_matrix))
 ```
 
 ```python
->>> print(format_traceback_matrix(seq1, seq2, traceback_matrix, cell_width=5))
+>>> HTML(show_T(seq1[0], seq2[0], traceback_matrix))
 ```
 
-And finally, during the traceback step, you begin in the cell with the highest value, rather than the bottom right cell of the matrix.
+### Step 3: Transcribe the alignment.
 
-```python
->>> %psource _traceback
-```
+There is one small difference in the traceback step between Smith-Waterman and Needleman-Wunsch. You should now begin tracing back from the cell with the highest value in $F$, rather than the bottom right cell of the matrix. We find this cell directly in the code below. As before, the alignment terminates when we hit a bullet (•) character, but in contrast to Needleman-Wunsch alignment, this can happen anywhere in the matrix, not only in $F(0, 0)$.
 
 ```python
 >>> max_value = 0.0
@@ -528,6 +558,8 @@ And finally, during the traceback step, you begin in the cell with the highest v
 >>> print(score)
 ```
 
+### Automating Smith-Waterman alignment with Python
+
 Again, we can define a *convenience function*, which will allow us to provide the required input and just get our aligned sequences back.
 
 ```python
@@ -536,7 +568,7 @@ Again, we can define a *convenience function*, which will allow us to provide th
 >>> %psource local_pairwise_align
 ```
 
-And we can take the *convenience function* one step further, and wrap `sw_align` and `nw_align` up in a more general `align` function, which takes a boolean parameter (i.e., `True` or `False`) indicating where we want a local or global alignment.
+And we can take the *convenience function* one step further, and wrap `local_pairwise_align` and `global_pairwise_align` up in a more general `align` function, which takes a boolean parameter (i.e., `True` or `False`) indicating where we want a local or global alignment.
 
 ```python
 >>> def align(sequence1, sequence2, gap_penalty, substitution_matrix, local):
@@ -560,9 +592,11 @@ And we can take the *convenience function* one step further, and wrap `sw_align`
 >>> print(score)
 ```
 
-So there you have it: the basics of pairwise sequence alignment, which is easily the most fundamental algorithm in bioinformatics.
+This was a lot of complicated material, so congratulations on making it this far. If you feel comfortable with everything we just went through, you now understand the basics of pairwise alignment, which is easily the most fundamental algorithm in bioinformatics. If you're not feeling totally comfortable with all of this, go back and re-read it. This time spend more time working out the individual steps with a pencil and paper by computing more cells in $F$ and $T$ as you go, and performing the traceback step manually. And don't get discouraged: we can describe the steps that need to be carried out to a computer with just a few lines of code, so it's nothing magical. Computing a pairwise alignment just involves the systematic application of a few well defined steps. You *will* be able to carry out those steps (a metric of your understanding of the algorithm) as long as you put a bit of effort into performing those steps.
 
-### Smith-Waterman local alignment with affine gap scoring <link src='976169'/>
+## Affine gap scoring <link src='976169'/>
+
+**PICK UP HERE**
 
 The second limitation of the our simple alignment algorithm, and one that is also present in our version of Smith-Waterman as implemented above, is that all gaps are scored equally whether they represent the opening of a new insertion/deletion, or the extension of an existing insertion/deletion. This isn't ideal based on what we know about how insertion/deletion events occur (see [this discussion of replication slippage](http://www.ncbi.nlm.nih.gov/books/NBK21114/)). Instead, **we might want to incur a large penalty for opening a gap, but a smaller penalty for extending a gap**. To do this, **we need to make two small changes to our scoring scheme**. When we compute the score for a gap, we should incur a *gap open penalty* if the previous max score was derived from inserting a gap character in the same sequence. If we represent our traceback matrix as $T$, our gap open penalty as $d^0$, and our gap extend penalty as $d^e$, our scoring scheme would look like the following:
 
