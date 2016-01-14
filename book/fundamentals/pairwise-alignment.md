@@ -558,7 +558,7 @@ There is one small difference in the traceback step between Smith-Waterman and N
 >>> print(score)
 ```
 
-### Automating Smith-Waterman alignment with Python
+### Automating Smith-Waterman alignment with Python <link src="zX1OjN"/>
 
 Again, we can define a *convenience function*, which will allow us to provide the required input and just get our aligned sequences back.
 
@@ -594,28 +594,24 @@ And we can take the *convenience function* one step further, and wrap `local_pai
 
 This was a lot of complicated material, so congratulations on making it this far. If you feel comfortable with everything we just went through, you now understand the basics of pairwise alignment, which is easily the most fundamental algorithm in bioinformatics. If you're not feeling totally comfortable with all of this, go back and re-read it. This time spend more time working out the individual steps with a pencil and paper by computing more cells in $F$ and $T$ as you go, and performing the traceback step manually. And don't get discouraged: we can describe the steps that need to be carried out to a computer with just a few lines of code, so it's nothing magical. Computing a pairwise alignment just involves the systematic application of a few well defined steps. You *will* be able to carry out those steps (a metric of your understanding of the algorithm) as long as you put a bit of effort into performing those steps.
 
-## Affine gap scoring <link src='976169'/>
+## Differential scoring of gaps <link src='976169'/>
 
-**PICK UP HERE**
+The second limitation of the our simple alignment algorithm (which we discussed [way back at the beginning of this chapter](alias://jzshiO)), and one that is also present in the versions of Needleman-Wunsch and Smith-Waterman implemented above, is that all gaps are scored equally whether they represent the opening of a new insertion/deletion, or the extension of an existing insertion/deletion. This isn't ideal based on what we know about how insertion/deletion events occur (see [this discussion of replication slippage](http://www.ncbi.nlm.nih.gov/books/NBK21114/) if you're not familiar with the biological process that is thought to lead to small insertions as deletions). Instead, we might want to incur a large penalty for opening a gap, but a smaller penalty for extending an existing gap. This is referred to as *affine gap scoring*.
 
-The second limitation of the our simple alignment algorithm, and one that is also present in our version of Smith-Waterman as implemented above, is that all gaps are scored equally whether they represent the opening of a new insertion/deletion, or the extension of an existing insertion/deletion. This isn't ideal based on what we know about how insertion/deletion events occur (see [this discussion of replication slippage](http://www.ncbi.nlm.nih.gov/books/NBK21114/)). Instead, **we might want to incur a large penalty for opening a gap, but a smaller penalty for extending a gap**. To do this, **we need to make two small changes to our scoring scheme**. When we compute the score for a gap, we should incur a *gap open penalty* if the previous max score was derived from inserting a gap character in the same sequence. If we represent our traceback matrix as $T$, our gap open penalty as $d^0$, and our gap extend penalty as $d^e$, our scoring scheme would look like the following:
+To score gap extensions differently from gap creations (or gap opens), we need to modify the terms corresponding to the addition of gaps in our scoring function. When we compute the score corresponding to a gap in our alignment (i.e., where we'd insert either a ↑ or a ← in $T$), we should incur a *gap extension penalty* if the value in $T$ that the new arrow will point to is the same type of arrow. Otherwise, we should incur the *gap open penalty*. If we represent our gap open penalty as $d^0$, and our gap extend penalty as $d^e$, our scoring scheme would look now like the following:
 
 $$
 F(i, j) = max \left(\begin{align}
 & 0\\
 & F(i-1, j-1) + s(c_i, c_j)\\
-& \left\{\begin{array}{l l} F(i-1, j) - d^e \quad \text{if $T(i-1, j)$ is gap}\\ F(i-1, j) - d^o \quad \text{if $T(i-1, j)$ is not gap} \end{array}  \right\} \\
-& \left\{\begin{array}{l l} F(i, j-1) - d^e \quad \text{if $T(i, j-1)$ is gap}\\ F(i, j-1) - d^o \quad \text{if $T(i, j-1)$ is not gap} \end{array}  \right\}
+& \left\{\begin{array}{l l} F(i-1, j) - d^e \quad \text{if $T(i-1, j)$ is ↑}\\ F(i-1, j) - d^o \quad \text{if $T(i-1, j)$ is not ↑} \end{array}  \right\} \\
+& \left\{\begin{array}{l l} F(i, j-1) - d^e \quad \text{if $T(i, j-1)$ is ←}\\ F(i, j-1) - d^o \quad \text{if $T(i, j-1)$ is not ←} \end{array}  \right\}
  \end{align}\right)
 $$
 
-Notice how we only use the gap extend penalty if the previous max score resulted from a gap in the same sequence (which we know by looking in the traceback matrix) because it represents the continuation of an existing gap in that sequence. This is why we check for a specific type of gap in $T$, rather than checking whether $T$ `!= '\'`.
+Notice how we only use the gap extend penalty if the previous max score resulted from a gap in the same sequence because it represents the continuation of an existing gap in that sequence. We know which sequence a gap is being introduced in by the characters in the traceback matrix: ↑ always implies a gap in the sequence on the horizontal axis of $F$ and $T$, and ← always implies a gap in the sequence on the vertical axis of $F$ and $T$.
 
-Here is our ``_compute_score_and_traceback_matrices`` function again for reference.
-
-```python
->>> %psource _compute_score_and_traceback_matrices
-```
+And here's a quick quiz: is this a Smith-Waterman or Needleman-Wunsch scoring function? How do you know?
 
 Take a look at how the scores differ with these additions.
 
@@ -632,10 +628,12 @@ Take a look at how the scores differ with these additions.
 >>> print(format_traceback_matrix(seq1, seq2, traceback_matrix))
 ```
 
+While we just looked at Smith-Waterman alignment with affine gap scoring, Needleman-Wunsh is adapted in the same way for affine gap scoring.
+
 The convenience functions we worked with above all take ``gap_open_penalty`` and ``gap_extend_penalty``, so we can use those to explore sequence alignment with affine gap scoring. Here I define `seq1` to be slightly different than what I have above. Notice how we get different alignments when we use affine gap penalties (i.e., ``gap_extend_penalty`` is not equal to ``gap_open_penalty``) versus equal gap open and gap extend penalties.
 
 ```python
->>> help(local_pairwise_align)
+>>> help(global_pairwise_align)
 ```
 
 ```python
@@ -656,6 +654,8 @@ The convenience functions we worked with above all take ``gap_open_penalty`` and
 ```
 
 ## How long does pairwise sequence alignment take? <link src='ac446d'/>
+
+**PICK UP HERE**
 
 The focus of this book is *applied* bioinformatics, and **some of the practical considerations we need to think about when developing applications is their runtime and memory requirements**. The third issue we mentioned above is general to the problem of sequence alignment: runtime can be problematic. Over the next few cells we'll explore the runtime of sequence alignment.
 
