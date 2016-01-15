@@ -450,7 +450,7 @@ Algorithmically, Smith-Waterman is nearly identical to Needleman-Wunsch, with th
 >>> seq2 = Protein("PAWHEAE")
 ```
 
-### Step 1: Create blank matrices.
+### Step 1: Create blank matrices. <link src="Ew2bdO"/>
 
 $F$ and $T$ are created in the same way for Smith-Waterman as for Needleman-Wunsch so prior to initialization, $F$ and $T$ would again look like the following.
 
@@ -468,7 +468,7 @@ $F$ and $T$ are created in the same way for Smith-Waterman as for Needleman-Wuns
 >>> HTML(show_T(seq1, seq2, T))
 ```
 
-### Step 2: Compute $F$ and $T$.
+### Step 2: Compute $F$ and $T$. <link src="qHCRuJ"/>
 
 Computing $F$ and $T$ is slightly different for Smith-Waterman than for Needleman-Wunsch. First, initialization is easier. The following formulas are used for computing the first row and column of $F$.
 
@@ -538,7 +538,7 @@ We'll use the same function that we used above to compute the full $F$ and $T$ m
 >>> HTML(show_T(seq1[0], seq2[0], traceback_matrix))
 ```
 
-### Step 3: Transcribe the alignment.
+### Step 3: Transcribe the alignment. <link src="Yf5dZy"/>
 
 There is one small difference in the traceback step between Smith-Waterman and Needleman-Wunsch. You should now begin tracing back from the cell with the highest value in $F$, rather than the bottom right cell of the matrix. We find this cell directly in the code below. As before, the alignment terminates when we hit a bullet (•) character, but in contrast to Needleman-Wunsch alignment, this can happen anywhere in the matrix, not only in $F(0, 0)$.
 
@@ -704,7 +704,7 @@ If you were truly evaluating a new heuristic, you'd want to compare many differe
 
 ### Analyzing Smith-Waterman run time as a function of sequence length <link src="1gIcuj"/>
 
-Next, let's apply this to pairs of sequences where we vary the length. We don't really care what the sequences are here, so we'll use [numpy's ``random`` module](http://docs.scipy.org/doc/numpy/reference/routines.random.html) to get random pairs of sequences. 
+Next, let's apply this to pairs of sequences where we vary the length. We don't really care what the sequences are here, so we'll use [numpy's ``random`` module](http://docs.scipy.org/doc/numpy/reference/routines.random.html) to get random pairs of sequences.
 
 Let's first define a function to generate a random sequence of a specific length and type of biological sequence. Take a minute to understand that code, as we'll do this a few times throughout the text.
 
@@ -761,7 +761,7 @@ That's probably to be expected, but what we care about now is *how* the runtimes
 * linear: $runtime \approx constant \times sequence\ length$
 * quadratic: $runtime \approx constant \times {sequence\ length}^2$
 * exponential: $runtime \approx {constant}^{sequence\ length}$
-* or something else? 
+* or something else?
 
 Ultimately, we'd like to get an idea of how useful alignment would be in practice if our sequences were much longer, and specifically if sequence length might ultimately make sequence alignment too slow. Plotting these runtimes can help us to figure this out.
 
@@ -773,9 +773,9 @@ Ultimately, we'd like to get an idea of how useful alignment would be in practic
 >>> ax
 ```
 
-This looks to be a [quadratic relationship](http://en.wikipedia.org/wiki/Quadratic_time): the increase in runtime is proportional to the square of sequence length. If you think back to the computation of $F$ and $T$, this makes sense. If our sequences are each five bases long, our matrices will have five rows and five colums, so $5 \times 5 = 25$ cells that need to be filled in by performing some numeric computations. If we double our sequences lengths to ten, our matrices will have ten rows and ten columns, so $10 \times 10 = 100$ cells that need to be filled in. Because each of the numeric computations take roughly the same amount of time (you can take that on faith, or prove it to yourself using ``timeit``), when we double our sequence length we have four times as many cells to compute. 
+This looks to be a [quadratic relationship](http://en.wikipedia.org/wiki/Quadratic_time): the increase in runtime is proportional to the square of sequence length. If you think back to the computation of $F$ and $T$, this makes sense. If our sequences are each five bases long, our matrices will have five rows and five colums, so $5 \times 5 = 25$ cells that need to be filled in by performing some numeric computations. If we double our sequences lengths to ten, our matrices will have ten rows and ten columns, so $10 \times 10 = 100$ cells that need to be filled in. Because each of the numeric computations take roughly the same amount of time (you can take that on faith, or prove it to yourself using ``timeit``), when we double our sequence length we have four times as many cells to compute.
 
-When runtime scales quadratically, that can be a practical limitation for algorithm. We'd much prefer to see a linear relationship (i.e., if we double our sequence length, our runtime doubles). But this is an inherent issue with pairwise alignment, so it's one that we need to deal with. 
+When runtime scales quadratically, that can be a practical limitation for algorithm. We'd much prefer to see a linear relationship (i.e., if we double our sequence length, our runtime doubles). But this is an inherent issue with pairwise alignment, so it's one that we need to deal with.
 
 One question you might have is whether developing a version of this algorithm which can run in parallel on multiple processors would be an effective way to make it scale to larger data sets. In the next cell, we look and how the plot would change if we could run the alignment process over four processors.
 
