@@ -621,20 +621,22 @@ Take a look at how the scores differ with these additions.
 ...
 >>> sw_matrix, traceback_matrix = _compute_score_and_traceback_matrices(seq1, seq2, 8, 1, blosum50)
 ...
->>> print(format_dynamic_programming_matrix(seq1, seq2, sw_matrix))
+>>> HTML(show_F(seq1[0], seq2[0], sw_matrix))
 ```
 
 ```python
->>> print(format_traceback_matrix(seq1, seq2, traceback_matrix))
+>>> HTML(show_T(seq1[0], seq2[0], traceback_matrix))
 ```
 
 While we just looked at Smith-Waterman alignment with affine gap scoring, Needleman-Wunsh is adapted in the same way for affine gap scoring.
 
-The convenience functions we worked with above all take ``gap_open_penalty`` and ``gap_extend_penalty``, so we can use those to explore sequence alignment with affine gap scoring. Here I define `seq1` to be slightly different than what I have above. Notice how we get different alignments when we use affine gap penalties (i.e., ``gap_extend_penalty`` is not equal to ``gap_open_penalty``) versus equal gap open and gap extend penalties.
+The convenience functions we worked with above all take ``gap_open_penalty`` and ``gap_extend_penalty``, which we can see by calling ``help`` on the function. So, we can use those functions to explore sequence alignment with affine gap scoring.
 
 ```python
 >>> help(global_pairwise_align)
 ```
+
+Here I define `seq1` to be slightly different than what I have above. Notice how we get different alignments when we use affine gap penalties (i.e., ``gap_extend_penalty`` is not equal to ``gap_open_penalty``) versus equal gap open and gap extend penalties.
 
 ```python
 >>> seq1 = TabularMSA([Protein("HEAGAWGFHEE")])
@@ -653,27 +655,34 @@ The convenience functions we worked with above all take ``gap_open_penalty`` and
 >>> print(score)
 ```
 
+As a final exercise in this section, try to adapt the commands above to compute local alignments with affine gap scoring. You won't need to write any code to do this, but rather you can adapt some of the commands that we've already used above. Don't forget about the ``help`` function - that's essential for learning how to use a function.
+
 ## How long does pairwise sequence alignment take? <link src='ac446d'/>
 
-**PICK UP HERE**
+The focus of this book is *applied* bioinformatics, and two of the practical considerations we need to think about when developing algorithms and applications is how long they'll take to run, and how much system memory (or RAM) they'll require. Both of these can be limiting factors for applications that require sequence alignments, so a lot of effort is spent understanding how to optimize sequence alignment.
 
-The focus of this book is *applied* bioinformatics, and **some of the practical considerations we need to think about when developing applications is their runtime and memory requirements**. The third issue we mentioned above is general to the problem of sequence alignment: runtime can be problematic. Over the next few cells we'll explore the runtime of sequence alignment.
+We just worked through a few algorithms for pairwise sequence alignment, and ran some toy examples based on short sequences. What if we wanted to scale this up to align much longer sequences, or to align relatively short sequences against a large database? In this section we'll explore the runtime of sequence alignment.
 
-We just worked through a few algorithms for pairwise sequence alignment, and used some toy examples with short sequences. What if we wanted to scale this up to align much longer sequences, or to align relatively short sequences against a large database?
-
-To explore runtime, let's use the IPython [magic function](http://ipython.org/ipython-doc/dev/interactive/tutorial.html#magic-functions) called ``timeit``, which runs a given command many times and reports the average time it takes to fun. We'll use this to see how long global alignment takes to run. Note that we don't care about getting the actual alignment back anymore, we just want the runtime in seconds.
+To explore runtime, let's use the IPython [magic function](http://ipython.org/ipython-doc/dev/interactive/tutorial.html#magic-functions) called ``timeit``, which runs a given command many times and reports the average time it takes to run. We'll use this to see how long local alignment takes to run. Note that we don't care about getting the actual alignment back anymore, we just want the runtime in seconds. Here we're going to use a faster version of pairwise alignment that's implemented in scikit-bio, to facilitate testing with more alignments.
 
 ```python
->>> %timeit global_pairwise_align(seq1, seq2, 8, 1, blosum50)
+>>> from skbio.alignment import local_pairwise_align_ssw
+...
+>>> seq1 = DNA("GGTCTTCGCTAGGCTTTCATCGGGTTCGGCATCTACTCTGAGTTACTACG")
+>>> seq2 = DNA("GGTCTTCAGGCTTTCATCGGGAACGGCATCTCTGAGTTACTACC")
+...
+>>> %timeit local_pairwise_align_ssw(seq1, seq2)
 ```
 
-Next, let's apply this to pairs of sequences where we vary the length. We don't really care what the sequences are here, so we'll use python's ``random`` module to get random pairs of sequences. Let's play with that first to see how it can be applied to generate random sequences, as that's generally useful functionality.
+Next, let's apply this to pairs of sequences where we vary the length. We don't really care what the sequences are here, so we'll use python's ``random`` module to get random pairs of sequences. Let's play with that first to see how it can be applied to generate random sequences, as we'll do that a few times throughout the text.
 
 ```python
 >>> from random import choice
 ...
 >>> def random_sequence(moltype, length):
 ...     result = []
+...     # Our "alphabet" here will consist of the standard characters in a
+...     # molecules alphabet.
 ...     alphabet = list(moltype.nondegenerate_chars)
 ...     for e in range(length):
 ...         result.append(choice(alphabet))
@@ -687,11 +696,10 @@ Next, let's apply this to pairs of sequences where we vary the length. We don't 
 >>> print(random_sequence(DNA, 50))
 ```
 
-Next, let's define a loop where we align, randomly, pairs of sequences of increasing length, and compile the time it took to align the sequences. Here we're going to use a faster version of pairwise alignment that's implemented in scikit-bio, to facilitate testing with more alignments.
+Now we'll define a loop where we align random pairs of sequences of increasing length, and compile the time it took to align the sequences.
 
 ```python
 >>> import timeit
->>> from skbio.alignment import local_pairwise_align_ssw
 ...
 >>> times = []
 >>> seq_lengths = range(50,100000,20000)
@@ -707,14 +715,14 @@ Next, let's define a loop where we align, randomly, pairs of sequences of increa
 ...     times.append(min(timeit.Timer(get_time_function(seq_length)).repeat(repeat=3, number=3)))
 ```
 
-If we look at the run times, we can see that they are increasing with increasing sequence lengths.
+If we look at the run times, we can see that they are increasing with increasing sequence lengths:
 
 ```python
 >>> for seq_length, t in zip(seq_lengths, times):
 ...     print("%d\t%1.4f sec" % (seq_length, t))
 ```
 
-That's expected, but what we care about is how they're increasing. Can we use this information to project how well this alignment would work if our sequences were much longer? This is where plotting becomes useful.
+That's probably to be expected, but what we care about is how the runtimes are increasing as a function of sequence length. Ultimately, we'd like to get an idea of how useful alignment would be in practice if our sequences were much longer, and specifically if sequence length might ultimately make sequence alignment too slow. This is where plotting becomes useful.
 
 ```python
 >>> import matplotlib.pyplot as plt
@@ -723,6 +731,10 @@ That's expected, but what we care about is how they're increasing. Can we use th
 >>> plt.xlabel('Sequence Length')
 >>> plt.ylabel('Runtime (s)')
 ```
+
+**PICK UP HERE**
+
+These are pretty long sequences that we're working with here, and the runtime is still pretty reasonable (only a few seconds for DNA sequences with 80,000 bases), so that suggests that the alignment algorithms we worked with here should scale ok for aligning pairs of sequences. However, we're often interested in doing more than just pairwise alignment. For example, we may want to align many sequences to each other (which we'll explore in the Multiple Sequence Alignment chapter), or we may want to perform many pairwise alignments (which we'll explore in the Database Searching chapter). For these applications, the shape of this
 
 **One good question is whether developing a version of this algorithm which can run in parallel would be an effective way to make it scale to larger data sets.** In the next cell, we look and how the plot would change if we could run the alignment process over four processors. This would effectively make each alignment run four times as fast (so each runtime would be divided by four) but it doesn't solve our scalability problem.
 
