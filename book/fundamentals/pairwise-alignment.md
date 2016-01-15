@@ -663,21 +663,53 @@ The focus of this book is *applied* bioinformatics, and two of the practical con
 
 We just worked through a few algorithms for pairwise sequence alignment, and ran some toy examples based on short sequences. What if we wanted to scale this up to align much longer sequences, or to align relatively short sequences against a large database? In this section we'll explore the runtime of sequence alignment.
 
-To explore runtime, let's use the IPython [magic function](http://ipython.org/ipython-doc/dev/interactive/tutorial.html#magic-functions) called ``timeit``, which runs a given command many times and reports the average time it takes to run. We'll use this to see how long local alignment takes to run. Note that we don't care about getting the actual alignment back anymore, we just want the runtime in seconds. Here we're going to use a faster version of pairwise alignment that's implemented in scikit-bio, to facilitate testing with more alignments.
+### Comparing implementations of Smith-Waterman <link src="gFhVcP"/>
+
+To explore runtime, let's use the IPython [magic function](http://ipython.org/ipython-doc/dev/interactive/tutorial.html#magic-functions) called ``timeit``. This allows us to conveniently run a given command many times and reports the average time it takes to run. We'll use this to see how long local alignment takes to run. Note that we don't care about getting the actual alignment back for the moment. We just want the runtime in seconds.
+
+First, let's *benchmark* the runtime of the scikit-bio ``local_pairwise_align_nucleotide`` function. This specifically performs nucleotide alignment, and is implemented in Python.
 
 ```python
->>> from skbio.alignment import local_pairwise_align_ssw
+>>> from skbio.alignment import local_pairwise_align_nucleotide
 ...
 >>> seq1 = DNA("GGTCTTCGCTAGGCTTTCATCGGGTTCGGCATCTACTCTGAGTTACTACG")
 >>> seq2 = DNA("GGTCTTCAGGCTTTCATCGGGAACGGCATCTCTGAGTTACTACC")
 ...
+>>> %timeit local_pairwise_align_nucleotide(seq1, seq2, gap_open_penalty=8, gap_extend_penalty=1)
+```
+
+From interpreting these results, it looks like this is taking a few seconds to compute the alignment. When executing this, you may see a red warning box pop up. Read that warning message (a good practice, in general!). This is telling us that there is a faster implementation of Smith-Waterman alignment available in scikit-bio, so let's benchmark that one for comparison. We'll use the same two sequences for a direct comparison, of course.
+
+```python
+>>> from skbio.alignment import local_pairwise_align_ssw
+...
 >>> %timeit local_pairwise_align_ssw(seq1, seq2)
 ```
 
-Next, let's apply this to pairs of sequences where we vary the length. We don't really care what the sequences are here, so we'll use python's ``random`` module to get random pairs of sequences. Let's play with that first to see how it can be applied to generate random sequences, as we'll do that a few times throughout the text.
+We clearly see here that the ``local_pairwise_align_ssw`` function is much faster for performing alignment than ``local_pairwise_align_nucleotide`` (be sure to compare the units of each run time!). This is because ``local_pairwise_align_ssw`` is a much more efficent implementation of Smith-Waterman alignment, and it additionally applies some cool tricks that allow it to not compute all of the values in $F$ and $T$, but still get the right answer most of the time. This is referred to as a *heuristic* approach to optimizing an algorithm. We'll spend some time defining and comparing heuristics in the Database Searching chapter, but to get you to start thinking about it, what you care about is how much a heuristic reduces the run time of an algorithm, and how often it gives you the same answer as the full algorithm. Take a minute to compare the results of the two functions we just ran:
 
 ```python
->>> from random import choice
+>>> msa, _, _ = local_pairwise_align_nucleotide(seq1, seq2, gap_open_penalty=8, gap_extend_penalty=1)
+>>> msa
+```
+
+```python
+>>> msa, _, _ = local_pairwise_align_ssw(seq1, seq2)
+>>> msa
+```
+
+How do the results look?
+
+If you were truly evaluating a new heuristic, you'd want to compare many different inputs with the heuristic and the full algorithm.  For now, just take it from me that ``local_pairwise_align_ssw`` is generally producing comparable results to ``local_pairwise_align_nucleotide``, and you can clearly see that it's running much faster. So, we'll use that implementation in this text when we need to perform fast local alignments.
+
+### Analyzing Smith-Waterman run time as a function of sequence length <link src="1gIcuj"/>
+
+Next, let's apply this to pairs of sequences where we vary the length. We don't really care what the sequences are here, so we'll use [numpy's ``random`` module](http://docs.scipy.org/doc/numpy/reference/routines.random.html) to get random pairs of sequences. 
+
+Let's first define a function to generate a random sequence of a specific length and type of biological sequence. Take a minute to understand that code, as we'll do this a few times throughout the text.
+
+```python
+>>> import numpy as np
 ...
 >>> def random_sequence(moltype, length):
 ...     result = []
@@ -685,9 +717,11 @@ Next, let's apply this to pairs of sequences where we vary the length. We don't 
 ...     # molecules alphabet.
 ...     alphabet = list(moltype.nondegenerate_chars)
 ...     for e in range(length):
-...         result.append(choice(alphabet))
+...         result.append(np.random.choice(alphabet))
 ...     return moltype(''.join(result))
 ```
+
+Now let's apply that function a few times. Execute this cell a few times to confirm that the sequences we get back are in fact changing each time.
 
 ```python
 >>> print(random_sequence(DNA, 10))
@@ -696,13 +730,13 @@ Next, let's apply this to pairs of sequences where we vary the length. We don't 
 >>> print(random_sequence(DNA, 50))
 ```
 
-Now we'll define a loop where we align random pairs of sequences of increasing length, and compile the time it took to align the sequences.
+Now we'll define a loop where we align random pairs of sequences of increasing length, and compile the time it took to align the sequences. Here we want programmatic access to the runtimes, so we're going to use [Python's ``timeit`` module](https://docs.python.org/3/library/timeit.html) (which the ``%timeit`` magic function is based on).
 
 ```python
 >>> import timeit
 ...
 >>> times = []
->>> seq_lengths = range(50,100000,20000)
+>>> seq_lengths = range(5000,110000,20000)
 ...
 >>> def get_time_function(seq_length):
 ...     def f():
@@ -718,39 +752,45 @@ Now we'll define a loop where we align random pairs of sequences of increasing l
 If we look at the run times, we can see that they are increasing with increasing sequence lengths:
 
 ```python
->>> for seq_length, t in zip(seq_lengths, times):
-...     print("%d\t%1.4f sec" % (seq_length, t))
+>>> import pandas as pd
+>>> runtimes = pd.DataFrame(data=np.asarray([seq_lengths, times]).T, columns=["Sequence length", "Runtime (s)"] )
+>>> runtimes
 ```
 
-That's probably to be expected, but what we care about is how the runtimes are increasing as a function of sequence length. Ultimately, we'd like to get an idea of how useful alignment would be in practice if our sequences were much longer, and specifically if sequence length might ultimately make sequence alignment too slow. This is where plotting becomes useful.
+That's probably to be expected, but what we care about now is *how* the runtimes are increasing as a function of sequence length. Is the relationship between runtime and sequence length:
+* linear: $runtime \approx sequence\ length$
+* quadratic: $runtime \approx {sequence\ length}^2$
+* exponential: $runtime \approx {constant}^{sequence\ length}$
+* or something else? 
+
+Ultimately, we'd like to get an idea of how useful alignment would be in practice if our sequences were much longer, and specifically if sequence length might ultimately make sequence alignment too slow. Plotting these runtimes can help us to figure this out.
 
 ```python
->>> import matplotlib.pyplot as plt
-...
->>> plt.plot(seq_lengths, times)
->>> plt.xlabel('Sequence Length')
->>> plt.ylabel('Runtime (s)')
+>>> import seaborn as sns
+>>> ax = sns.regplot(x="Sequence length", y="Runtime (s)", data=runtimes, fit_reg=False)
+>>> ax.set_xlim(0)
+>>> ax.set_ylim(0)
 ```
 
-**PICK UP HERE**
+This looks to be a [quadratic relationship](http://en.wikipedia.org/wiki/Quadratic_time): the increase in runtime is proportional to the square of sequence length. If you think back to the computation of $F$ and $T$, this makes sense. If our sequences are each five bases long, our matrices will have five rows and five colums, so $5 \times 5 = 25$ cells that need to be filled in by performing some numeric computations. If we double our sequences lengths to ten, our matrices will have ten rows and ten columns, so $10 \times 10 = 100$ cells that need to be filled in. Because each of the numeric computations take roughly the same amount of time (you can take that on faith, or prove it to yourself using ``timeit``), when we double our sequence length we have four times as many cells to compute. 
 
-These are pretty long sequences that we're working with here, and the runtime is still pretty reasonable (only a few seconds for DNA sequences with 80,000 bases), so that suggests that the alignment algorithms we worked with here should scale ok for aligning pairs of sequences. However, we're often interested in doing more than just pairwise alignment. For example, we may want to align many sequences to each other (which we'll explore in the Multiple Sequence Alignment chapter), or we may want to perform many pairwise alignments (which we'll explore in the Database Searching chapter). For these applications, the shape of this
+When runtime scales quadratically, that can be a practical limitation for algorithm. We'd much prefer to see a linear relationship (i.e., if we double our sequence length, our runtime doubles). But this is an inherent issue with pairwise alignment, so it's one that we need to deal with. 
 
-**One good question is whether developing a version of this algorithm which can run in parallel would be an effective way to make it scale to larger data sets.** In the next cell, we look and how the plot would change if we could run the alignment process over four processors. This would effectively make each alignment run four times as fast (so each runtime would be divided by four) but it doesn't solve our scalability problem.
+One question you might have is whether developing a version of this algorithm which can run in parallel on multiple processors would be an effective way to make it scale to larger data sets. In the next cell, we look and how the plot would change if we could run the alignment process over four processors.
 
 ```python
 >>> # if we could split this process over more processors (four, for example)
 ... # that would effectively reduce the runtime by 1/4
-... times = [t / 4 for t in times]
+... parallel_runtimes = pd.DataFrame(data=np.asarray([seq_lengths, [t/4 for t in times]]).T, columns=["Sequence length", "Runtime (s)"] )
+>>> parallel_runtimes
 ...
-...
->>> plt.plot(seq_lengths, times)
->>> plt.xlabel('Sequence Length')
->>> plt.ylabel('Runtime (s)')
+>>> ax = sns.regplot(x="Sequence length", y="Runtime (s)", data=parallel_runtimes, fit_reg=False)
+>>> ax.set_xlim(0)
+>>> ax.set_ylim(0)
 ```
 
-**Notice that the runtimes in the plot (the y-axis) are smaller, but shape of the curve is the same.** This tells us that we won't be in trouble as soon (we can run bigger alignments in a reasonable amount of time), but we'll still be in trouble eventually. While parallelization can help with this class of computational problem -- one that scales [quadratically](http://en.wikipedia.org/wiki/Quadratic_time) -- it doesn't resolve the problem completely.
+Notice that the runtimes in the plot are smaller, but shape of the curve is the same. While parallelization can reduce the runtime of an algorithm, it won't change its *computational complexity* (or how its runtime scales as a function of its input size). You can explore the computational complexity of different types of algorithms in the [Big-O cheatsheet](http://bigocheatsheet.com/), though it's a fairly advanced introduction to the topic (and one that's usually covered in the second or third year for Computer Science majors).
 
-How an algorithm scales with input size is referred to as its computational complexity. You can explore the computational complexity of different types of algorithms in the [Big-O cheatsheet](http://bigocheatsheet.com/), though it's a fairly advanced introduction to the topic (and one that's usually covered in the second or third year for Computer Science majors).
+### Conclusions on the scability of pairwise sequence alignment with Smith-Waterman <link src="N9htIl"/>
 
-In the next chapter we'll begin exploring ways to address this scalability issue by approximating solutions to the problem.
+These are pretty long sequences that we're working with here, and the runtime is still pretty reasonable (only a few seconds for DNA sequences with 80,000 bases), so that suggests this implementation of Smith-Waterman should work ok for aligning pairs of sequences, even if the sequences are fairly long. However, we're often interested in doing more than just pairwise alignment. For example, we may want to align many sequences to each other (which we'll explore in the Multiple Sequence Alignment chapter), or we may want to perform many pairwise alignments (which we'll explore in the Database Searching chapter). In the next chapter we'll begin exploring ways to address this scalability issue by approximating solutions to the problem.
