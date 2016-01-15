@@ -113,7 +113,7 @@ Here's how you'd import a function and then view its source code:
 
 Now let's look at how to align these sequences.
 
-### Step 1: Create a blank matrix where the columns represent the positions in ``seq1`` and the rows represent the positions in ``seq2``. <link src="pf7Bf8"/>
+### Step 1: Create a blank matrix where the rows and columns represent the positions in the sequences. <link src="pf7Bf8"/>
 
 We'll create this matrix and initialize it with all zeros as follows:
 
