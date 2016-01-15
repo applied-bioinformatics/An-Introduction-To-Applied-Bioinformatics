@@ -16,6 +16,7 @@ from skbio.sequence import Sequence, DNA
 from skbio import DistanceMatrix
 from skbio.alignment import local_pairwise_align_ssw, TabularMSA
 from skbio import TreeNode
+import tabulate
 
 blosum50 = {'A': {'A': 5, 'C': -1, 'D': -2, 'E': -1, 'F': -3, 'G': 0, 'H': -2, 'I': -1, 'K': -1, 'L': -2, 'M': -1, 'N': -1, 'P': -1, 'Q': -1, 'R': -2, 'S': 1, 'T': 0, 'V': 0, 'W': -3, 'Y': -2},
 'C': {'A': -1, 'C': 13, 'D': -4, 'E': -3, 'F': -2, 'G': -3, 'H': -3, 'I': -2, 'K': -3, 'L': -2, 'M': -2, 'N': -2, 'P': -4, 'Q': -3, 'R': -4, 'S': -1, 'T': -1, 'V': -1, 'W': -5, 'Y': -3},
@@ -54,29 +55,49 @@ def hamming_distance(s1, s2):
     s2 = Sequence(s2)
     return s1.distance(s2)
 
-
-def format_matrix(row_headers, col_headers, data, hide_zeros=False, cell_width=3):
-    result = []
-    cell_format = "%" + str(cell_width) + "s"
-    line_format = cell_format * (len(row_headers) + 1)
-
-    # print a header row
-    result.append(line_format % tuple([' '] + list(row_headers)))
-
-    # print the data rows
-    for b2, row in zip(col_headers,data):
-        if hide_zeros:
-            display_row = []
-            for v in row:
-                if v == 0:
-                    display_row.append('')
+def show_F(h_sequence, v_sequence, data, hide_zeros=False, nonzero_val=None):
+    rows = []
+    col_headers = [c.decode('UTF-8') for c in h_sequence.values]
+    row_headers = [c.decode('UTF-8') for c in v_sequence.values]
+    pad_headers = data.shape == (len(row_headers) + 1, len(col_headers) + 1)
+    if pad_headers:
+        row_headers = [" "] + row_headers
+        col_headers = [" "] + col_headers
+    for h, d in zip(row_headers, data):
+        current_row = ["<b>%s</b>" % h]
+        for e in d:
+            if e == 0:
+                if hide_zeros:
+                    current_row.append('')
                 else:
-                    display_row.append(v)
-        else:
-            display_row = row
-        result.append(line_format % tuple([b2] + display_row))
+                    current_row.append(0)
+            else:
+                if nonzero_val is not None:
+                    current_row.append(nonzero_val)
+                else:
+                    current_row.append(e)
+        rows.append(current_row)
+    return tabulate.tabulate(rows, headers=col_headers, tablefmt='html')
 
-    return '\n'.join(result)
+def show_T(h_sequence, v_sequence, data):
+    if data.dtype == np.int:
+        data_ = T = np.full(shape=data.shape, fill_value=" ", dtype=np.str)
+        translation_table = {0: "•", 1: "↖", 2: "↑", 3: "←"}
+        for i, row in enumerate(data):
+            for j, value in enumerate(row):
+                data_[i, j] =  translation_table[value]
+    else:
+        data_ = data
+    return show_F(h_sequence, v_sequence, data_)
+
+def show_substitution_matrix(headers, data):
+    rows = []
+    for h, d in zip(headers, data):
+        current_row = ["<b>%s</b>" % h]
+        for e in d:
+            current_row.append(e)
+        rows.append(current_row)
+    return tabulate.tabulate(rows, headers=headers, tablefmt='html')
 
 def format_dynamic_programming_matrix(seq1, seq2, matrix, cell_width=6):
     """ define a function for formatting dynamic programming matrices
