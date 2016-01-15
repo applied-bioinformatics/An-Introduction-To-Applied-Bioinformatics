@@ -113,7 +113,9 @@ Here's how you'd import a function and then view its source code:
 
 Now let's look at how to align these sequences.
 
-**Step 1.** Create a matrix (or *array*), where the columns represent the positions in ``seq1`` and the rows represent the positions in ``seq2``. We'll initialize this matrix with zeros.
+### Step 1: Create a blank matrix where the columns represent the positions in ``seq1`` and the rows represent the positions in ``seq2``. <link src="pf7Bf8"/>
+
+We'll create this matrix and initialize it with all zeros as follows:
 
 ```python
 >>> num_rows = len(seq2)
@@ -123,7 +125,9 @@ Now let's look at how to align these sequences.
 >>> HTML(show_F(seq1, seq2, data))
 ```
 
-**Step 2.** Score the cells so if the characters at the corresponding row and column are the same the value is changed from zero to one. We can then revew the resulting matrix. For clarity, we'll have ``show_table`` hide the zero values.
+### Step 2: Add values to the cells in the matrix. <link src="fDXYPE"/>
+
+Next we'll the cells so if the characters at the corresponding row and column are the same the value is changed from zero to one. We can then review the resulting matrix. For clarity, we'll have ``show_table`` hide the zero values.
 
 ```python
 >>> for row_number, row_character in enumerate(seq2):
@@ -134,7 +138,9 @@ Now let's look at how to align these sequences.
 >>> HTML(show_F(seq1, seq2, data, hide_zeros=True))
 ```
 
-**Step 3**: Identify the longest diagonal stretches of non-zero characters (we'll call these *diagonals*). Diagonals indicate segments of the two sequences that are identical and uninterrupted by mismatched characters (substitution events) or indel events.
+### Step 3: Identify the longest diagonals. <link src="AHda6V"/>
+
+Next we'll identify the longest stretches of non-zero characters, which we'll refer to here as the *diagonals*. Diagonals indicate segments of the two sequences that are identical and uninterrupted by mismatched characters (substitution events) or indel events.
 
 We can identify the longest diagonals as follows:
 
@@ -158,7 +164,7 @@ We can identify the longest diagonals as follows:
 >>> HTML(show_F(seq1, seq2, summed_data, hide_zeros=True))
 ```
 
-**Step 4**: Next, we'd want to transcribe some of the possible alignments that arise from this process.
+### Step 4: Transcribe some of the possible alignments that arise from this process. <link src="PD0jSR"/>
 
 We're going to gloss over how to do this algorithmically for the moment, as we'll come back to that in a lot of detail later in this chapter. Briefly, what we want to do is start with the longest diagonal and trace it backwards to transcribe the alignment by writing down the characters from each of the two sequences at every row and column corresponding to the diagonal that you're following. When we encounter a break in the diagonal, we find the next longest diagonal that starts in a cell that is up and/or to the left of the cell when the previous diagonal you were following ends. For every cell that you move straight upwards (non-diagonally), you'd insert a gap in the sequence on the horizontal axis of your matrix. For every cell that you move straight leftwards, you'd insert a gap in the sequence on the vertical axis of your matrix.
 
