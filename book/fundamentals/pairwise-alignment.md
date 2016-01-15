@@ -758,8 +758,8 @@ If we look at the run times, we can see that they are increasing with increasing
 ```
 
 That's probably to be expected, but what we care about now is *how* the runtimes are increasing as a function of sequence length. Is the relationship between runtime and sequence length:
-* linear: $runtime \approx sequence\ length$
-* quadratic: $runtime \approx {sequence\ length}^2$
+* linear: $runtime \approx constant \times sequence\ length$
+* quadratic: $runtime \approx constant \times {sequence\ length}^2$
 * exponential: $runtime \approx {constant}^{sequence\ length}$
 * or something else? 
 
@@ -770,6 +770,7 @@ Ultimately, we'd like to get an idea of how useful alignment would be in practic
 >>> ax = sns.regplot(x="Sequence length", y="Runtime (s)", data=runtimes, fit_reg=False)
 >>> ax.set_xlim(0)
 >>> ax.set_ylim(0)
+>>> ax
 ```
 
 This looks to be a [quadratic relationship](http://en.wikipedia.org/wiki/Quadratic_time): the increase in runtime is proportional to the square of sequence length. If you think back to the computation of $F$ and $T$, this makes sense. If our sequences are each five bases long, our matrices will have five rows and five colums, so $5 \times 5 = 25$ cells that need to be filled in by performing some numeric computations. If we double our sequences lengths to ten, our matrices will have ten rows and ten columns, so $10 \times 10 = 100$ cells that need to be filled in. Because each of the numeric computations take roughly the same amount of time (you can take that on faith, or prove it to yourself using ``timeit``), when we double our sequence length we have four times as many cells to compute. 
@@ -787,10 +788,11 @@ One question you might have is whether developing a version of this algorithm wh
 >>> ax = sns.regplot(x="Sequence length", y="Runtime (s)", data=parallel_runtimes, fit_reg=False)
 >>> ax.set_xlim(0)
 >>> ax.set_ylim(0)
+>>> ax
 ```
 
 Notice that the runtimes in the plot are smaller, but shape of the curve is the same. While parallelization can reduce the runtime of an algorithm, it won't change its *computational complexity* (or how its runtime scales as a function of its input size). You can explore the computational complexity of different types of algorithms in the [Big-O cheatsheet](http://bigocheatsheet.com/), though it's a fairly advanced introduction to the topic (and one that's usually covered in the second or third year for Computer Science majors).
 
 ### Conclusions on the scability of pairwise sequence alignment with Smith-Waterman <link src="N9htIl"/>
 
-These are pretty long sequences that we're working with here, and the runtime is still pretty reasonable (only a few seconds for DNA sequences with 80,000 bases), so that suggests this implementation of Smith-Waterman should work ok for aligning pairs of sequences, even if the sequences are fairly long. However, we're often interested in doing more than just pairwise alignment. For example, we may want to align many sequences to each other (which we'll explore in the Multiple Sequence Alignment chapter), or we may want to perform many pairwise alignments (which we'll explore in the Database Searching chapter). In the next chapter we'll begin exploring ways to address this scalability issue by approximating solutions to the problem.
+These are pretty long sequences that we're working with here, and the runtime is still pretty reasonable (only a few seconds for DNA sequences around 100,000 bases), so that suggests this implementation of Smith-Waterman should work ok for aligning pairs of sequences, even if the sequences are fairly long. However, we're often interested in doing more than just pairwise alignment. For example, we may want to align many sequences to each other (which we'll explore in the Multiple Sequence Alignment chapter), or we may want to perform many pairwise alignments (which we'll explore in the Database Searching chapter). In the next chapter we'll begin exploring ways to address this scalability issue by approximating solutions to the problem.
