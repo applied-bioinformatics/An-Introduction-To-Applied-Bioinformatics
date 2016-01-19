@@ -73,7 +73,7 @@ Let's take a minute to think about sequence evolution and what a biological sequ
 Figure 1 illustrates how one ancestral DNA sequence (Figure 1a), over time, might evolve into two derived sequences (Figure 1b). When two or more sequences are derived from a single ancestral sequence, as is the case in this example, those sequences are said to be **homologs** of one another, or homologous sequences. On a piece of paper, make a hypothesis about which of these types of mutation events occurred where over our hypothetical evolution of these sequences.
 
 <figure>
-    <img src="images/alignment.png">
+    <img src="https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/book/fundamentals/images/alignment.png">
     <figcaption>Figure 1: Sequence evolution and pairwise sequence alignment.</figcaption>
 </figure>
 <p>
