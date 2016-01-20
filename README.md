@@ -15,7 +15,7 @@ An **I**ntroduction to **A**pplied **B**ioinformatics (or IAB) is a **free, open
 
 * If you're interested in writing or editing content or code for IAB, see [CONTRIBUTING.md](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/CONTRIBUTING.md).
 
-IAB is in early development stage. To see the plans for where the project will go, see the [project milestones](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/milestones). **A good example of where we're going** is the [multiple sequence alignment](http://readIAB.org/book/latest/2/3) chapter.
+IAB is in early development stage. To see the plans for where the project will go, see the [project milestones](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/milestones). **A good example of where we're going** is the [pairwise alignment](http://readIAB.org/book/latest/2/1) chapter.
 
 **Warning:** The code in the ``iab`` module is **not sufficiently tested, documented, or optimized for production use**, but is rather intended for educational use only. As code reaches those quality standards it is ported to [scikit-bio](http://www.scikit-bio.org). I do not recommend using the code in the ``iab`` module outside of the text. In other words, don't `import iab` outside of the text - if you want access to the functionality in your own code, you should `import skbio`.
 
