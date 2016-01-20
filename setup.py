@@ -10,6 +10,15 @@
 __version__ = '0.1.1-dev'
 
 from setuptools import find_packages, setup
+import sys
+
+# Check that Python version is 3, since build will
+# currently complete in Python 2, but the notebooks
+# won't work.
+python_version = sys.version_info.major
+if python_version != 3:
+  sys.exit("IAB can only be used with Python 3. "
+           "You are currently running Python %d." % python_version)
 
 classes = """
     Development Status :: 1 - Planning
