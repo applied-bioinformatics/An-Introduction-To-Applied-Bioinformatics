@@ -30,10 +30,12 @@ In the *Getting started with [Biology](alias://cf88ac) and [Computer Science](al
 
 There are two ways to read *An Introduction To Applied Bioinformatics*:
 
-* The *recommended* way is to install it and work with it interactively. See the [install instructions below](alias://96d24f).
+* The *recommended* way is to work with it interactively. You have two options here:
+  * Work with the hosted version on [Binder](http://mybinder.org/repo/gregcaporaso/built-iab). This is very easy and will let you work with the latest development version of IAB. This is currently experimental, as Binder is undergoing active development. **Note: On opening a notebook in Binder, you'll need to select the *Kernel* menu item, then *Change kernel*, and then *Python 3*. If you don't do this, you will get errors when you try to execute the notebooks** (this step won't always be required, it should be addressed as part of [Binder issue #20](https://github.com/binder-project/binder/issues/20)).
+  * Install IAB locally. See the [install instructions below](alias://96d24f).
 * The *easiest* way is to view the static notebooks online at  [readIAB.org](http://readIAB.org/). You should:
- * [start here to view the latest release version](http://readIAB.org/book/latest/), or
- * [start here to view the development version](http://readIAB.org/book/dev/) (which will have the latest content, but will be less polished and possibly buggy).
+  * [start here to view the latest version](http://readIAB.org/book/latest/), or
+  * [start here to view the previous release versions](http://readIAB.org/) (which will won't have all the latest content, but will be more polished and likely less buggy).
 
 IAB is split into four different sections: *Getting started*, *Fundamentals*, *Applications*, and *Wrapping up*. You should start reading IAB by working through the *Getting started* and *Fundamentals* chapters in order. You should then read the *Applications* chapters and *Wrapping up* in any order, based on your own interest.
 
