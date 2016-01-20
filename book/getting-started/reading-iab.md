@@ -31,7 +31,7 @@ In the *Getting started with [Biology](alias://cf88ac) and [Computer Science](al
 There are two ways to read *An Introduction To Applied Bioinformatics*:
 
 * The *recommended* way is to work with it interactively. You have two options here:
-  * Work with the hosted version on [Binder](http://mybinder.org/repo/gregcaporaso/built-iab). This is very easy and will let you work with the latest development version of IAB. This is currently experimental, as Binder is undergoing active development. **Note: On opening a notebook in Binder, you'll need to select the *Kernel* menu item, then *Change kernel*, and then *Python 3*. If you don't do this, you will get errors when you try to execute the notebooks** (this step won't always be required, it should be addressed as part of [Binder issue #20](https://github.com/binder-project/binder/issues/20)).
+  * Work with the hosted version on [Binder](http://mybinder.org/repo/gregcaporaso/built-iab). This is very easy and will let you work with the latest development version of IAB. This is currently experimental, as Binder is undergoing active development. **Note: On opening a notebook in Binder, you'll need to select the *Kernel* menu item, then *Change kernel*, and then *Python 3*. If you don't do this, you will get errors when you try to execute the notebooks** (this step won't always be required - it should be addressed as part of [Binder issue #20](https://github.com/binder-project/binder/issues/20)).
   * Install IAB locally. See the [install instructions below](alias://96d24f).
 * The *easiest* way is to view the static notebooks online at  [readIAB.org](http://readIAB.org/). You should:
   * [start here to view the latest version](http://readIAB.org/book/latest/), or
