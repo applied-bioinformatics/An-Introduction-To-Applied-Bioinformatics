@@ -1,13 +1,40 @@
 
-# Finding the best local alignment in a database <link src='d22e6b'/>
+# Sequence homology searching <link src='d22e6b'/>
 
-The next idea we'll explore is database searching. In this context, what that means is that **we have some *query* sequence, and we want to know which *reference* sequence in a database it is most similar to**. This could be achieved in a few ways. It could be implemented with local alignment by representing the database as one long sequnence (if we build some functionality to support that into the algorithm), or with local or global alignment (depending on your application) by running our align function many times to search one *query* sequence against many *reference* sequences in the database.
+In this chapter we'll talk about using pairwise alignment to search databases of biological sequences with the goal of identifying sequence homology. We [previously defined homology](alias://e63a4f) between a pair of sequences to mean that those sequences are derived from a common ancestral sequence. Homology searching is an essential part of making inferences about where a biological sequence came from, and/or what it does. In most cases, if you have an unannotated biological sequence, such as the following protein sequence, it's very hard (really, impossible) to know what it is without more information.
 
-When our database starts getting hundreds of millions of bases long (as would be the case if we were searching against 97% OTUs from the Greengenes rRNA reference database), billions of bases long (as would be the case if we were searching against the human genome) or trillions of bases long (as would be the case if we were seraching against the NCBI non-redundant nucleotide database), **runtime becomes an important consideration**.
+```
+> mystery-sequence1
+PQITLWQRPLVTIRIGGQLKEALLDTGADDTVLEEMNLPGKWKPKMIGGIGGFIKVRQYDQIPVEIAHKAIGTVLVGPTPVNIIGRNLLTQIGATLNF
+```
+
+What a researcher will often do is search this sequence, their *query*, against some *reference database* of annotated sequences to learn what function the sequence performs (if the reference database contains functional annotation of sequences) and/or what organisms are likely to encode this sequence in their genome (if the reference database contains taxonomic annotation of sequences).
+
+Whose genome is the above sequence encoded in? What is its function? Take a minute now to answer these questions using the [Protein BLAST homology search tool on the NCBI website](http://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastp).
+
+In the context of database searching, a query sequence and a reference sequence that we hypothesize to be homologous can be identical to one another, or they can differ as a result of mutation events. When sequences differ, we're often then interested in how much their differ, or their pairwise similarity, which can help us identify the most closely related of several homologs in the reference database. There is an important distinction in the terms *homology* and *similarity*: homology is a discrete variable, and similarity is a continuous variable. A pair of biological sequences either *are* or *are not* derived from a common ancestor, but they can be more or less similar to each other. Saying that two sequences are 80% homologous doesn't make sense. What people generally mean when they say this is that two sequences are 80% similar, and as a result they are hypothesizing homology between the sequences.
+
+## Defining the problem
+
+As mentioned above, if we want to perform a homology search we'll have one or more *query sequences*, and for each we want to know which sequence(s) in a reference database it is most similar to.
+
+Sequence homology searching can be implemented in a few ways. In this chapter, we'll use the local alignment function that we worked with in [the Pairwise Alignment chapter](alias://a76822), ``local_pairwise_align_ssw``, run it many times to search one *query* sequence against many *reference* sequences, and investigate the highest scoring alignment(s) to identify the best database match. Remember that you can always get help with a function by passing it as an argument to ``help``:
+
+```python
+>>> from skbio.alignment import local_pairwise_align_ssw
+>>> help(local_pairwise_align_ssw)
+```
+
+When our reference database starts getting hundreds of millions of bases long (as would be the case if we were searching against 97% OTUs from the [Greengenes small-subunit ribosomal RNA (SSU rRNA) reference database](http://www.ncbi.nlm.nih.gov/pubmed/22134646)), billions of bases long (as would be the case if we were searching against [the human genome](https://genome.ucsc.edu/cgi-bin/hgGateway)) or trillions of bases long (as would be the case if we were searching against the [NCBI non-redundant nucleotide database](http://www.ncbi.nlm.nih.gov/refseq/)), runtime becomes an important consideration. For that reason, learning about *heuristic algorithms* is an essential part of learning about sequence homology searching. Heuristic algorithms apply some rules (i.e., heuristics) to approximate the correct solution to a problem in a fraction of the runtime that would be required if we wanted to be guaranteed to find the correct solution. Heuristic algorithms are very common in bioinformatics, and we'll use them in several other places in this book.
+
+While we'll be aligning nucleotide sequences in this chapter, the same concepts apply to protein homology searching.
+
+## A complete database search <link src="gAKBxE"/>
+
+**PICK UP HERE**
 
 ```python
 >>> %pylab inline
->>> from __future__ import division, print_function
 >>> from time import time
 >>> from random import random, shuffle
 >>> from IPython.core import page
@@ -17,17 +44,11 @@ When our database starts getting hundreds of millions of bases long (as would be
 >>> import matplotlib.pyplot as plt
 >>> import seaborn as sns
 >>> from scipy.spatial.distance import hamming
->>> from skbio.alignment import local_pairwise_align_ssw
 >>> import skbio.io
 ...
 >>> page.page = print
 ```
 
-The main function that we'll use for database searching is ``local_pairwise_align_ssw``. Remember that you can always get help with a function by passing it as an argument to ``help``:
-
-```python
->>> help(local_pairwise_align_ssw)
-```
 
 First, we're going to define some sequences in fasta format to serve as our reference database. These are derived from the [Greengenes](http://greengenes.secondgenome.com/) [13_8](ftp://greengenes.microbio.me/greengenes_release/gg_13_5/) database, and we're pulling them from the [QIIME default reference project](https://github.com/biocore/qiime-default-reference). We can load these as a list of sequences using ``skbio.parse.sequences.parse_fasta``, and count them by taking the length of the list.
 
@@ -132,7 +153,7 @@ $f$ represents the fold-reduction in runtime (e.g., $f=2$ represents a two-fold 
 >>> plt.ylabel('Runtime (s)')
 ```
 
-Database seearching is a slightly different problem however. There are a few different scenarios here:
+Database searching is a slightly different problem however. There are a few different scenarios here:
 
 1. we may have a database that is growing in size (for example, over months and years as more sequences are discovered);
 2. we may have a fixed database, but increasingly be obtaining larger numbers of sequences that we want to search against that database;
@@ -142,7 +163,7 @@ For the purposes of an exercise, think of the database as one long sequence that
 
 **The core issue here is that it just takes too long to search each query sequence against the whole database. If we can search against a subset of the database by quickly deciding on certain sequences that are unlikely to match, that may help us to reduce runtime.** A heurtistic in this case would be a rule that we apply to determine which sequecnces we're going to align and which sequences we're not going to align. If we decided to not align against a given reference sequence, it becomes possible that we might miss the best alignment, so we want our heurtistics to be good to make that unlikely. So, when thinking about heurtistics, there are some important considerations:
 
-1. How often do I fail to find the best alignment? 
+1. How often do I fail to find the best alignment?
 2. Is my runtime reduced enough that I can tolerate not getting the best alignment this often?
 
 Let's look at a few heuristics, starting with a silly one first: we'll select a random `p` percent of database to align our query against. We'll start by defining `p` as 10%.
