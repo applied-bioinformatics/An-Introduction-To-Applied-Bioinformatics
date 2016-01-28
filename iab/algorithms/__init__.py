@@ -618,57 +618,40 @@ def align(sequence1, sequence2, gap_penalty, substitution_matrix, local):
 # DB searching notebook
 ##
 
-def local_alignment_search(query, reference_db, aligner=local_pairwise_align_ssw):
-    best_score = 0.0
-    best_match = None
-    best_a1 = None
-    best_a2 = None
+def local_alignment_search(query, reference_db, n=5, aligner=local_pairwise_align_ssw):
+    # first we'll compute all of the alignments and their associated scores
+    results = []
     for seq in reference_db:
         alignment, score, _ = aligner(query, seq)
-        if score > best_score:
-            best_score = score
-            best_match = seq.metadata['id']
-            best_a1 = str(alignment[0])
-            best_a2 = str(alignment[1])
-    return best_a1, best_a2, best_score, best_match
+        results.append((alignment, score, seq.metadata['id']))
+    # then we reverse-sort them by score, and return the n highest
+    # scoring alignments (this needs to be updated so we only
+    # ever keep track of the n highest scoring alignments)
+    results = sorted(results, key=lambda e: e[1], reverse=True)
+    return results[:n]
 
 def approximated_local_alignment_search_random(
-        query, reference_db, p=0.10, aligner=local_pairwise_align_ssw):
-    best_score = 0.0
-    best_match = None
-    best_a1 = None
-    best_a2 = None
-    for seq in reference_db:
-        if random() < p:
-            alignment, score, _ = aligner(query, seq)
-            if score > best_score:
-                best_score = score
-                best_match = seq.metadata['id']
-                best_a1 = str(alignment[0])
-                best_a2 = str(alignment[1])
-    return best_a1, best_a2, best_score, best_match
-
-def gc_content(seq):
-    return (seq.count('G') + seq.count('C')) / len(seq)
+        query, reference_db, n=5, p=0.10, aligner=local_pairwise_align_ssw):
+    k = int(p * len(reference_db))
+    database_subset = random.sample(reference_db, k)
+    return local_alignment_search(query, database_subset, n=n, aligner=aligner)
 
 def approximated_local_alignment_search_gc(
-        query, reference_db, reference_db_gc_contents, p=0.05,
+        query, reference_db, n=5, reference_db_gc_contents=None, p=0.05,
         aligner=local_pairwise_align_ssw):
-    query_gc = gc_content(query)
-    best_score = 0.0
-    best_match = None
-    best_a1 = None
-    best_a2 = None
+    query_gc = query.gc_content()
+    database_subset = []
+    # this step results in a second iteration through the reference database,
+    # but for now I'm trying to minimize duplication of the code in
+    # local_alignment_search because the aligner interface is going to change
     for seq in reference_db:
-        ref_gc = reference_db_gc_contents[seq.metadata['id']]
-        if ref_gc - p < query_gc < ref_gc + p:
-            alignment, score, _ = aligner(query, seq)
-            if score > best_score:
-                best_score = score
-                best_match = seq.metadata['id']
-                best_a1 = str(alignment[0])
-                best_a2 = str(alignment[1])
-    return best_a1, best_a2, best_score, best_match
+        if reference_db_gc_contents is None:
+            ref_gc_content = seq.gc_content()
+        else:
+            ref_gc_content = reference_db_gc_contents[seq.metadata['id']]
+        if ref_gc_content - p < query_gc < ref_gc_content + p:
+            database_subset.append(seq)
+    return local_alignment_search(query, database_subset, n=n, aligner=aligner)
 
 def shuffle_sequence(sequence):
     randomized_order = list(range(len(sequence)))

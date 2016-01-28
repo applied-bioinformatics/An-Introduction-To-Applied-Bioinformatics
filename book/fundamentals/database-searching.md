@@ -29,54 +29,72 @@ When our reference database starts getting hundreds of millions of bases long (a
 
 While we'll be aligning nucleotide sequences in this chapter, the same concepts apply to protein homology searching.
 
-## A complete database search <link src="gAKBxE"/>
+## Loading annotated sequences <link src="gAKBxE"/>
 
-**PICK UP HERE**
+The first thing we'll do as we learn about sequence homology searching is load some annotated sequences. The sequences that we're going to work with are derived from the [Greengenes](http://greengenes.secondgenome.com/) [13_8](ftp://greengenes.microbio.me/greengenes_release/gg_13_5/) database, and we're accessing them using the [QIIME default reference project](https://github.com/biocore/qiime-default-reference) project. Greengenes is a database of 16S rRNA gene sequences, a component of the archaeal and bacterial [ribosome](http://www.nature.com/scitable/definition/ribosome-194) (the molecular machine that drives translation of mRNA to proteins). This gene is of a lot of interest to biologists because it's one of about 200 genes that are encoded in the genomes of all known cellular organisms. We'll come back to this gene a few times in the book, notably in [Studying Biological Diversity](alias://2bb2cf). The sequences in Greengenes are taxonomically annotated, meaning that we'll have a collection of gene sequences and the taxonomic identify of the organism whose genome the sequence is found in. If we search an unannotated 16S rRNA query sequence against this database, we can make inferences about what organism our query sequence is from. 
+
+First, let's load Greengenes into a list of ``skbio.DNA`` sequence objects, and associate the taxonomy of each sequence as sequence metadata.
 
 ```python
 >>> %pylab inline
->>> from time import time
->>> from random import random, shuffle
+...
 >>> from IPython.core import page
->>> import numpy as np
->>> import pandas as pd
-...
->>> import matplotlib.pyplot as plt
->>> import seaborn as sns
->>> from scipy.spatial.distance import hamming
->>> import skbio.io
-...
 >>> page.page = print
 ```
 
-
-First, we're going to define some sequences in fasta format to serve as our reference database. These are derived from the [Greengenes](http://greengenes.secondgenome.com/) [13_8](ftp://greengenes.microbio.me/greengenes_release/gg_13_5/) database, and we're pulling them from the [QIIME default reference project](https://github.com/biocore/qiime-default-reference). We can load these as a list of sequences using ``skbio.parse.sequences.parse_fasta``, and count them by taking the length of the list.
-
 ```python
->>> from qiime_default_reference import get_reference_sequences
+>>> import qiime_default_reference as qdr
+>>> import skbio
+>>> import locale
+>>> locale.setlocale(locale.LC_ALL, 'en_US')
 ...
->>> reference_db = list(skbio.io.read(get_reference_sequences(), format='fasta', constructor=skbio.DNA))
->>> shuffle(reference_db)
->>> print(len(reference_db))
+>>> # Load the taxonomic data
+... reference_taxonomy = {}
+>>> for e in open(qdr.get_reference_taxonomy()):
+...     seq_id, seq_tax = e.strip().split('\t')
+...     reference_taxonomy[seq_id] = [t.strip() for t in seq_tax.split(';')]
+...
+>>> # Load the reference sequences, and associate the taxonmic annotation with
+... # each as metadata
+... reference_db = []
+>>> for e in skbio.io.read(qdr.get_reference_sequences(), format='fasta', constructor=skbio.DNA):
+...     seq_tax = reference_taxonomy[e.metadata['id']]
+...     e.metadata['domain'] = seq_tax[0][3:] or 'unknown'
+...     e.metadata['phylum'] = seq_tax[1][3:] or 'unknown'
+...     e.metadata['class'] = seq_tax[2][3:] or 'unknown'
+...     e.metadata['order'] = seq_tax[3][3:] or 'unknown'
+...     e.metadata['family'] = seq_tax[4][3:] or 'unknown'
+...     e.metadata['genus'] = seq_tax[5][3:] or 'unknown'
+...     e.metadata['species'] = seq_tax[6][3:] or 'unknown'
+...     reference_db.append(e)
+...
+>>> print("%s sequences were loaded from the reference database." % locale.format("%d", len(reference_db), grouping=True))
 ```
+
+Next, we'll just inspect a couple of the sequences we loaded. Notice how the specificity of our taxonomic annotations (i.e., how many taxonomic levels are annotated and unknown) differs for different sequences.
 
 ```python
 >>> reference_db[0]
 ```
 
-For the sake of runtime, let's work with only a random (approximately) 10% of these sequences.
-
 ```python
->>> temp_reference_db = []
->>> fraction_to_keep = 0.10
->>> for e in reference_db:
-...     if random() < fraction_to_keep:
-...         temp_reference_db.append(e)
->>> reference_db = temp_reference_db
->>> print(len(temp_reference_db))
+>>> reference_db[-1]
 ```
 
-And we can next define our search function which takes a query sequence, a reference sequence, and an aligner function:
+For the sake of runtime, we're going to work through this chapter using a random sample of 10,000 sequences from this database. Here we'll use Python's [random module](https://docs.python.org/3/library/random.html) to select sequences at random.
+
+```python
+>>> import random
+...
+>>> reference_db = random.sample(reference_db, k=10000)
+>>> print("%s are present in the subsampled database." % locale.format("%d", len(reference_db), grouping=True))
+```
+
+## Defining a homology search function <link src="0C9FCS"/>
+
+**PICK UP HERE**
+
+Next, we'll define our homology search function. This function will take as input a query sequence and the list of sequences that will serve as our reference database. The results of this will be (Our search function also optionally takes a function to use for performing the alignments, in case for example we wanted to perform global alignments instead of local alignments during our search.)
 
 ```python
 >>> from iab.algorithms import local_alignment_search
@@ -92,6 +110,9 @@ Next, let's define a query sequence to search against this database. We'll defin
 ...
 >>> print(query1.metadata['id'])
 >>> print(query1)
+>>> print(query1.metadata['phylum'])
+>>> print(query1.metadata['genus'])
+>>> print(query1.metadata['species'])
 ```
 
 And we can now perform some database searches. Experiment with different sequences to see how they align by modifying `query1` in the next cell and then executing it (remember that you'll need to execute all of the above cells before executing this one).
@@ -99,20 +120,20 @@ And we can now perform some database searches. Experiment with different sequenc
 Also, think about the runtime here. How many sequences are we searching, and how long are they? Does this strategy seem scalable?
 
 ```python
->>> start_time = time()
->>> a1, a2, score, ref_id = local_alignment_search(query1, reference_db)
->>> stop_time = time()
+>>> import time
 ...
->>> alignment_length = len(a1)
->>> percent_id = 1 - (hamming(a1, a2)/alignment_length)
-...
->>> print(a1)
->>> print(a2)
->>> print(score)
->>> print(ref_id)
->>> print(alignment_length)
->>> print(percent_id)
+>>> start_time = time.time()
+>>> results = local_alignment_search(query1, reference_db)
+>>> stop_time = time.time()
 >>> print("Runtime: %1.4f sec" % (stop_time - start_time))
+```
+
+```python
+>>> for alignment, score, reference_id in results:
+...     print('Percent similarity between query and reference: %1.2f' % (100 * (1. - alignment[0].distance(alignment[1]))))
+...     print('Alignment score: %d' % score)
+...     print('Reference taxonomy:\n %s' % '; '.join(reference_taxonomy[reference_id]))
+...     print()
 ```
 
 In the next cell, I took a shorter exact match from `query1`. What is the effect on our database base search here? How can this happen?
