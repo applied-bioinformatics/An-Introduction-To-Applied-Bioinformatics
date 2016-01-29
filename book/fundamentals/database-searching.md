@@ -52,20 +52,14 @@ First, let's load Greengenes into a list of ``skbio.DNA`` sequence objects, and 
 ... reference_taxonomy = {}
 >>> for e in open(qdr.get_reference_taxonomy()):
 ...     seq_id, seq_tax = e.strip().split('\t')
-...     reference_taxonomy[seq_id] = [t.strip() for t in seq_tax.split(';')]
+...     reference_taxonomy[seq_id] = seq_tax
 ...
 >>> # Load the reference sequences, and associate the taxonmic annotation with
 ... # each as metadata
 ... reference_db = []
 >>> for e in skbio.io.read(qdr.get_reference_sequences(), format='fasta', constructor=skbio.DNA):
 ...     seq_tax = reference_taxonomy[e.metadata['id']]
-...     e.metadata['domain'] = seq_tax[0][3:] or 'unknown'
-...     e.metadata['phylum'] = seq_tax[1][3:] or 'unknown'
-...     e.metadata['class'] = seq_tax[2][3:] or 'unknown'
-...     e.metadata['order'] = seq_tax[3][3:] or 'unknown'
-...     e.metadata['family'] = seq_tax[4][3:] or 'unknown'
-...     e.metadata['genus'] = seq_tax[5][3:] or 'unknown'
-...     e.metadata['species'] = seq_tax[6][3:] or 'unknown'
+...     e.metadata['taxonomy'] = seq_tax
 ...     reference_db.append(e)
 ...
 >>> print("%s sequences were loaded from the reference database." % locale.format("%d", len(reference_db), grouping=True))
@@ -87,7 +81,7 @@ For the sake of runtime, we're going to work through this chapter using a random
 >>> import random
 ...
 >>> reference_db = random.sample(reference_db, k=5000)
->>> print("%s are present in the subsampled database." % locale.format("%d", len(reference_db), grouping=True))
+>>> print("%s sequences are present in the subsampled database." % locale.format("%d", len(reference_db), grouping=True))
 ```
 
 We'll also extract some sequences from Greengenes to use as query sequences in our database searches. This time we won't annotate them (to simulate not knowing what organisms they're from). We'll also trim these sequences so they're shorter than the full length references. This will simulate obtaining a partial gene sequence, as is most common with the current sequencing technologies (as of this writing), but will also help to make the examples run faster.
@@ -99,7 +93,7 @@ Note that some of our query sequences may also be in our subsampled reference da
 >>> for e in skbio.io.read(qdr.get_reference_sequences(), format='fasta', constructor=skbio.DNA):
 ...     e = e[100:300]
 ...     queries.append(e)
->>> queries = random.sample(queries, k=100)
+>>> queries = random.sample(queries, k=500)
 ```
 
 Let's inspect a couple of the query sequences that we'll work with.
@@ -112,11 +106,20 @@ Let's inspect a couple of the query sequences that we'll work with.
 >>> queries[-1]
 ```
 
-## Defining a homology search function <link src="0C9FCS"/>
+## Defining the problem <link src="SZ9u3S"/>
 
-**PICK UP HERE**
+The problem that we are going to address here is as follows. We now have a query sequence ($q_i$) which is not taxonomically annotated (meaning we don't know the taxonomy of the organism whose genome it is found in), and a reference database ($R$) of taxonomically annotated sequences ($r_1, r_2, r_3, ... r_n$). We want to infer a taxonomic annotation for $q_i$. We'll do this by identifying the most closely evolutionary related sequences in $R$ and associating their taxonomy with $q_i$. Because we actually do know the taxonomy of $q_i$ (to the extent that we trust the annotations in $R$), we can evaluate how well this approach works.
 
-Next, we'll define our homology search function. This function will take as input a query sequence and the list of sequences that will serve as our reference database. The results of this will be (Our search function also optionally takes a function to use for performing the alignments, in case for example we wanted to perform global alignments instead of local alignments during our search.)
+There are a few realistic features of the situtation that we've set up here that I want you to be aware of.
+
+1. All of the query and reference sequences are homologous. In this case, they are all sequences of the 16S rRNA gene from archaea and bacteria. This may or may not be the case in real-world applications. Sometimes you'll work with gene-specific databases such as Greengenes, and sometimes you'll work with non-specific databases such as the NCBI nucleotide database (nr). Regardless, the search process is similar.
+2. The evolutionary distance between each query sequence and its most closely related sequences in $R$ will vary widely. Sometimes $q$ will be an exact match to a reference sequence $r_i$, and sometimes we may have as little as $50\%$ similarity. 
+
+As we work through the next sections, imagine that we're exploring scaling this system up, so that instead of search just one or a few query sequences against the reference database, we ultimately want to apply this to search millions of sequences against the database. This would be the real-world problem we faced if we had collected 16S rRNA sequences from the environment (which would of course be unannotated) using high-throughput DNA sequencing.
+
+## A complete homology search function <link src="0C9FCS"/>
+
+Let's define a homology search function that applies pairwise alignment to search individual query sequences $q_i$ to each of our reference database sequences ($r_1, r_2, r_3, ... r_n$). This function will take as input one or more query sequences, and the reference database. We'll call the top scoring alignments for each $q_i$ the *best hits*, and we'll specifically request some number (`n`) of best hits for each $q_i$. The output of this function will be a summary of the `n` best hits for each query sequence. We'll then review the taxonomy annotations for our best hits, and from those make an inference about the taxonomy annotation for $q$.
 
 ```python
 >>> from iab.algorithms import local_alignment_search
@@ -131,20 +134,27 @@ Also, think about the runtime here. How many sequences are we searching, and how
 ```python
 >>> import time
 ...
->>> query_sequence = queries[0]
 >>> start_time = time.time()
->>> results = local_alignment_search(query_sequence, reference_db)
+>>> current_queries = random.sample(queries, k=2)
+>>> results = local_alignment_search(current_queries, reference_db)
 >>> stop_time = time.time()
->>> print("Runtime: %1.4f sec" % (stop_time - start_time))
+>>> print("Runtime: %1.4f sec per query" % ((stop_time - start_time) / len(current_queries)))
+>>> results
 ```
 
 ```python
->>> for alignment, score, reference_id in results:
-...     print('Percent similarity between query and reference: %1.2f%%' % (100 * (1. - alignment[0].distance(alignment[1]))))
-...     print('Length of the alignment: %d' % alignment.shape[1])
-...     print('Alignment score: %d' % score)
-...     print('Reference taxonomy:\n %s' % '; '.join(reference_taxonomy[reference_id]))
-...     print('The actual taxonomy of your query is:\n %s' % '; '.join(reference_taxonomy[query_sequence.metadata['id']]))
+>>> for q in current_queries:
+...     q_id = q.metadata['id']
+...     print('Closest taxonomies for query %s (in order):' % q_id)
+...     for e in results['reference taxonomy'][q_id]:
+...         print(' ', e)
+...     print()
+```
+
+```python
+>>> for q in current_queries:
+...     q_id = q.metadata['id']
+...     print('Known taxonomy for query %s:\n %s' % (q_id, reference_taxonomy[q_id]))
 ...     print()
 ```
 
