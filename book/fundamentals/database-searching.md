@@ -12,7 +12,7 @@ What a researcher will often do is search this sequence, their *query*, against 
 
 Whose genome is the above sequence encoded in? What is its function? Take a minute now to answer these questions using the [Protein BLAST homology search tool on the NCBI website](http://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastp).
 
-In the context of database searching, a query sequence and a reference sequence that we hypothesize to be homologous can be identical to one another, or they can differ as a result of mutation events. When sequences differ, we're often then interested in how much their differ, or their pairwise similarity, which can help us identify the most closely related of several homologs in the reference database. There is an important distinction in the terms *homology* and *similarity*: homology is a discrete variable, and similarity is a continuous variable. A pair of biological sequences either *are* or *are not* derived from a common ancestor, but they can be more or less similar to each other. Saying that two sequences are 80% homologous doesn't make sense. What people generally mean when they say this is that two sequences are 80% similar, and as a result they are hypothesizing homology between the sequences.
+In the context of database searching, a query sequence and a reference sequence that we hypothesize to be homologous can be identical to one another, or they can differ as a result of mutation events. When sequences differ, we're often then interested in how much they differ, or their pairwise similarity, which can help us identify the most closely related of several homologs in the reference database. There is an important distinction in the terms *homology* and *similarity*: homology is a discrete variable, and similarity is a continuous variable. A pair of biological sequences either *are* or *are not* derived from a common ancestor, but they can be more or less similar to each other. Saying that two sequences are 80% homologous doesn't make sense. What people generally mean when they say this is that two sequences are 80% similar, and as a result they are hypothesizing homology between the sequences.
 
 ## Defining the problem
 
@@ -81,16 +81,16 @@ Next, we'll just inspect a couple of the sequences we loaded. Notice how the spe
 >>> reference_db[-1]
 ```
 
-For the sake of runtime, we're going to work through this chapter using a random sample of 10,000 sequences from this database. Here we'll use Python's [random module](https://docs.python.org/3/library/random.html) to select sequences at random.
+For the sake of runtime, we're going to work through this chapter using a random sample of sequences from this database. Here we'll use Python's [random module](https://docs.python.org/3/library/random.html) to select sequences at random.
 
 ```python
 >>> import random
 ...
->>> reference_db = random.sample(reference_db, k=10000)
+>>> reference_db = random.sample(reference_db, k=5000)
 >>> print("%s are present in the subsampled database." % locale.format("%d", len(reference_db), grouping=True))
 ```
 
-We'll also extract some sequences from Greengenes to use as query sequences in our database searches. This time we won't annotate them (to simulate no knowing what organisms they're from). We'll also trim these sequences so they're shorter than the full length references. This will simulate obtaining a partial gene sequence, as is most common with the current sequencing technologies, but will also help to make the examples run faster.
+We'll also extract some sequences from Greengenes to use as query sequences in our database searches. This time we won't annotate them (to simulate not knowing what organisms they're from). We'll also trim these sequences so they're shorter than the full length references. This will simulate obtaining a partial gene sequence, as is most common with the current sequencing technologies (as of this writing), but will also help to make the examples run faster.
 
 Note that some of our query sequences may also be in our subsampled reference database and some won't. This is realistic: sometimes we're working with sequences that are exact matches to known sequences, and sometimes we're working with sequences that don't match any known sequences (or at least any in the reference database that we're working with).
 
@@ -102,7 +102,7 @@ Note that some of our query sequences may also be in our subsampled reference da
 >>> queries = random.sample(queries, k=100)
 ```
 
-Let's also inspect a couple of the query sequences that we'll work with.
+Let's inspect a couple of the query sequences that we'll work with.
 
 ```python
 >>> queries[0]
@@ -146,27 +146,6 @@ Also, think about the runtime here. How many sequences are we searching, and how
 ...     print('Reference taxonomy:\n %s' % '; '.join(reference_taxonomy[reference_id]))
 ...     print('The actual taxonomy of your query is:\n %s' % '; '.join(reference_taxonomy[query_sequence.metadata['id']]))
 ...     print()
-```
-
-In the next cell, I took a shorter exact match from `query1`. What is the effect on our database base search here? How can this happen?
-
-```python
->>> query2 = query1[25:35]
-...
->>> start_time = time()
->>> a1, a2, score, ref_id = local_alignment_search(query2, reference_db)
->>> stop_time = time()
-...
->>> alignment_length = len(a1)
->>> percent_id = 1 - (hamming(a1, a2)/alignment_length)
-...
->>> print(a1)
->>> print(a2)
->>> print(score)
->>> print(ref_id)
->>> print(alignment_length)
->>> print(percent_id)
->>> print("Runtime: %1.4f sec" % (stop_time - start_time))
 ```
 
 ## Using heuristics to reduce runtime for database searches <link src='0f9232'/>
