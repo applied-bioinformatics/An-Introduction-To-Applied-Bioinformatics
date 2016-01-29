@@ -23,6 +23,50 @@ Sequence homology searching can be implemented in a few ways. In this chapter, w
 ```python
 >>> from skbio.alignment import local_pairwise_align_ssw
 >>> help(local_pairwise_align_ssw)
+Help on function local_pairwise_align_ssw in module skbio.alignment._pairwise:
+
+local_pairwise_align_ssw(sequence1, sequence2, **kwargs)
+    Align query and target sequences with Striped Smith-Waterman.
+    
+    State: Experimental as of 0.4.0.
+    
+    Parameters
+    ----------
+    sequence1 : DNA, RNA, or Protein
+        The first unaligned sequence
+    sequence2 : DNA, RNA, or Protein
+        The second unaligned sequence
+    
+    Returns
+    -------
+    tuple
+        ``TabularMSA`` object containing the aligned sequences, alignment score
+        (float), and start/end positions of each input sequence (iterable
+        of two-item tuples). Note that start/end positions are indexes into the
+        unaligned sequences.
+    
+    Notes
+    -----
+    This is a wrapper for the SSW package [1]_.
+    
+    For a complete list of optional keyword-arguments that can be provided,
+    see ``skbio.alignment.StripedSmithWaterman``.
+    
+    The following kwargs will not have any effect: `suppress_sequences`,
+    `zero_index`, and `protein`
+    
+    If an alignment does not meet a provided filter, `None` will be returned.
+    
+    References
+    ----------
+    .. [1] Zhao, Mengyao, Wan-Ping Lee, Erik P. Garrison, & Gabor T.
+       Marth. "SSW Library: An SIMD Smith-Waterman C/C++ Library for
+       Applications". PLOS ONE (2013). Web. 11 July 2014.
+       http://www.plosone.org/article/info:doi/10.1371/journal.pone.0082138
+    
+    See Also
+    --------
+    skbio.alignment.StripedSmithWaterman
 ```
 
 When our reference database starts getting hundreds of millions of bases long (as would be the case if we were searching against 97% OTUs from the [Greengenes small-subunit ribosomal RNA (SSU rRNA) reference database](http://www.ncbi.nlm.nih.gov/pubmed/22134646)), billions of bases long (as would be the case if we were searching against [the human genome](https://genome.ucsc.edu/cgi-bin/hgGateway)) or trillions of bases long (as would be the case if we were searching against the [NCBI non-redundant nucleotide database](http://www.ncbi.nlm.nih.gov/refseq/)), runtime becomes an important consideration. For that reason, learning about *heuristic algorithms* is an essential part of learning about sequence homology searching. Heuristic algorithms apply some rules (i.e., heuristics) to approximate the correct solution to a problem in a fraction of the runtime that would be required if we wanted to be guaranteed to find the correct solution. Heuristic algorithms are very common in bioinformatics, and we'll use them in several other places in this book.
@@ -40,6 +84,9 @@ First, let's load Greengenes into a list of ``skbio.DNA`` sequence objects, and 
 ...
 >>> from IPython.core import page
 >>> page.page = print
+Populating the interactive namespace from numpy and matplotlib
+WARNING: pylab import has clobbered these variables: ['random', 'e']
+`%matplotlib` prevents importing * from pylab and numpy
 ```
 
 ```python
@@ -63,16 +110,55 @@ First, let's load Greengenes into a list of ``skbio.DNA`` sequence objects, and 
 ...     reference_db.append(e)
 ...
 >>> print("%s sequences were loaded from the reference database." % locale.format("%d", len(reference_db), grouping=True))
+99,322 sequences were loaded from the reference database.
 ```
 
 Next, we'll just inspect a couple of the sequences we loaded. Notice how the specificity of our taxonomic annotations (i.e., how many taxonomic levels are annotated and unknown) differs for different sequences.
 
 ```python
 >>> reference_db[0]
+DNA
+-----------------------------------------------------------------------
+Metadata:
+    'description': ''
+    'id': '1111883'
+    'taxonomy': 'k__Bacteria; p__Gemmatimonadetes; c__Gemm-1; o__; f__;
+                 g__; s__'
+Stats:
+    length: 1428
+    has gaps: False
+    has degenerates: False
+    has non-degenerates: True
+    GC-content: 61.90%
+-----------------------------------------------------------------------
+0    GCTGGCGGCG TGCCTAACAC ATGTAAGTCG AACGGGACTG GGGGCAACTC CAGTTCAGTG
+60   GCAGACGGGT GCGTAACACG TGAGCAACTT GTCCGACGGC GGGGGATAGC CGGCCCAACG
+...
+1320 GCCGCGGTGA ATACGTTCCC GGGCCTTGTA CACACCGCCC GTCACGCCAT GGAAGCCGGA
+1380 GGGACCCGAA ACCGGTGGGC CAACCGCAAG GGGGCAGCCG TCTAAGGT
 ```
 
 ```python
 >>> reference_db[-1]
+DNA
+----------------------------------------------------------------------
+Metadata:
+    'description': ''
+    'id': '4483258'
+    'taxonomy': 'k__Archaea; p__Crenarchaeota; c__Thermoprotei;
+                 o__Thermoproteales; f__Thermoproteaceae; g__; s__'
+Stats:
+    length: 2123
+    has gaps: False
+    has degenerates: False
+    has non-degenerates: True
+    GC-content: 58.36%
+----------------------------------------------------------------------
+0    CTGGTTGATC CTGCCGGACC CGACCGCTAT CGGGGTGGGG CTTAGCCATG CGAGTCAAGC
+60   GCCCCAGGGA CCCGCTGGGG TGCGGCGCAC GGCTCAGTAA CACGTGGCCA ACCTACCCTC
+...
+2040 ATAATCTCCT TATTGTCTGA TCCTTATGCA TTTTCCTTTG GCCCATCCCG TGAATACGCG
+2100 CGGTGAATAC GTCCCTGCCC CTT
 ```
 
 For the sake of runtime, we're going to work through this chapter using a random sample of sequences from this database. Here we'll use Python's [random module](https://docs.python.org/3/library/random.html) to select sequences at random.
@@ -82,6 +168,7 @@ For the sake of runtime, we're going to work through this chapter using a random
 ...
 >>> reference_db = random.sample(reference_db, k=5000)
 >>> print("%s sequences are present in the subsampled database." % locale.format("%d", len(reference_db), grouping=True))
+5,000 sequences are present in the subsampled database.
 ```
 
 We'll also extract some sequences from Greengenes to use as query sequences in our database searches. This time we won't annotate them (to simulate not knowing what organisms they're from). We'll also trim these sequences so they're shorter than the full length references. This will simulate obtaining a partial gene sequence, as is most common with the current sequencing technologies (as of this writing), but will also help to make the examples run faster.
@@ -100,10 +187,42 @@ Let's inspect a couple of the query sequences that we'll work with.
 
 ```python
 >>> queries[0]
+DNA
+---------------------------------------------------------------------
+Metadata:
+    'description': ''
+    'id': '555829'
+Stats:
+    length: 200
+    has gaps: False
+    has degenerates: False
+    has non-degenerates: True
+    GC-content: 56.00%
+---------------------------------------------------------------------
+0   AACGACTGCT AATACCGCAT GATGTCTACG GACCAAAGTG GGGGACCTTC GGGCCTCACG
+60  CCATAAGATT AGCCCAAGTG GGATTAGCTA GTTGGTGAGG TAATGGCTCA CCAAGGCGAC
+120 GATCCCTAGC TGGTTTGAGA GGATGATCAG CCACACTGGG ACTGAGACAC GGCCCAGACT
+180 CCTACGGGAG GCAGCAGTGG
 ```
 
 ```python
 >>> queries[-1]
+DNA
+---------------------------------------------------------------------
+Metadata:
+    'description': ''
+    'id': '4441348'
+Stats:
+    length: 200
+    has gaps: False
+    has degenerates: False
+    has non-degenerates: True
+    GC-content: 58.00%
+---------------------------------------------------------------------
+0   GTGGATGATC TGCCCTACGG CGGGGGATAA CCGCGGGAAA CTGCGGCTAA TACCGCATAC
+60  GATTGCAGGC ATAGAAGCTT GCAAGGAAAG GCGCTTCTGG CGTCGCCGGA GGATGAGTCC
+120 GCCCCCCATT AGCTAGTTGG CGAGATAATA GCTCACCAAG GCAACGATGG GTAGCCGAGC
+180 TGAGAGGTTG ATCGGCCACA
 ```
 
 ## Defining the problem <link src="SZ9u3S"/>
@@ -119,28 +238,109 @@ As we work through the next sections, imagine that we're exploring scaling this 
 
 ## A complete homology search function <link src="0C9FCS"/>
 
-Let's define a homology search function that applies pairwise alignment to search individual query sequences $q_i$ to each of our reference database sequences ($r_1, r_2, r_3, ... r_n$). This function will take as input one or more query sequences, and the reference database. We'll call the top scoring alignments for each $q_i$ the *best hits*, and we'll specifically request some number (`n`) of best hits for each $q_i$. The output of this function will be a summary of the `n` best hits for each query sequence. We'll then review the taxonomy annotations for our best hits, and from those make an inference about the taxonomy annotation for $q$.
+Let's define a homology search function that aligns each provided query sequences $q_i$ with each of our reference database sequences ($r_1, r_2, r_3, ... r_n$). This function will take as input one or more query sequences, and the reference database. We'll call the top scoring alignments for each $q_i$ the *best hits*, and we'll specifically request some number (`n`) of best hits for each $q_i$. The output of this function will be a summary of the `n` best hits for each query sequence, including some technical information about the alignment and the taxonomy associated with the corresponding reference sequence. We'll then review the taxonomy annotations for our best hits, and from those make an inference about the taxonomy annotation for $q$. 
+
+Spend a minute looking at this function to understand what it's doing.
 
 ```python
 >>> from iab.algorithms import local_alignment_search
 ...
 >>> %psource local_alignment_search
+[0;32mdef[0m [0mlocal_alignment_search[0m[0;34m([0m[0mqueries[0m[0;34m,[0m [0mreference_db[0m[0;34m,[0m [0mn[0m[0;34m=[0m[0;36m5[0m[0;34m,[0m[0;34m[0m
+[0;34m[0m                           [0maligner[0m[0;34m=[0m[0mlocal_pairwise_align_ssw[0m[0;34m)[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m    [0mresults[0m [0;34m=[0m [0;34m[[0m[0;34m][0m[0;34m[0m
+[0;34m[0m    [0mindices[0m [0;34m=[0m [0;34m[[0m[0;34m][0m[0;34m[0m
+[0;34m[0m    [0;32mfor[0m [0mq[0m [0;32min[0m [0mqueries[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m        [0;31m# first we'll compute all of the alignments and their associated scores[0m[0;34m[0m
+[0;34m[0m        [0mhits[0m [0;34m=[0m [0;34m[[0m[0;34m][0m[0;34m[0m
+[0;34m[0m        [0;32mfor[0m [0mr[0m [0;32min[0m [0mreference_db[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m            [0maln[0m[0;34m,[0m [0mscore[0m[0;34m,[0m [0m_[0m [0;34m=[0m [0maligner[0m[0;34m([0m[0mq[0m[0;34m,[0m [0mr[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m            [0mhits[0m[0;34m.[0m[0mappend[0m[0;34m([0m[0;34m[[0m[0mr[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m[0;34m,[0m [0mscore[0m[0;34m,[0m [0maln[0m[0;34m,[0m[0;34m[0m
+[0;34m[0m                         [0mr[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'taxonomy'[0m[0;34m][0m[0;34m][0m[0;34m)[0m[0;34m[0m
+[0;34m[0m        [0;31m# then we reverse-sort them by score, and return the n highest[0m[0;34m[0m
+[0;34m[0m        [0;31m# scoring alignments (this needs to be updated so we only[0m[0;34m[0m
+[0;34m[0m        [0;31m# ever keep track of the n highest scoring alignments)[0m[0;34m[0m
+[0;34m[0m        [0mbest_hits[0m [0;34m=[0m [0msorted[0m[0;34m([0m[0mhits[0m[0;34m,[0m [0mkey[0m[0;34m=[0m[0;32mlambda[0m [0me[0m[0;34m:[0m [0me[0m[0;34m[[0m[0;36m1[0m[0;34m][0m[0;34m,[0m [0mreverse[0m[0;34m=[0m[0;32mTrue[0m[0;34m)[0m[0;34m[[0m[0;34m:[0m[0mn[0m[0;34m][0m[0;34m[0m
+[0;34m[0m        [0;31m# then we compile and track some information about the n best hits[0m[0;34m[0m
+[0;34m[0m        [0;32mfor[0m [0mr_id[0m[0;34m,[0m [0mscore[0m[0;34m,[0m [0maln[0m[0;34m,[0m [0mr_tax[0m [0;32min[0m [0mbest_hits[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m            [0mpercent_similarity[0m [0;34m=[0m [0;34m([0m[0;36m100[0m [0;34m*[0m [0;34m([0m[0;36m1.[0m [0;34m-[0m [0maln[0m[0;34m[[0m[0;36m0[0m[0;34m][0m[0;34m.[0m[0mdistance[0m[0;34m([0m[0maln[0m[0;34m[[0m[0;36m1[0m[0;34m][0m[0;34m)[0m[0;34m)[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m            [0maln_length[0m [0;34m=[0m [0maln[0m[0;34m.[0m[0mshape[0m[0;34m[[0m[0;36m1[0m[0;34m][0m[0;34m[0m
+[0;34m[0m            [0mindices[0m[0;34m.[0m[0mappend[0m[0;34m([0m[0;34m([0m[0mq[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m[0;34m,[0m [0mr_id[0m[0;34m)[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m            [0mresults[0m[0;34m.[0m[0mappend[0m[0;34m([0m[0;34m([0m[0mr_tax[0m[0;34m,[0m [0mpercent_similarity[0m[0;34m,[0m[0;34m[0m
+[0;34m[0m                            [0maln_length[0m[0;34m,[0m [0mscore[0m[0;34m)[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m    [0mindex[0m [0;34m=[0m [0mpd[0m[0;34m.[0m[0mMultiIndex[0m[0;34m.[0m[0mfrom_tuples[0m[0;34m([0m[0mindices[0m[0;34m,[0m [0mnames[0m[0;34m=[0m[0;34m[[0m[0;34m'query'[0m[0;34m,[0m [0;34m'reference'[0m[0;34m][0m[0;34m)[0m[0;34m[0m
+[0;34m[0m    [0mcolumns[0m [0;34m=[0m [0;34m[[0m[0;34m'reference taxonomy'[0m[0;34m,[0m [0;34m'percent similarity'[0m[0;34m,[0m[0;34m[0m
+[0;34m[0m               [0;34m'alignment length'[0m[0;34m,[0m [0;34m'score'[0m[0;34m][0m[0;34m[0m
+[0;34m[0m    [0mresults[0m [0;34m=[0m [0mpd[0m[0;34m.[0m[0mDataFrame[0m[0;34m([0m[0mresults[0m[0;34m,[0m [0mindex[0m[0;34m=[0m[0mindex[0m[0;34m,[0m [0mcolumns[0m[0;34m=[0m[0mcolumns[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m    [0;32mreturn[0m [0mresults[0m[0;34m[0m[0m
 ```
 
-And now we can now perform some database searches. Experiment with different sequences to see how they align by modifying which query sequence you're searching against the database in the next cell and then executing it (remember that you'll need to execute all of the above cells before executing this one).
+Now let's perform some database searches. You can run the remaining code cells in this section a few times to experiment with searching different query sequences against the same reference database.
 
-Also, think about the runtime here. How many sequences are we searching, and how long are they? Does this strategy seem scalable?
+This next cell, which is the one that actually performs the database searches, will take a little bit of time to run (maybe up to a minute or two). There is some code in this cell that will track the runtime. As it's running, think about how many query sequences we're searching against how many reference sequences, and refer back to the number of sequences in the full reference database. Does this strategy seem scalable to millions or sequences, which as mentioned above might be our ultimate goal? When you know the per-sequence runtime of this search, estimate how long it would take to do this in seconds for one million sequences. Convert the time in seconds to a unit that will be more meaningful to you.
 
 ```python
 >>> import time
 ...
 >>> start_time = time.time()
->>> current_queries = random.sample(queries, k=2)
+>>> current_queries = random.sample(queries, k=4)
 >>> results = local_alignment_search(current_queries, reference_db)
 >>> stop_time = time.time()
 >>> print("Runtime: %1.4f sec per query" % ((stop_time - start_time) / len(current_queries)))
 >>> results
+Runtime: 8.5163 sec per query
+                                                  reference taxonomy  \
+query   reference                                                      
+4362165 317527     k__Bacteria; p__Proteobacteria; c__Betaproteob...   
+        4377697    k__Bacteria; p__Proteobacteria; c__Betaproteob...   
+        568420     k__Bacteria; p__Proteobacteria; c__Betaproteob...   
+        4336863    k__Bacteria; p__Proteobacteria; c__Betaproteob...   
+        339773     k__Bacteria; p__Proteobacteria; c__Betaproteob...   
+1131091 551602     k__Bacteria; p__Actinobacteria; c__Actinobacte...   
+        565291     k__Bacteria; p__Actinobacteria; c__Actinobacte...   
+        1144585    k__Bacteria; p__Actinobacteria; c__Actinobacte...   
+        279325     k__Bacteria; p__Actinobacteria; c__Actinobacte...   
+        547232     k__Bacteria; p__Actinobacteria; c__Actinobacte...   
+219098  3721827    k__Bacteria; p__Cyanobacteria; c__Chloroplast;...   
+        4377549    k__Bacteria; p__Cyanobacteria; c__Chloroplast;...   
+        735769     k__Bacteria; p__Cyanobacteria; c__Chloroplast;...   
+        2925630    k__Bacteria; p__Cyanobacteria; c__Chloroplast;...   
+        509617     k__Bacteria; p__Cyanobacteria; c__Oscillatorio...   
+855996  4479566    k__Bacteria; p__Gemmatimonadetes; c__Gemmatimo...   
+        214676     k__Bacteria; p__Gemmatimonadetes; c__Gemmatimo...   
+        4412017    k__Bacteria; p__Gemmatimonadetes; c__Gemmatimo...   
+        2216488    k__Bacteria; p__Gemmatimonadetes; c__Gemmatimo...   
+        1108941    k__Bacteria; p__Gemmatimonadetes; c__Gemmatimo...   
+
+                   percent similarity  alignment length  score  
+query   reference                                               
+4362165 317527              97.500000               200    375  
+        4377697             97.500000               200    375  
+        568420              96.500000               200    365  
+        4336863             96.500000               200    365  
+        339773              96.500000               200    365  
+1131091 551602              95.522388               201    355  
+        565291              94.000000               200    340  
+        1144585             92.079208               202    328  
+        279325              91.584158               202    323  
+        547232              90.594059               202    313  
+219098  3721827             84.079602               201    249  
+        4377549             85.000000               200    246  
+        735769              84.500000               200    241  
+        2925630             84.000000               200    240  
+        509617              83.500000               200    233  
+855996  4479566             86.274510               204    284  
+        214676              87.500000               200    275  
+        4412017             86.500000               200    273  
+        2216488             84.803922               204    264  
+        1108941             83.743842               203    260
 ```
+
+Now, let's try to answer our initial question: what is the most likely taxonomic annotation for each of our query sequences? Spend a few minutes reviewing this information, and write down what you think the most likely taxonomic annotation is for each of the query sequences. Here are some hints to help you out:
+
+ * The ``k``, ``p``, ``c``, ``o``, ``f``, ``g``, and ``s`` refer to *kingdom*, *phylum*, *class*, *order*, *family*, *genus*, and *species*, respectively. If you see an annotation for a reference sequence that looks like ``g__``, that means that the genus is unknown for that sequence. 
+ * Just as the reference taxonomy annotations don't always go down to the species level, your taxonomic annotations don't have to either. Not assigning at a given level implies that you're uncertain about what the annotation should be at that level, and it's usually better just to indicate that you're uncertain rather than make a bad guess. If you're uncertain of what the species is, assign the query ``s__`` and try to decide what the most likely genus is. If you're uncertain of the genus, assign ``g__``, and try to decide what the most likely family is...
+ * As you look at each of the reference taxonomy annotations below, refer back to the table above to look at the percent similarity between each query and reference, and maybe the length of the alignments and their scores. These values give you an idea of how confident you should be in each of your taxonomic annotations.
 
 ```python
 >>> for q in current_queries:
@@ -149,16 +349,58 @@ Also, think about the runtime here. How many sequences are we searching, and how
 ...     for e in results['reference taxonomy'][q_id]:
 ...         print(' ', e)
 ...     print()
+Closest taxonomies for query 4362165 (in order):
+  k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__; s__
+  k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__Limnohabitans; s__curvus
+  k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__; s__
+  k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__; s__
+  k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__Limnohabitans; s__
+
+Closest taxonomies for query 1131091 (in order):
+  k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Micrococcaceae; g__Micrococcus; s__
+  k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Micrococcaceae; g__Micrococcus; s__
+  k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Microbacteriaceae; g__Salinibacterium; s__
+  k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Microbacteriaceae; g__Salinibacterium; s__
+  k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Nocardiaceae; g__Rhodococcus; s__
+
+Closest taxonomies for query 219098 (in order):
+  k__Bacteria; p__Cyanobacteria; c__Chloroplast; o__; f__; g__; s__
+  k__Bacteria; p__Cyanobacteria; c__Chloroplast; o__Streptophyta; f__; g__; s__
+  k__Bacteria; p__Cyanobacteria; c__Chloroplast; o__Streptophyta; f__; g__; s__
+  k__Bacteria; p__Cyanobacteria; c__Chloroplast; o__; f__; g__; s__
+  k__Bacteria; p__Cyanobacteria; c__Oscillatoriophycideae; o__Chroococcales; f__Xenococcaceae; g__; s__
+
+Closest taxonomies for query 855996 (in order):
+  k__Bacteria; p__Gemmatimonadetes; c__Gemmatimonadetes; o__; f__; g__; s__
+  k__Bacteria; p__Gemmatimonadetes; c__Gemmatimonadetes; o__N1423WL; f__; g__; s__
+  k__Bacteria; p__Gemmatimonadetes; c__Gemmatimonadetes; o__Ellin5290; f__; g__; s__
+  k__Bacteria; p__Gemmatimonadetes; c__Gemmatimonadetes; o__Ellin5290; f__; g__; s__
+  k__Bacteria; p__Gemmatimonadetes; c__Gemmatimonadetes; o__; f__; g__; s__
 ```
+
+Because we have taxonomic annotations for all of the Greengenes sequences (though as you probably have noticed by now, they differ in their specificity), we can next look at taxonomy associated with each of our queries in Greengenes. How do your annotations compare to those from Greengenes, which we'll print out in the next cell?
 
 ```python
 >>> for q in current_queries:
 ...     q_id = q.metadata['id']
 ...     print('Known taxonomy for query %s:\n %s' % (q_id, reference_taxonomy[q_id]))
 ...     print()
+Known taxonomy for query 4362165:
+ k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__Limnohabitans; s__
+
+Known taxonomy for query 1131091:
+ k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Micrococcaceae; g__Micrococcus; s__
+
+Known taxonomy for query 219098:
+ k__Bacteria; p__Cyanobacteria; c__Chloroplast; o__Chlorophyta; f__; g__; s__
+
+Known taxonomy for query 855996:
+ k__Bacteria; p__Gemmatimonadetes; c__Gemmatimonadetes; o__N1423WL; f__; g__; s__
 ```
 
 ## Using heuristics to reduce runtime for database searches <link src='0f9232'/>
+
+**Pick up here**
 
 **As illustrated above, runtimes for performing pairwise alignments can be prohibitive for database searching.** The Smith-Waterman implementation we're using here, [SSW](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0082138), is very fast. As we covered in the previous chapter, if we were to create an even faster implementation, that would provide some initial help (it'd reduce our runtime by some factor $f$) but ultimately, we're still going to have a problem regardless of how big $f$ is, because **the runtime of the algorithm scales quadratically with sequence lengths**. Experiment with different values of $f$ to see how it changes the curve below.
 
