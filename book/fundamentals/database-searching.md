@@ -90,6 +90,28 @@ For the sake of runtime, we're going to work through this chapter using a random
 >>> print("%s are present in the subsampled database." % locale.format("%d", len(reference_db), grouping=True))
 ```
 
+We'll also extract some sequences from Greengenes to use as query sequences in our database searches. This time we won't annotate them (to simulate no knowing what organisms they're from). We'll also trim these sequences so they're shorter than the full length references. This will simulate obtaining a partial gene sequence, as is most common with the current sequencing technologies, but will also help to make the examples run faster.
+
+Note that some of our query sequences may also be in our subsampled reference database and some won't. This is realistic: sometimes we're working with sequences that are exact matches to known sequences, and sometimes we're working with sequences that don't match any known sequences (or at least any in the reference database that we're working with).
+
+```python
+>>> queries = []
+>>> for e in skbio.io.read(qdr.get_reference_sequences(), format='fasta', constructor=skbio.DNA):
+...     e = e[100:300]
+...     queries.append(e)
+>>> queries = random.sample(queries, k=100)
+```
+
+Let's also inspect a couple of the query sequences that we'll work with.
+
+```python
+>>> queries[0]
+```
+
+```python
+>>> queries[-1]
+```
+
 ## Defining a homology search function <link src="0C9FCS"/>
 
 **PICK UP HERE**
@@ -102,37 +124,27 @@ Next, we'll define our homology search function. This function will take as inpu
 >>> %psource local_alignment_search
 ```
 
-Next, let's define a query sequence to search against this database. We'll define `query1` to be an exact subsequence of one of the database sequences.
-
-```python
->>> query1 = reference_db[-1]
->>> query1 = query1[100:300]
-...
->>> print(query1.metadata['id'])
->>> print(query1)
->>> print(query1.metadata['phylum'])
->>> print(query1.metadata['genus'])
->>> print(query1.metadata['species'])
-```
-
-And we can now perform some database searches. Experiment with different sequences to see how they align by modifying `query1` in the next cell and then executing it (remember that you'll need to execute all of the above cells before executing this one).
+And now we can now perform some database searches. Experiment with different sequences to see how they align by modifying which query sequence you're searching against the database in the next cell and then executing it (remember that you'll need to execute all of the above cells before executing this one).
 
 Also, think about the runtime here. How many sequences are we searching, and how long are they? Does this strategy seem scalable?
 
 ```python
 >>> import time
 ...
+>>> query_sequence = queries[0]
 >>> start_time = time.time()
->>> results = local_alignment_search(query1, reference_db)
+>>> results = local_alignment_search(query_sequence, reference_db)
 >>> stop_time = time.time()
 >>> print("Runtime: %1.4f sec" % (stop_time - start_time))
 ```
 
 ```python
 >>> for alignment, score, reference_id in results:
-...     print('Percent similarity between query and reference: %1.2f' % (100 * (1. - alignment[0].distance(alignment[1]))))
+...     print('Percent similarity between query and reference: %1.2f%%' % (100 * (1. - alignment[0].distance(alignment[1]))))
+...     print('Length of the alignment: %d' % alignment.shape[1])
 ...     print('Alignment score: %d' % score)
 ...     print('Reference taxonomy:\n %s' % '; '.join(reference_taxonomy[reference_id]))
+...     print('The actual taxonomy of your query is:\n %s' % '; '.join(reference_taxonomy[query_sequence.metadata['id']]))
 ...     print()
 ```
 
@@ -187,22 +199,18 @@ For the purposes of an exercise, think of the database as one long sequence that
 1. How often do I fail to find the best alignment?
 2. Is my runtime reduced enough that I can tolerate not getting the best alignment this often?
 
-Let's look at a few heuristics, starting with a silly one first: we'll select a random `p` percent of database to align our query against. We'll start by defining `p` as 10%.
-
-```python
->>> random()
-```
+Let's look at a few heuristics, starting with a [straw man](https://en.wikipedia.org/wiki/Straw_man). We'll select a random `p` percent of database to align our query against. We'll start by defining `p` as 10%.
 
 ```python
 >>> from iab.algorithms import approximated_local_alignment_search_random
->>> %psource approximated_local_alignment_search_random
+>>> %psource heuristic_local_alignment_search_random
 ```
 
 Let's pass our initial `query1` (again, an exact match to a database sequence) and see if we get the right answer, and how much runtime is reduced.
 
 ```python
 >>> start_time = time()
->>> a1, a2, score, ref_id = approximated_local_alignment_search_random(query1, reference_db)
+>>> a1, a2, score, ref_id = heuristic_local_alignment_search_random(query1, reference_db)
 >>> stop_time = time()
 ...
 >>> print(a1)

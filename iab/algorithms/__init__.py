@@ -630,13 +630,13 @@ def local_alignment_search(query, reference_db, n=5, aligner=local_pairwise_alig
     results = sorted(results, key=lambda e: e[1], reverse=True)
     return results[:n]
 
-def approximated_local_alignment_search_random(
+def heuristic_local_alignment_search_random(
         query, reference_db, n=5, p=0.10, aligner=local_pairwise_align_ssw):
     k = int(p * len(reference_db))
     database_subset = random.sample(reference_db, k)
     return local_alignment_search(query, database_subset, n=n, aligner=aligner)
 
-def approximated_local_alignment_search_gc(
+def heuristic_local_alignment_search_gc(
         query, reference_db, n=5, reference_db_gc_contents=None, p=0.05,
         aligner=local_pairwise_align_ssw):
     query_gc = query.gc_content()
