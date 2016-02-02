@@ -85,8 +85,6 @@ First, let's load Greengenes into a list of ``skbio.DNA`` sequence objects, and 
 >>> from IPython.core import page
 >>> page.page = print
 Populating the interactive namespace from numpy and matplotlib
-WARNING: pylab import has clobbered these variables: ['random', 'e']
-`%matplotlib` prevents importing * from pylab and numpy
 ```
 
 ```python
@@ -191,18 +189,18 @@ DNA
 ---------------------------------------------------------------------
 Metadata:
     'description': ''
-    'id': '555829'
+    'id': '1129362'
 Stats:
     length: 200
     has gaps: False
     has degenerates: False
     has non-degenerates: True
-    GC-content: 56.00%
+    GC-content: 55.00%
 ---------------------------------------------------------------------
-0   AACGACTGCT AATACCGCAT GATGTCTACG GACCAAAGTG GGGGACCTTC GGGCCTCACG
-60  CCATAAGATT AGCCCAAGTG GGATTAGCTA GTTGGTGAGG TAATGGCTCA CCAAGGCGAC
-120 GATCCCTAGC TGGTTTGAGA GGATGATCAG CCACACTGGG ACTGAGACAC GGCCCAGACT
-180 CCTACGGGAG GCAGCAGTGG
+0   TGACACGTGG GCAACCTGCC TGTAAGATCG GGATAACTCC GGGAAACCGG GGCTAATACC
+60  GGATAATACT TTTTCTCGCG TGGGGAGAAG TTGAAAGATG GCTTCGGCTA TCGCTTACAG
+120 ATGGGCCCGC GGCGCATTAG CTAGTTGGTA GGGTAACGGC CTACCAAGGC AACGATGCGT
+180 AGCCGACCTG AGAGGGTGAT
 ```
 
 ```python
@@ -211,7 +209,7 @@ DNA
 ---------------------------------------------------------------------
 Metadata:
     'description': ''
-    'id': '4441348'
+    'id': '241186'
 Stats:
     length: 200
     has gaps: False
@@ -219,10 +217,10 @@ Stats:
     has non-degenerates: True
     GC-content: 58.00%
 ---------------------------------------------------------------------
-0   GTGGATGATC TGCCCTACGG CGGGGGATAA CCGCGGGAAA CTGCGGCTAA TACCGCATAC
-60  GATTGCAGGC ATAGAAGCTT GCAAGGAAAG GCGCTTCTGG CGTCGCCGGA GGATGAGTCC
-120 GCCCCCCATT AGCTAGTTGG CGAGATAATA GCTCACCAAG GCAACGATGG GTAGCCGAGC
-180 TGAGAGGTTG ATCGGCCACA
+0   TAACGGCCTA CCAAGGCGAC GATCCGTAGC TGGTTTGAGA GGACGACCAG CCACACTGGG
+60  ACTGAGACAC GGCCCAGACT CCTACGGGAG GCAGCAGTGG GGAATTTTGG ACAATGGGGG
+120 AAACCCTGAT CCAGCCATCC CGCGTGTGCG ATGAAGGCCT TCGGGTTGTA AAGCACTTTT
+180 GGCAGGAAAG AAACGTCGCG
 ```
 
 ## Defining the problem <link src="SZ9u3S"/>
@@ -288,52 +286,52 @@ This next cell, which is the one that actually performs the database searches, w
 >>> stop_time = time.time()
 >>> print("Runtime: %1.4f sec per query" % ((stop_time - start_time) / len(current_queries)))
 >>> results
-Runtime: 8.5163 sec per query
+Runtime: 8.7565 sec per query
                                                   reference taxonomy  \
 query   reference                                                      
-4362165 317527     k__Bacteria; p__Proteobacteria; c__Betaproteob...   
-        4377697    k__Bacteria; p__Proteobacteria; c__Betaproteob...   
-        568420     k__Bacteria; p__Proteobacteria; c__Betaproteob...   
-        4336863    k__Bacteria; p__Proteobacteria; c__Betaproteob...   
-        339773     k__Bacteria; p__Proteobacteria; c__Betaproteob...   
-1131091 551602     k__Bacteria; p__Actinobacteria; c__Actinobacte...   
-        565291     k__Bacteria; p__Actinobacteria; c__Actinobacte...   
-        1144585    k__Bacteria; p__Actinobacteria; c__Actinobacte...   
-        279325     k__Bacteria; p__Actinobacteria; c__Actinobacte...   
-        547232     k__Bacteria; p__Actinobacteria; c__Actinobacte...   
-219098  3721827    k__Bacteria; p__Cyanobacteria; c__Chloroplast;...   
-        4377549    k__Bacteria; p__Cyanobacteria; c__Chloroplast;...   
-        735769     k__Bacteria; p__Cyanobacteria; c__Chloroplast;...   
-        2925630    k__Bacteria; p__Cyanobacteria; c__Chloroplast;...   
-        509617     k__Bacteria; p__Cyanobacteria; c__Oscillatorio...   
-855996  4479566    k__Bacteria; p__Gemmatimonadetes; c__Gemmatimo...   
-        214676     k__Bacteria; p__Gemmatimonadetes; c__Gemmatimo...   
-        4412017    k__Bacteria; p__Gemmatimonadetes; c__Gemmatimo...   
-        2216488    k__Bacteria; p__Gemmatimonadetes; c__Gemmatimo...   
-        1108941    k__Bacteria; p__Gemmatimonadetes; c__Gemmatimo...   
+316642  326804     k__Bacteria; p__Firmicutes; c__Clostridia; o__...   
+        311096     k__Bacteria; p__Firmicutes; c__Clostridia; o__...   
+        323155     k__Bacteria; p__Firmicutes; c__Clostridia; o__...   
+        251395     k__Bacteria; p__Firmicutes; c__Clostridia; o__...   
+        333675     k__Bacteria; p__Firmicutes; c__Clostridia; o__...   
+3900488 4384293    k__Bacteria; p__Firmicutes; c__Clostridia; o__...   
+        1689987    k__Bacteria; p__Firmicutes; c__Clostridia; o__...   
+        4311536    k__Bacteria; p__Firmicutes; c__Clostridia; o__...   
+        152014     k__Bacteria; p__Firmicutes; c__Clostridia; o__...   
+        333471     k__Bacteria; p__Firmicutes; c__Clostridia; o__...   
+4478817 719879     k__Bacteria; p__Bacteroidetes; c__[Saprospirae...   
+        1104589    k__Bacteria; p__Bacteroidetes; c__[Saprospirae...   
+        4384311    k__Bacteria; p__Bacteroidetes; c__[Saprospirae...   
+        808539     k__Bacteria; p__Bacteroidetes; c__[Saprospirae...   
+        208595     k__Bacteria; p__Bacteroidetes; c__[Saprospirae...   
+254871  575373     k__Bacteria; p__Bacteroidetes; c__Sphingobacte...   
+        103997     k__Bacteria; p__Bacteroidetes; c__Cytophagia; ...   
+        4302951    k__Bacteria; p__Bacteroidetes; c__Cytophagia; ...   
+        4342029    k__Bacteria; p__Bacteroidetes; c__Cytophagia; ...   
+        826061     k__Bacteria; p__Bacteroidetes; c__Cytophagia; ...   
 
                    percent similarity  alignment length  score  
 query   reference                                               
-4362165 317527              97.500000               200    375  
-        4377697             97.500000               200    375  
-        568420              96.500000               200    365  
-        4336863             96.500000               200    365  
-        339773              96.500000               200    365  
-1131091 551602              95.522388               201    355  
-        565291              94.000000               200    340  
-        1144585             92.079208               202    328  
-        279325              91.584158               202    323  
-        547232              90.594059               202    313  
-219098  3721827             84.079602               201    249  
-        4377549             85.000000               200    246  
-        735769              84.500000               200    241  
-        2925630             84.000000               200    240  
-        509617              83.500000               200    233  
-855996  4479566             86.274510               204    284  
-        214676              87.500000               200    275  
-        4412017             86.500000               200    273  
-        2216488             84.803922               204    264  
-        1108941             83.743842               203    260
+316642  326804              90.594059               202    330  
+        311096              89.447236               199    294  
+        323155              88.944724               199    289  
+        251395              88.888889               198    286  
+        333675              87.939698               199    279  
+3900488 4384293            100.000000               200    400  
+        1689987             92.574257               202    336  
+        4311536             81.407035               199    236  
+        152014              81.909548               199    233  
+        333471              78.500000               200    230  
+4478817 719879              72.857143               210    217  
+        1104589             79.899497               199    210  
+        4384311             77.832512               203    198  
+        808539              76.470588               204    193  
+        208595              77.889447               199    179  
+254871  575373              82.587065               201    225  
+        103997              82.000000               200    220  
+        4302951             80.295567               203    220  
+        4342029             78.325123               203    210  
+        826061              79.207921               202    202
 ```
 
 Now, let's try to answer our initial question: what is the most likely taxonomic annotation for each of our query sequences? Spend a few minutes reviewing this information, and write down what you think the most likely taxonomic annotation is for each of the query sequences. Here are some hints to help you out:
@@ -349,33 +347,33 @@ Now, let's try to answer our initial question: what is the most likely taxonomic
 ...     for e in results['reference taxonomy'][q_id]:
 ...         print(' ', e)
 ...     print()
-Closest taxonomies for query 4362165 (in order):
-  k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__; s__
-  k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__Limnohabitans; s__curvus
-  k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__; s__
-  k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__; s__
-  k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__Limnohabitans; s__
+Closest taxonomies for query 316642 (in order):
+  k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__; g__; s__
+  k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__; g__; s__
+  k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__; g__; s__
+  k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__; g__; s__
+  k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__; g__; s__
 
-Closest taxonomies for query 1131091 (in order):
-  k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Micrococcaceae; g__Micrococcus; s__
-  k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Micrococcaceae; g__Micrococcus; s__
-  k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Microbacteriaceae; g__Salinibacterium; s__
-  k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Microbacteriaceae; g__Salinibacterium; s__
-  k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Nocardiaceae; g__Rhodococcus; s__
+Closest taxonomies for query 3900488 (in order):
+  k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__; g__; s__
+  k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__; g__; s__
+  k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__; g__; s__
+  k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__; g__; s__
+  k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__; g__; s__
 
-Closest taxonomies for query 219098 (in order):
-  k__Bacteria; p__Cyanobacteria; c__Chloroplast; o__; f__; g__; s__
-  k__Bacteria; p__Cyanobacteria; c__Chloroplast; o__Streptophyta; f__; g__; s__
-  k__Bacteria; p__Cyanobacteria; c__Chloroplast; o__Streptophyta; f__; g__; s__
-  k__Bacteria; p__Cyanobacteria; c__Chloroplast; o__; f__; g__; s__
-  k__Bacteria; p__Cyanobacteria; c__Oscillatoriophycideae; o__Chroococcales; f__Xenococcaceae; g__; s__
+Closest taxonomies for query 4478817 (in order):
+  k__Bacteria; p__Bacteroidetes; c__[Saprospirae]; o__[Saprospirales]; f__Saprospiraceae; g__; s__
+  k__Bacteria; p__Bacteroidetes; c__[Saprospirae]; o__[Saprospirales]; f__Saprospiraceae; g__; s__
+  k__Bacteria; p__Bacteroidetes; c__[Saprospirae]; o__[Saprospirales]; f__Saprospiraceae; g__; s__
+  k__Bacteria; p__Bacteroidetes; c__[Saprospirae]; o__[Saprospirales]; f__Saprospiraceae; g__; s__
+  k__Bacteria; p__Bacteroidetes; c__[Saprospirae]; o__[Saprospirales]; f__Saprospiraceae; g__; s__
 
-Closest taxonomies for query 855996 (in order):
-  k__Bacteria; p__Gemmatimonadetes; c__Gemmatimonadetes; o__; f__; g__; s__
-  k__Bacteria; p__Gemmatimonadetes; c__Gemmatimonadetes; o__N1423WL; f__; g__; s__
-  k__Bacteria; p__Gemmatimonadetes; c__Gemmatimonadetes; o__Ellin5290; f__; g__; s__
-  k__Bacteria; p__Gemmatimonadetes; c__Gemmatimonadetes; o__Ellin5290; f__; g__; s__
-  k__Bacteria; p__Gemmatimonadetes; c__Gemmatimonadetes; o__; f__; g__; s__
+Closest taxonomies for query 254871 (in order):
+  k__Bacteria; p__Bacteroidetes; c__Sphingobacteriia; o__Sphingobacteriales; f__; g__; s__
+  k__Bacteria; p__Bacteroidetes; c__Cytophagia; o__Cytophagales; f__Flammeovirgaceae; g__; s__
+  k__Bacteria; p__Bacteroidetes; c__Cytophagia; o__Cytophagales; f__Cyclobacteriaceae; g__Indibacter; s__alkaliphilus
+  k__Bacteria; p__Bacteroidetes; c__Cytophagia; o__Cytophagales; f__Cyclobacteriaceae; g__; s__
+  k__Bacteria; p__Bacteroidetes; c__Cytophagia; o__Cytophagales; f__Flammeovirgaceae; g__; s__
 ```
 
 Because we have taxonomic annotations for all of the Greengenes sequences (though as you probably have noticed by now, they differ in their specificity), we can next look at taxonomy associated with each of our queries in Greengenes. How do your annotations compare to those from Greengenes, which we'll print out in the next cell?
@@ -385,24 +383,26 @@ Because we have taxonomic annotations for all of the Greengenes sequences (thoug
 ...     q_id = q.metadata['id']
 ...     print('Known taxonomy for query %s:\n %s' % (q_id, reference_taxonomy[q_id]))
 ...     print()
-Known taxonomy for query 4362165:
- k__Bacteria; p__Proteobacteria; c__Betaproteobacteria; o__Burkholderiales; f__Comamonadaceae; g__Limnohabitans; s__
+Known taxonomy for query 316642:
+ k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__Ruminococcaceae; g__; s__
 
-Known taxonomy for query 1131091:
- k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Micrococcaceae; g__Micrococcus; s__
+Known taxonomy for query 3900488:
+ k__Bacteria; p__Firmicutes; c__Clostridia; o__Clostridiales; f__; g__; s__
 
-Known taxonomy for query 219098:
- k__Bacteria; p__Cyanobacteria; c__Chloroplast; o__Chlorophyta; f__; g__; s__
+Known taxonomy for query 4478817:
+ k__Bacteria; p__Bacteroidetes; c__[Saprospirae]; o__[Saprospirales]; f__Saprospiraceae; g__; s__
 
-Known taxonomy for query 855996:
- k__Bacteria; p__Gemmatimonadetes; c__Gemmatimonadetes; o__N1423WL; f__; g__; s__
+Known taxonomy for query 254871:
+ k__Bacteria; p__Bacteroidetes; c__Cytophagia; o__Cytophagales; f__Flammeovirgaceae; g__; s__
 ```
 
 ## Using heuristics to reduce runtime for database searches <link src='0f9232'/>
 
-**Pick up here**
+**pick up here**
 
-**As illustrated above, runtimes for performing pairwise alignments can be prohibitive for database searching.** The Smith-Waterman implementation we're using here, [SSW](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0082138), is very fast. As we covered in the previous chapter, if we were to create an even faster implementation, that would provide some initial help (it'd reduce our runtime by some factor $f$) but ultimately, we're still going to have a problem regardless of how big $f$ is, because **the runtime of the algorithm scales quadratically with sequence lengths**. Experiment with different values of $f$ to see how it changes the curve below.
+In the examples above, it's taking on the order of 5-15 seconds to search a single sequence against our subset of Greengenes. This makes sense when you think about the computations that are being performed. For every sequence in our reference database (5000, if you haven't modified the database subsampling step) it is computing the $F$ and $T$ matrices described in [the Pairwise Alignment chapter](alias://a76822), and then tracing back the matrix to compute the aligned sequences. Given all of that, the fact that computation only takes 5-15 seconds is pretty incredible. However, that doesn't change the fact that this very likely won't scale to modern-sized sequence data sets. In other words, we'd have to wait way too long for results. Performing all pairwise alignments is prohibitively expensive for database searching.
+
+As we discussed in the previous chapter, if we were to create an even faster implementation, that would provide some initial help (it'd reduce our runtime by some factor $f$) but ultimately, we're still going to have a problem regardless of how big $f$ is, because the runtime of the algorithm scales quadratically with sequence lengths. Experiment with different values of $f$ to see how it changes the curve below.
 
 $f$ represents the fold-reduction in runtime (e.g., $f=2$ represents a two-fold reduction, or halving, of runtime, and $f=10$ equals a ten-fold reduction in runtime).
 
