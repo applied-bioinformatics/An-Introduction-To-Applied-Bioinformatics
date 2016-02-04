@@ -396,32 +396,99 @@ Known taxonomy for query 254871:
  k__Bacteria; p__Bacteroidetes; c__Cytophagia; o__Cytophagales; f__Flammeovirgaceae; g__; s__
 ```
 
-## Using heuristics to reduce runtime for database searches <link src='0f9232'/>
-
-**pick up here**
+## Reducing the runtime for database searches <link src='0f9232'/>
 
 In the examples above, it's taking on the order of 5-15 seconds to search a single sequence against our subset of Greengenes. This makes sense when you think about the computations that are being performed. For every sequence in our reference database (5000, if you haven't modified the database subsampling step) it is computing the $F$ and $T$ matrices described in [the Pairwise Alignment chapter](alias://a76822), and then tracing back the matrix to compute the aligned sequences. Given all of that, the fact that computation only takes 5-15 seconds is pretty incredible. However, that doesn't change the fact that this very likely won't scale to modern-sized sequence data sets. In other words, we'd have to wait way too long for results. Performing all pairwise alignments is prohibitively expensive for database searching.
 
-As we discussed in the previous chapter, if we were to create an even faster implementation, that would provide some initial help (it'd reduce our runtime by some factor $f$) but ultimately, we're still going to have a problem regardless of how big $f$ is, because the runtime of the algorithm scales quadratically with sequence lengths. Experiment with different values of $f$ to see how it changes the curve below.
-
-$f$ represents the fold-reduction in runtime (e.g., $f=2$ represents a two-fold reduction, or halving, of runtime, and $f=10$ equals a ten-fold reduction in runtime).
+As we discussed in the previous chapter, the run time of pairwise alignment scales quadratically with sequence length. Database searching, at least in the example we're exploring in this chapter, is a bit of a different problem however. Our sequence lengths aren't changing, but rather it takes a long time because we're performing a computationally expensive step, pairwise alignment, many times. Our database is fixed in that the number of sequences in it doesn't change, the sequences themselves don't change, and they're roughly the same length. Our query sequences are also exactly the same length in this example (remember that we set that above, when we sliced a single region from reference database sequences to create our query sequences). Let's explore how the runtime of this database search scales under these constriants.
 
 ```python
->>> seq_lengths = range(25)
->>> times = [t * t for t in range(25)]
->>> f = 10000 # no scaling factor
->>> times = [t / f for t in times]
+>>> import pandas as pd
 ...
->>> plt.plot(range(25), times)
->>> plt.xlabel('Sequence Length')
->>> plt.ylabel('Runtime (s)')
+>>> def tabulate_local_alignment_search_runtime(queries, reference_db, n_query_sequences, n_reference_sequences,
+...                                             search_function):
+...     data = []
+...     # we'll iterate over the pairs of number of query sequences
+...     # and number of reference sequences, and compute the runtime
+...     # of the database search three times for each pair (so we
+...     # have some idea of the variance in the runtimes). this is
+...     # achieved here with a nested for loop (i.e., a for loop
+...     # within a for loop).
+...     for nq, nr in zip(n_query_sequences, n_reference_sequences):
+...         for i in range(3):
+...             # select nq query sequences at random
+...             current_queries = random.sample(queries, k=nq)
+...             # select nr reference sequences at random
+...             temp_reference_db = random.sample(reference_db, k=nr)
+...             # run the search and store its runtime
+...             start_time = time.time()
+...             _ = search_function(current_queries, temp_reference_db)
+...             stop_time = time.time()
+...             median_query_sequence_len = np.median([len(q) for q in current_queries])
+...             median_reference_sequence_len = np.median([len(r) for r in temp_reference_db])
+...             data.append((nq, nr, median_query_sequence_len, median_reference_sequence_len,
+...                          stop_time - start_time))
+...     runtimes = pd.DataFrame(data=np.asarray(data),
+...                             columns=["Number of query seqs", "Number of reference seqs",
+...                                      "Median query seq length", "Median reference seq length",
+...                                      "Runtime (s)"] )
+...     return runtimes
+...
+>>> # we'll temporarily work with a smaller reference database
+... # so this will run a lot faster. this will be of fixed size.
+... n_reference_sequences = [100, 100, 100]
+>>> # since our database is smaller, we can work with some slightly
+... # larger numbers of sequences.
+... n_query_sequences = [1, 5, 10, 15]
+...
+>>> local_alignment_search_runtimes = tabulate_local_alignment_search_runtime(queries, reference_db,
+...                                                                           n_query_sequences, n_reference_sequences,
+...                                                                           local_alignment_search)
+>>> local_alignment_search_runtimes
+   Number of query seqs  Number of reference seqs  Median query seq length  \
+0                     1                       100                      200   
+1                     1                       100                      200   
+2                     1                       100                      200   
+3                     5                       100                      200   
+4                     5                       100                      200   
+5                     5                       100                      200   
+6                    10                       100                      200   
+7                    10                       100                      200   
+8                    10                       100                      200   
+
+   Median reference seq length  Runtime (s)  
+0                       1424.5     0.182923  
+1                       1450.0     0.170758  
+2                       1414.0     0.172627  
+3                       1437.0     0.853667  
+4                       1446.0     0.867526  
+5                       1437.5     0.887163  
+6                       1408.0     1.696071  
+7                       1428.0     1.729055  
+8                       1422.0     1.708480
 ```
 
-Database searching is a slightly different problem however. There are a few different scenarios here:
+This table shows that we've tried a few variations on number of query sequences and kept the number of reference sequences constant. The is no variance in the query sequence length, and there is a relatively small amount of variance in reference sequence length (they're all of the same order of magnitude). There is also relatively little variance in runtime for fixed numbers of query and reference sequences.
 
-1. we may have a database that is growing in size (for example, over months and years as more sequences are discovered);
-2. we may have a fixed database, but increasingly be obtaining larger numbers of sequences that we want to search against that database;
-3. or, the situation that we find ourselves in as of this writing: both.
+The interesting aspect of this table is that there is an increase in runtime with an increasing number of query sequences. We expect that, but what we care about is how runtime is increasing as a function of number of query sequences. Let's plot runtime versus the number of query sequences to help us understand the relationship.
+
+```python
+>>> import seaborn as sns
+>>> ax = sns.regplot(x="Number of query seqs", y="Runtime (s)", data=local_alignment_search_runtimes)
+>>> ax.set_xlim(0)
+>>> ax.set_ylim(0)
+>>> ax
+```
+
+What we see here is pretty clearly a linear relationship: $runtime \approx constant \times number\ of\ query\ sequences$. This is because as we increase the number of query sequences, we're increasing the number of pairwise alignments that we need to perform. If we have 5 queries and 10 reference sequences, we compute $5 \times 10 = 50$ pairwise alignments. If we have 10 queries and 100 reference sequences, we compute $10 \times 100 = 1000$ pairwise alignments. There are a few practical ways to reduce the runtime of a process like this. 
+
+The first seems obvious, and even silly at first: perform fewer alignments. This could be achieved in a few ways. You could reduce the number of query sequences, though this might be something a researcher is resistant to: they have some collection of unknown sequences, and they want to know what they all are. You could alternatively reduce the number of reference sequences, but you might run into the same issues there: we wouldn't want to exclude reference sequences that might provide us with useful information about our query sequences. Finally, we might be able to figure out some ways to perform fewer alignments by not searching all of the query sequences against all of the reference sequences. 
+
+Another approach to reducing the runtime of this process would be to create a faster implemention of the algorithm (though at some point that won't be possible anymore), use a faster computer, or run the process in parallel on multiple processors. All of these would be ways to reduce the runtime of the search by some factor $f$, where $new\ runtime \approx \frac{runtime}{f}$. 
+
+In practice, for a production scale sequence database search application like BLAST, we'd combine these approaches. In the next section we'll explore wa
+
+## Heurisitic algorithms <link src="mUArdw"/>
 
 For the purposes of an exercise, think of the database as one long sequence that we want to align against and a collection of query sequence as another long sequence that we want to search. What do you expect a curve for each of the above to look like?
 
