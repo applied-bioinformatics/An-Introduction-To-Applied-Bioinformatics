@@ -14,7 +14,7 @@ Whose genome is the above sequence encoded in? What is its function? Take a minu
 
 In the context of database searching, a query sequence and a reference sequence that we hypothesize to be homologous can be identical to one another, or they can differ as a result of mutation events. When sequences differ, we're often then interested in how much they differ, or their pairwise similarity, which can help us identify the most closely related of several homologs in the reference database. There is an important distinction in the terms *homology* and *similarity*: homology is a discrete variable, and similarity is a continuous variable. A pair of biological sequences either *are* or *are not* derived from a common ancestor, but they can be more or less similar to each other. Saying that two sequences are 80% homologous doesn't make sense. What people generally mean when they say this is that two sequences are 80% similar, and as a result they are hypothesizing homology between the sequences.
 
-## Defining the problem
+## Defining the problem <link src="P7kHdy"/>
 
 As mentioned above, if we want to perform a homology search we'll have one or more *query sequences*, and for each we want to know which sequence(s) in a reference database it is most similar to.
 
@@ -295,7 +295,7 @@ Let's pass our initial `queries` to see how the results compare to our known tax
 ...     print('Known taxonomy for query %s:\n %s' % (q_id, reference_taxonomy[q_id]))
 ```
 
-What we need now is a way to know how often we get the "right answer", and how long this heuristic algorithm takes relative to the complete algorithm. We therefore first need to define what the "right answer" is. How about this: if the most common taxonomy assignment resulting from the database search at `taxonomy_levels` levels of taxonomy (i.e., how deep or specific our assignment is) matches the known taxonomy, then our algorithm has achieved the right answer. We can vary `taxonomy_levels` to see how the different heuristics perform at different levels. 
+What we need now is a way to know how often we get the "right answer", and how long this heuristic algorithm takes relative to the complete algorithm. We therefore first need to define what the "right answer" is. How about this: if the most common taxonomy assignment resulting from the database search at `taxonomy_levels` levels of taxonomy (i.e., how deep or specific our assignment is) matches the known taxonomy, then our algorithm has achieved the right answer. We can vary `taxonomy_levels` to see how the different heuristics perform at different levels.
 
 Here's what this would look like:
 
