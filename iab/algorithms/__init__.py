@@ -653,25 +653,26 @@ def heuristic_local_alignment_search_random(
     return local_alignment_search(queries, database_subset, n=n, aligner=aligner)
 
 def heuristic_local_alignment_search_gc(
-        queries, reference_db, n=5, reference_db_gc_contents=None, p=0.05,
+        queries, reference_db, p, n=5, reference_db_gc_contents=None,
         aligner=local_pairwise_align_ssw):
-    query_gc = query.gc_content()
-    database_subset = []
-    # this step results in a second iteration through the reference database,
-    # but for now I'm trying to minimize duplication of the code in
-    # local_alignment_search because the aligner interface is going to change
-    for seq in reference_db:
-        if reference_db_gc_contents is None:
-            ref_gc_content = seq.gc_content()
-        else:
-            ref_gc_content = reference_db_gc_contents[seq.metadata['id']]
-        if ref_gc_content - p < query_gc < ref_gc_content + p:
-            database_subset.append(seq)
-    return local_alignment_search(query, database_subset, n=n, aligner=aligner)
+    results = []
+    if reference_db_gc_contents is None:
+        reference_db_gc_contents = \
+         {r.metadata['id'] : r.gc_content() for r in reference_db}
+    for q in queries:
+        query_gc_content = q.gc_content()
+        database_subset = []
+        for r in reference_db:
+            ref_gc_content = r.gc_content()
+            if ref_gc_content - p < query_gc_content < ref_gc_content + p:
+                database_subset.append(r)
+        results.append(local_alignment_search([q], database_subset,
+                                              n=n, aligner=aligner))
+    return pd.concat(results)
 
 def shuffle_sequence(sequence):
     randomized_order = list(range(len(sequence)))
-    shuffle(randomized_order)
+    random.shuffle(randomized_order)
     return sequence[randomized_order]
 
 def generate_random_score_distribution(query_sequence,
