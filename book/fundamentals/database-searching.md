@@ -46,7 +46,7 @@ First, let's load Greengenes into a list of ``skbio.DNA`` sequence objects, and 
 >>> import qiime_default_reference as qdr
 >>> import skbio
 >>> import locale
->>> locale.setlocale(locale.LC_ALL, 'en_US')
+>>> locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 ...
 >>> # Load the taxonomic data
 ... reference_taxonomy = {}
@@ -258,7 +258,7 @@ Figure 1: Genome sequencing costs.
 
 Figure 2: Size of GenBank.</figcaption>
 
-One way that we can deal with this problem is by acknowledging that most of the alignments that are performed in a database search are unlikely to be the best alignment. An algorithm developer could therefore improve runtime by defining a heuristic (or a rule) that is applied to determine which sequences we're going to align and which sequences we're not going to align. For it to be useful, deciding whether to align a pair of sequences (i.e., applying the heurtistic) must be much faster than performing the pairwise alignment. It is important to note that if we decide to not align against a query against a given reference sequence, we exclude that reference sequence as a possible result of our search, so a good heuristic makes that very unlikely. When thinking about heuristic algorithms, there are some important considerations:
+One way that we can deal with this problem is by recognizing that most of the alignments that are performed in a database search are unlikely to be the best alignment. An algorithm developer could therefore improve runtime by defining a heuristic (or a rule) that is applied to determine which sequences we're going to align and which sequences we're not going to align. For it to be useful, deciding whether to align a pair of sequences (i.e., applying the heurtistic) must be much faster than performing the pairwise alignment. It is important to note that if we decide to not align a query against a given reference sequence, we exclude that reference sequence as a possible result of our search. A good heuristic makes it very unlikely to exclude good alignments. When thinking about heuristic algorithms, there are some important considerations:
 
 1. How often do I fail to get the right answer?
 2. Is my runtime reduced enough that I'm willing to tolerate not getting the best alignment this often?
@@ -365,7 +365,7 @@ Again, what's the runtime, and how often do we get the correct answer? Based on 
 
 ### Composition-based reference sequence collection <link src="P4vQ4b"/>
 
-While the random selection of database sequences can vastly reduce the runtime for database searching, we don't get the right answer very often. Let's go a heuristic that's a bit smarter. How about this: if the overall nucleotide composition of a query sequence is different than the overall nucleotide composition of a reference sequence, it's unlikely that the best alignment will result from that pairwise alignment. One metric of sequence composition that we can compute quickly (because remember, this has to be a lot faster than computing the alignment for it to be worth it) is GC content. Let's define a heuristic that only performs a pairwise alignment if the GC content of the reference sequence is within $p%%$ of the GC content of the query sequence.
+While the random selection of database sequences can vastly reduce the runtime for database searching, we don't get the right answer very often. Let's try a heuristic that's a bit smarter. How about this: if the overall nucleotide composition of a query sequence is different than the overall nucleotide composition of a reference sequence, it's unlikely that the best alignment will result from that pairwise alignment. One metric of sequence composition that we can compute quickly (because remember, this has to be a lot faster than computing the alignment for it to be worth it) is GC content. Let's define a heuristic that only performs a pairwise alignment if the GC content of the reference sequence is within $p%%$ of the GC content of the query sequence.
 
 First, let's get an idea of what the range of GC contents is for all of our database sequences, as that will help us decide on a reasonable value for ``p``.
 
