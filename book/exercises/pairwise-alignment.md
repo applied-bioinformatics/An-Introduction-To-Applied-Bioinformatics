@@ -114,7 +114,7 @@ You can now use ``slice_sequence`` to extract a region of interest from a sequen
 ...
 ```
 
-This cell contains the potential primers that we will use to amplify specific regions
+This cell contains the potential primers that we will use to amplify specific regions.
 
 ```python
 >>> primers = [('p1', 'TTCCGGTTGATCCNGCCGGA'), # F21
@@ -123,10 +123,10 @@ This cell contains the potential primers that we will use to amplify specific re
 >>>            ('p4', 'TACGGNAGGCAGCAG'), # F343
 >>>            ('p5', 'GTGCCAGCNGCCGCGGTAA'), # F515
 >>>            ('p6', 'ATTAGATACCCNGGTAGTCC'), # F770
->>>            ('p7', 'GGACTACNNGGGTATCTAAT'), # R806
->>>            ('p8', 'GTGCTGCCCCGCCAATTCCT'), # R915
+>>>            ('p7', 'ATTAGATACCCNNGTAGTCC'), # R806 (reverse complement)
+>>>            ('p8', 'AGGAATTGGCGGGGCAGCAC'), # R915 (reverse complement)
 >>>            ('p9', 'AAACTNAAAGGAATTGACGG'), # F926
->>>            ('p10', 'TTNGGGGCATNCNNACCT')] # R1240
+>>>            ('p10', 'AGGTNNGNATGCCCCNAA')] # R1240 (reverse complement)
 ```
 
 If you want to locally align a primer against a primer, a primer against a sequence, or a sequence against a sequence, you could run the following:
