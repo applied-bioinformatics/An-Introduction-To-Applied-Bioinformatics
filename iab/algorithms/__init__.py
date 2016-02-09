@@ -7,16 +7,16 @@
 # http://creativecommons.org/licenses/by-nc-sa/4.0/.
 # -----------------------------------------------------------------------------
 from __future__ import division
-from random import choice, random, shuffle
+import random
 
 import numpy as np
+import pandas as pd
+import tabulate
 from scipy.cluster.hierarchy import average, dendrogram, to_tree
 import skbio
-from skbio.sequence import Sequence, DNA
-from skbio import DistanceMatrix
-from skbio.alignment import local_pairwise_align_ssw, TabularMSA
-from skbio import TreeNode
-import tabulate
+from skbio import Sequence, DNA, TabularMSA, TreeNode, DistanceMatrix
+from skbio.alignment import local_pairwise_align_ssw
+
 
 blosum50 = {'A': {'A': 5, 'C': -1, 'D': -2, 'E': -1, 'F': -3, 'G': 0, 'H': -2, 'I': -1, 'K': -1, 'L': -2, 'M': -1, 'N': -1, 'P': -1, 'Q': -1, 'R': -2, 'S': 1, 'T': 0, 'V': 0, 'W': -3, 'Y': -2},
 'C': {'A': -1, 'C': 13, 'D': -4, 'E': -3, 'F': -2, 'G': -3, 'H': -3, 'I': -2, 'K': -3, 'L': -2, 'M': -2, 'N': -2, 'P': -4, 'Q': -3, 'R': -4, 'S': -1, 'T': -1, 'V': -1, 'W': -5, 'Y': -3},
@@ -618,61 +618,61 @@ def align(sequence1, sequence2, gap_penalty, substitution_matrix, local):
 # DB searching notebook
 ##
 
-def local_alignment_search(query, reference_db, aligner=local_pairwise_align_ssw):
-    best_score = 0.0
-    best_match = None
-    best_a1 = None
-    best_a2 = None
-    for seq in reference_db:
-        alignment, score, _ = aligner(query, seq)
-        if score > best_score:
-            best_score = score
-            best_match = seq.metadata['id']
-            best_a1 = str(alignment[0])
-            best_a2 = str(alignment[1])
-    return best_a1, best_a2, best_score, best_match
+def local_alignment_search(queries, reference_db, n=5,
+                           aligner=local_pairwise_align_ssw):
+    results = []
+    indices = []
+    for q in queries:
+        # first we'll compute all of the alignments and their associated scores
+        hits = []
+        for r in reference_db:
+            aln, score, _ = aligner(q, r)
+            hits.append([r.metadata['id'], score, aln,
+                         r.metadata['taxonomy']])
+        # then we reverse-sort them by score, and return the n highest
+        # scoring alignments (this needs to be updated so we only
+        # ever keep track of the n highest scoring alignments)
+        best_hits = sorted(hits, key=lambda e: e[1], reverse=True)[:n]
+        # then we compile and track some information about the n best hits
+        for r_id, score, aln, r_tax in best_hits:
+            percent_similarity = (100 * (1. - aln[0].distance(aln[1])))
+            aln_length = aln.shape[1]
+            indices.append((q.metadata['id'], r_id))
+            results.append((r_tax, percent_similarity,
+                            aln_length, score))
+    index = pd.MultiIndex.from_tuples(indices, names=['query', 'reference'])
+    columns = ['reference taxonomy', 'percent similarity',
+               'alignment length', 'score']
+    results = pd.DataFrame(results, index=index, columns=columns)
+    return results
 
-def approximated_local_alignment_search_random(
-        query, reference_db, p=0.10, aligner=local_pairwise_align_ssw):
-    best_score = 0.0
-    best_match = None
-    best_a1 = None
-    best_a2 = None
-    for seq in reference_db:
-        if random() < p:
-            alignment, score, _ = aligner(query, seq)
-            if score > best_score:
-                best_score = score
-                best_match = seq.metadata['id']
-                best_a1 = str(alignment[0])
-                best_a2 = str(alignment[1])
-    return best_a1, best_a2, best_score, best_match
+def heuristic_local_alignment_search_random(
+        queries, reference_db, p, n=5, aligner=local_pairwise_align_ssw):
+    k = int(p * len(reference_db))
+    database_subset = random.sample(reference_db, k)
+    return local_alignment_search(queries, database_subset, n=n, aligner=aligner)
 
-def gc_content(seq):
-    return (seq.count('G') + seq.count('C')) / len(seq)
-
-def approximated_local_alignment_search_gc(
-        query, reference_db, reference_db_gc_contents, p=0.05,
+def heuristic_local_alignment_search_gc(
+        queries, reference_db, p, n=5, reference_db_gc_contents=None,
         aligner=local_pairwise_align_ssw):
-    query_gc = gc_content(query)
-    best_score = 0.0
-    best_match = None
-    best_a1 = None
-    best_a2 = None
-    for seq in reference_db:
-        ref_gc = reference_db_gc_contents[seq.metadata['id']]
-        if ref_gc - p < query_gc < ref_gc + p:
-            alignment, score, _ = aligner(query, seq)
-            if score > best_score:
-                best_score = score
-                best_match = seq.metadata['id']
-                best_a1 = str(alignment[0])
-                best_a2 = str(alignment[1])
-    return best_a1, best_a2, best_score, best_match
+    results = []
+    if reference_db_gc_contents is None:
+        reference_db_gc_contents = \
+         {r.metadata['id'] : r.gc_content() for r in reference_db}
+    for q in queries:
+        query_gc_content = q.gc_content()
+        database_subset = []
+        for r in reference_db:
+            ref_gc_content = r.gc_content()
+            if ref_gc_content - p < query_gc_content < ref_gc_content + p:
+                database_subset.append(r)
+        results.append(local_alignment_search([q], database_subset,
+                                              n=n, aligner=aligner))
+    return pd.concat(results)
 
 def shuffle_sequence(sequence):
     randomized_order = list(range(len(sequence)))
-    shuffle(randomized_order)
+    random.shuffle(randomized_order)
     return sequence[randomized_order]
 
 def generate_random_score_distribution(query_sequence,
@@ -808,14 +808,14 @@ def progressive_msa(sequences, guide_tree, pairwise_aligner):
     # this is a temporary hack as the aligners in skbio 0.4.1 are dropping
     # metadata - this makes sure that the right metadata is associated with
     # the sequence after alignment
-    if isinstance(c1_aln, skbio.Sequence):
+    if isinstance(c1_aln, Sequence):
         alignment[0].metadata = c1_aln.metadata
         len_c1_aln = 1
     else:
         for i in range(len(c1_aln)):
             alignment[i].metadata = c1_aln[i].metadata
         len_c1_aln = len(c1_aln)
-    if isinstance(c2_aln, skbio.Sequence):
+    if isinstance(c2_aln, Sequence):
         alignment[1].metadata = c2_aln.metadata
     else:
         for i in range(len(c2_aln)):
