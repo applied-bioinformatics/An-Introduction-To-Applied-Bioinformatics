@@ -7,7 +7,7 @@
 # http://creativecommons.org/licenses/by-nc-sa/4.0/.
 # -----------------------------------------------------------------------------
 from __future__ import division
-from random import choice, random, shuffle
+import random
 
 import numpy as np
 import pandas as pd
@@ -647,13 +647,13 @@ def local_alignment_search(queries, reference_db, n=5,
     return results
 
 def heuristic_local_alignment_search_random(
-        query, reference_db, n=5, p=0.10, aligner=local_pairwise_align_ssw):
+        queries, reference_db, p, n=5, aligner=local_pairwise_align_ssw):
     k = int(p * len(reference_db))
     database_subset = random.sample(reference_db, k)
-    return local_alignment_search(query, database_subset, n=n, aligner=aligner)
+    return local_alignment_search(queries, database_subset, n=n, aligner=aligner)
 
 def heuristic_local_alignment_search_gc(
-        query, reference_db, n=5, reference_db_gc_contents=None, p=0.05,
+        queries, reference_db, n=5, reference_db_gc_contents=None, p=0.05,
         aligner=local_pairwise_align_ssw):
     query_gc = query.gc_content()
     database_subset = []
