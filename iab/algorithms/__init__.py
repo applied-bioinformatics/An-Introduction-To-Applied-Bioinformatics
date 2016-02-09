@@ -14,7 +14,7 @@ import pandas as pd
 import tabulate
 from scipy.cluster.hierarchy import average, dendrogram, to_tree
 import skbio
-from skbio import Sequence, DNA, TabularMSA, TreeNode
+from skbio import Sequence, DNA, TabularMSA, TreeNode, DistanceMatrix
 from skbio.alignment import local_pairwise_align_ssw
 
 
