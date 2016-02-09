@@ -72,6 +72,8 @@ This concept is discussed in further detail [above](alias://9mM4Bb).
 
 You should always link using these ids, and never statically link to other sections of the text with URLs (because a section name might change, but its id won't).
 
-## License changes
+## License and license changes
 
-The IAB license is available [here](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/LICENSE). This license may change over time, but the online version of IAB will always be the most current version, and will be available free of charge. By contributing to IAB, you are agreeing that Greg Caporaso has sole discretion over the license and any future changes to the license. If a paid (e.g., printed) copy of IAB is ever created, contributors are not entitled to payments or royalties of any kind. Your contribution of content represents your agreement with these terms.
+The IAB license is available [here](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/LICENSE). This license may change over time, but the online version of IAB will always be the most current version, and will be available free of charge.
+
+By contributing to IAB, you are agreeing that Greg Caporaso has sole discretion over the license and any future changes to the license. If a paid (e.g., printed) copy of IAB is ever created, contributors are not entitled to payments or royalties of any kind. Your contribution of content represents your agreement with these terms.
