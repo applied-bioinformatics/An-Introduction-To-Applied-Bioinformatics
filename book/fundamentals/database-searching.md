@@ -256,7 +256,7 @@ Figure 1: Genome sequencing costs.
 >>> IPython.display.IFrame(width="763", height="371", src="https://docs.google.com/spreadsheets/d/1vUkUuZsRlLW5U05rXXUn8B2sDYwShkClRMGa8Wiu6bc/pubchart?oid=2103353397&amp;format=interactive")
 ```
 
-Figure 2: Size of GenBank.</figcaption>
+Figure 2: Size of GenBank.
 
 One way that we can deal with this problem is by recognizing that most of the alignments that are performed in a database search are unlikely to be the best alignment. An algorithm developer could therefore improve runtime by defining a heuristic (or a rule) that is applied to determine which sequences we're going to align and which sequences we're not going to align. For it to be useful, deciding whether to align a pair of sequences (i.e., applying the heurtistic) must be much faster than performing the pairwise alignment. It is important to note that if we decide to not align a query against a given reference sequence, we exclude that reference sequence as a possible result of our search. A good heuristic makes it very unlikely to exclude good alignments. When thinking about heuristic algorithms, there are some important considerations:
 
