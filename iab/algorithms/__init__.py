@@ -659,7 +659,8 @@ def heuristic_local_alignment_search_random(
     return local_alignment_search(queries, database_subset, n=n, aligner=aligner)
 
 def heuristic_local_alignment_search_gc(
-        queries, reference_db, p, n=5, reference_db_gc_contents=None,
+        queries, reference_db, database_subset_size, n=5,
+        reference_db_gc_contents=None,
         aligner=local_pairwise_align_ssw):
     results = []
     if reference_db_gc_contents is None:
@@ -670,10 +671,14 @@ def heuristic_local_alignment_search_gc(
         database_subset = []
         for r in reference_db:
             ref_gc_content = reference_db_gc_contents[r.metadata['id']]
-            if ref_gc_content - p < query_gc_content < ref_gc_content + p:
-                database_subset.append(r)
-        results.append(local_alignment_search([q], database_subset,
-                                              n=n, aligner=aligner))
+            # find the difference in GC content between the reference and
+            # query. we'll sort and select our reference sequences by this
+            # value
+            database_subset.append((abs(ref_gc_content - query_gc_content), r))
+        database_subset.sort(key=lambda x: x[0])
+        database_subset = [e[1] for e in database_subset[:database_subset_size]]
+        results.append(local_alignment_search(
+            [q], database_subset, n=n, aligner=aligner))
     return pd.concat(results)
 
 def shuffle_sequence(sequence):
@@ -738,7 +743,8 @@ def fraction_shared_kmers(kmer_freqs1, kmer_freqs2):
     return len(shared_kmers) / num_sequence1_kmers
 
 def heuristic_local_alignment_search_kmers(
-        queries, reference_db, min_shared, k, n=5, reference_db_kmer_frequencies=None,
+        queries, reference_db, database_subset_size, k, n=5,
+        reference_db_kmer_frequencies=None,
         aligner=local_pairwise_align_ssw):
     results = []
     if reference_db_kmer_frequencies is None:
@@ -750,10 +756,11 @@ def heuristic_local_alignment_search_kmers(
         for r in reference_db:
             ref_kmer_frequency = reference_db_kmer_frequencies[r.metadata['id']]
             s = fraction_shared_kmers(query_kmer_frequency, ref_kmer_frequency)
-            if s >= min_shared:
-                database_subset.append(r)
-        results.append(local_alignment_search([q], database_subset,
-                                              n=n, aligner=aligner))
+            database_subset.append((s, r))
+        database_subset.sort(key=lambda x: x[0], reverse=True)
+        database_subset = [e[1] for e in database_subset[:database_subset_size]]
+        results.append(local_alignment_search(
+            [q], database_subset, n=n, aligner=aligner))
     return pd.concat(results)
 
 

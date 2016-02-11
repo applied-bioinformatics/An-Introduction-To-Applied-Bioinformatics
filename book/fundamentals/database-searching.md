@@ -375,22 +375,15 @@ Go back to the beginning of this section and try running this check based on few
 
 ### Composition-based reference sequence collection <link src="P4vQ4b"/>
 
-While the random selection of database sequences can vastly reduce the runtime for database searching, we don't get the right answer very often. Let's try a heuristic that's a bit smarter. How about this: if the overall nucleotide composition of a query sequence is very different than the overall nucleotide composition of a reference sequence, it's unlikely that the best alignment will result from that pairwise alignment.
+While the random selection of database sequences can vastly reduce the runtime for database searching, we don't get the right answer very often. Let's try some heuristics that are a bit smarter. How about this: if the overall nucleotide composition of a query sequence is very different than the overall nucleotide composition of a reference sequence, it's unlikely that the best alignment will result from that pairwise alignment, so don't align the query to that reference sequence. Given that, how do we define "overall nuceotide composition" in a useful way?
 
 #### GC content <link src="8yiKFO"/>
 
-One metric of sequence composition that we can compute quickly (because remember, this has to be a lot faster than computing the alignment for it to be worth it) is GC content. Let's define a heuristic that only performs a pairwise alignment if the GC content of the reference sequence is within $p%%$ of the GC content of the query sequence.
-
-First, let's get an idea of what the range of GC contents is for all of our database sequences, as that will help us decide on a reasonable value for ``p``.
+One metric of sequence composition that we can compute quickly (because remember, this has to be a lot faster than computing the alignment for it to be worth it) is GC content. Let's define a heuristic that only performs a pairwise alignment for the reference sequences that have the most similar GC content to the query sequence. The number of alignments that we'll perform will be defined as ``database_subset_size``.
 
 ```python
->>> sns.set(style="white", palette="muted")
->>> reference_db_gc_contents = {r.metadata['id'] : r.gc_content() for r in reference_db}
->>> ax = sns.distplot(list(reference_db_gc_contents.values()))
->>> _ = ax.set_xlim((0, 1))
+>>> database_subset_size = 500
 ```
-
-The distribution of GC content values is fairly narrow, so we'll pick a small value for ``p``, maybe $4\%$, to keep the number of sequences that we search small. As you might imagine, the smaller we make ``p``, the faster our search will run, but we'll be more likely to obtain an incorrect taxonomy assignment.
 
 ```python
 >>> from iab.algorithms import heuristic_local_alignment_search_gc
@@ -401,7 +394,7 @@ The distribution of GC content values is fairly narrow, so we'll pick a small va
 If we run our queries again, how often do we get the right answer? How much did we reduce runtime? Do you think this is a better or worse heurtistic?
 
 ```python
->>> heuristic_local_alignment_search_gc_2 = functools.partial(heuristic_local_alignment_search_gc, p=0.04)
+>>> heuristic_local_alignment_search_gc_2 = functools.partial(heuristic_local_alignment_search_gc, database_subset_size=database_subset_size)
 ...
 >>> runtime, fraction_correct, data = evaluate_search(current_queries, reference_db, reference_taxonomy,
 ...                                                   heuristic_local_alignment_search_gc_2, taxonomy_levels=taxonomy_levels)
@@ -416,17 +409,35 @@ If we run our queries again, how often do we get the right answer? How much did 
 ...     print()
 ```
 
-Try increasing and decrease the GC content search range by increasing or decreasing ``p``. How does this impact the runtime and fraction of time that we get the correct answer?
+Try increasing and decreasing the number of sequences we'll align by increasing or decreasing ``database_subset_size``. How does this impact the runtime and fraction of time that we get the correct answer?
 
 #### kmer content <link src="QblTRV"/>
+
+Another metric of sequence composition is *kmer composition*. A kmer is simply a word (or list of adjacent characters) in a sequence of length k. Here are the kmer frequencies in a short DNA sequence. The ``overlap=True`` parameter here means that our kmers can overlap one another.
+
+```python
+>>> skbio.DNA('ACCGTGACCAGTTACCAGTTTGACCAA').kmer_frequencies(k=5, overlap=True)
+```
+
+In our next heuristic, we'll only align our query to the reference sequences with the largest fraction of the kmers that are observed in the query sequence are also present in the reference sequence. This makes a lot of sense to use as an alignment heuristic: we're only aligning sequences when it looks like they'll have multiple length-``k`` stretches of nucleotides that are not interupted by substitutions or insertion/deletion mutations. 
+
+Here's the source code:
+
+```python
+>>> from iab.algorithms import heuristic_local_alignment_search_kmers
+...
+>>> %psource heuristic_local_alignment_search_kmers
+```
 
 ```python
 >>> k = 7
 ```
 
+Let's apply this and see how it does. How does the runtime and fraction of correct assignments compare to our GC content-based search and our full database search?
+
 ```python
 >>> heuristic_local_alignment_search_kmers_50 = \
->>>  functools.partial(heuristic_local_alignment_search_kmers, k=k, min_shared=0.50)
+>>>  functools.partial(heuristic_local_alignment_search_kmers, k=k, database_subset_size=database_subset_size)
 ...
 >>> runtime, fraction_correct, data = evaluate_search(current_queries, reference_db, reference_taxonomy,
 ...                                                   heuristic_local_alignment_search_kmers_50,
@@ -442,14 +453,22 @@ Try increasing and decrease the GC content search range by increasing or decreas
 ...     print()
 ```
 
+#### Further optimizing composition-based approaches by pre-computing reference database information <link src="HQmZgF"/>
+
+One important feature of composition-based approaches is that, becuase the reference database doesn't change very often, we can pre-compute features of the reference sequences and re-use this. This can help us to vastly decrease the runtime of our hueristic searches. For example, the computation of all of the reference database kmer frequencies is a lot of work. If we can compute that outside of our database search, we can avoid doing that step for every database search, and therefore remove that computationally expensive (i.e., slow) step of the process.
+
+Here we'll compute all of the reference database kmer frequencies. Notice that this step takes about a minute to complete. This is a minute of compute time that we can save on every database search!
+
 ```python
 >>> reference_db_kmer_frequencies = {r.metadata['id']: r.kmer_frequencies(k=k, overlap=True) for r in reference_db}
 ```
 
+We'll now pass our pre-computed kmer frequencies into our search function. How does the runtime and accuracy of this search compare to the searches above? This last database search that we've implemented here is very similar to how BLAST works.
+
 ```python
 >>> heuristic_local_alignment_search_kmers_50 = \
 >>>  functools.partial(heuristic_local_alignment_search_kmers, reference_db_kmer_frequencies=reference_db_kmer_frequencies,
-...                    k=k, min_shared=0.50)
+...                    k=k, database_subset_size=database_subset_size)
 ...
 >>> runtime, fraction_correct, data = evaluate_search(current_queries, reference_db, reference_taxonomy,
 ...                                                   heuristic_local_alignment_search_kmers_50,
@@ -466,6 +485,8 @@ Try increasing and decrease the GC content search range by increasing or decreas
 ```
 
 ## Is my alignment "good"? Determining whether an alignment is statistically significant. <link src='87c92f'/>
+
+** This chapter is currently in revision. It has been revised through this point, so the text from this point is still changing rapidly.**
 
 You may have noticed that the score you get back for an alignment isn't extremely informative. It's dependent on the query and reference sequence lengths (and possibly composition, depending on your substitution matrix). An important question then is: **is my alignment score good?**
 
