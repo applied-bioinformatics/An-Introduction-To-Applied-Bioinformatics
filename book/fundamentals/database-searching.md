@@ -240,7 +240,7 @@ In practice, for a production scale sequence database search application like BL
 
 ## Heuristic algorithms <link src="mUArdw"/>
 
-As mentioned above, it just takes too long to search individual query sequences against a large database. This problem also isn't going away anytime soon. While computers are getting faster (or cheaper), the size of our sequences collections are getting bigger because sequencing is getting cheaper. In fact, many people think that obtaining DNA sequences is getting cheaper faster than computers are getting cheaper. As our number of query sequences increases because we are able to obtain more for the same amount of money, or the size of our reference databases increases (because we're continuously obtaining more sequence data) this will increasing become a problem. Figures 1 and 2, respectively, illustrate that these are both real-world issues.
+As mentioned above, it just takes too long to search individual query sequences against a large database. This problem also isn't going away anytime soon. While computers are getting faster (or cheaper), the size of our sequences collections are getting bigger because sequencing is getting cheaper. In fact, many people think that obtaining DNA sequences is getting cheaper faster than computers are getting cheaper. As our number of query sequences increases because we are able to obtain more for the same amount of money, or the size of our reference databases increases (because we're continuously obtaining more sequence data) this will increasing become a problem. Figures 1 and 2, respectively, illustrate that these are both real-world issues. Notice that the axes in these boths are on a log scale in both cases.
 
 ```python
 >>> import IPython.display
@@ -274,7 +274,11 @@ Here's the source code for this. You can see that we're just wrapping our ``loca
 >>> %psource heuristic_local_alignment_search_random
 ```
 
-Let's pass our initial `queries` to see how the results compare to our known taxonomies.
+Let's select some new queries and see how the results compare to our known taxonomies.
+
+```python
+>>> current_queries = random.sample(queries, k=10)
+```
 
 ```python
 >>> results = heuristic_local_alignment_search_random(current_queries, reference_db, p=0.10)
@@ -324,11 +328,15 @@ Here's what this would look like:
 ...     return per_query_runtime, fraction_correct, data
 ```
 
-First let's see how this works for our full database search algorithm. What's the runtime, and how often do we get the correct answer? We'll start with five levels of taxonomy (which corresponds to the family level).
+First let's see how this works for our full database search algorithm. What's the runtime, and how often do we get the correct answer? We'll start with five levels of taxonomy (which corresponds to the family level). **This step will take a couple of minutes to run, because it's doing the full database search.**
+
+```python
+>>> taxonomy_levels = 5
+```
 
 ```python
 >>> runtime, fraction_correct, data = evaluate_search(current_queries, reference_db, reference_taxonomy,
-...                                                   local_alignment_search, taxonomy_levels=5)
+...                                                   local_alignment_search, taxonomy_levels=taxonomy_levels)
 >>> print('%1.2f seconds per query sequence' % runtime)
 >>> print('%1.2f%% correct answers' % (fraction_correct * 100.0))
 >>> print('Result details:')
@@ -347,7 +355,7 @@ Next let's see how this compare to our random heuristic search algorithm. Try ru
 >>> heuristic_local_alignment_search_random_10 = functools.partial(heuristic_local_alignment_search_random, p=0.10)
 ...
 >>> runtime, fraction_correct, data = evaluate_search(current_queries, reference_db, reference_taxonomy,
-...                                                   heuristic_local_alignment_search_random_10, taxonomy_levels=5)
+...                                                   heuristic_local_alignment_search_random_10, taxonomy_levels=taxonomy_levels)
 ...
 >>> print('%1.2f seconds per query sequence' % runtime)
 >>> print('%1.2f%% correct answers' % (fraction_correct * 100.0))
@@ -359,22 +367,23 @@ Next let's see how this compare to our random heuristic search algorithm. Try ru
 ...     print()
 ```
 
-Again, what's the runtime, and how often do we get the correct answer? Based on comparison to the full search, what do you think: is this a good heuristic? Go back to the beginning of this section and try running this check based on fewer levels of taxonomy (i.e., decreased taxonomic specifity, such as the phylum instead of family level) and on more levels of taxonomy (i.e., increased taxonomic specificity, such as the genus instead of family level).
+Again, what's the runtime, and how often do we get the correct answer? Based on comparison to the full search, what do you think: is this a good heuristic? 
+
+After performing many trials of the the above searches, I get the correct genus-level assignment about half as often with the random reference database heuristic relative to the full database search. Your results might differ from that due to differences in the random selection of query and reference sequences. Try running all the cells in this section a few times. 
+
+Go back to the beginning of this section and try running this check based on fewer levels of taxonomy (i.e., decreased taxonomic specifity, such as the phylum) and on more levels of taxonomy (i.e., increased taxonomic specificity, such as the species level). How does that impact how often we get the right answer?
 
 ### Composition-based reference sequence collection <link src="P4vQ4b"/>
 
-While the random selection of database sequences can vastly reduce the runtime for database searching, we don't get the right answer very often. Let's try a heuristic that's a bit smarter. How about this: if the overall nucleotide composition of a query sequence is different than the overall nucleotide composition of a reference sequence, it's unlikely that the best alignment will result from that pairwise alignment. One metric of sequence composition that we can compute quickly (because remember, this has to be a lot faster than computing the alignment for it to be worth it) is GC content. Let's define a heuristic that only performs a pairwise alignment if the GC content of the reference sequence is within $p%%$ of the GC content of the query sequence.
+While the random selection of database sequences can vastly reduce the runtime for database searching, we don't get the right answer very often. Let's try some heuristics that are a bit smarter. How about this: if the overall nucleotide composition of a query sequence is very different than the overall nucleotide composition of a reference sequence, it's unlikely that the best alignment will result from that pairwise alignment, so don't align the query to that reference sequence. Given that, how do we define "overall nuceotide composition" in a useful way?
 
-First, let's get an idea of what the range of GC contents is for all of our database sequences, as that will help us decide on a reasonable value for ``p``.
+#### GC content <link src="8yiKFO"/>
+
+One metric of sequence composition that we can compute quickly (because remember, this has to be a lot faster than computing the alignment for it to be worth it) is GC content. Let's define a heuristic that only performs a pairwise alignment for the reference sequences that have the most similar GC content to the query sequence. The number of alignments that we'll perform will be defined as ``database_subset_size``.
 
 ```python
->>> sns.set(style="white", palette="muted")
->>> reference_db_gc_contents = {r.metadata['id'] : r.gc_content() for r in reference_db}
->>> ax = sns.distplot(list(reference_db_gc_contents.values()))
->>> _ = ax.set_xlim((0, 1))
+>>> database_subset_size = 500
 ```
-
-The distribution of GC content values is fairly narrow, so we'll pick a small value for ``p``, maybe $2.5%%$, to keep the number of sequences that we search small. As you might image, the smaller we make ``p``, the faster our search will run, but we'll be more likely to obtain an incorrect taxonomy assignment.
 
 ```python
 >>> from iab.algorithms import heuristic_local_alignment_search_gc
@@ -385,10 +394,10 @@ The distribution of GC content values is fairly narrow, so we'll pick a small va
 If we run our queries again, how often do we get the right answer? How much did we reduce runtime? Do you think this is a better or worse heurtistic?
 
 ```python
->>> heuristic_local_alignment_search_gc_2 = functools.partial(heuristic_local_alignment_search_gc, p=0.02)
+>>> heuristic_local_alignment_search_gc_2 = functools.partial(heuristic_local_alignment_search_gc, database_subset_size=database_subset_size)
 ...
 >>> runtime, fraction_correct, data = evaluate_search(current_queries, reference_db, reference_taxonomy,
-...                                                   heuristic_local_alignment_search_gc_2, taxonomy_levels=5)
+...                                                   heuristic_local_alignment_search_gc_2, taxonomy_levels=taxonomy_levels)
 ...
 >>> print('%1.2f seconds per query sequence' % runtime)
 >>> print('%1.2f%% correct answers' % (fraction_correct * 100.0))
@@ -400,9 +409,84 @@ If we run our queries again, how often do we get the right answer? How much did 
 ...     print()
 ```
 
-** Revision of this chapter is in progress. Pick up here!**
+Try increasing and decreasing the number of sequences we'll align by increasing or decreasing ``database_subset_size``. How does this impact the runtime and fraction of time that we get the correct answer?
+
+#### kmer content <link src="QblTRV"/>
+
+Another metric of sequence composition is *kmer composition*. A kmer is simply a word (or list of adjacent characters) in a sequence of length k. Here are the kmer frequencies in a short DNA sequence. The ``overlap=True`` parameter here means that our kmers can overlap one another.
+
+```python
+>>> skbio.DNA('ACCGTGACCAGTTACCAGTTTGACCAA').kmer_frequencies(k=5, overlap=True)
+```
+
+In our next heuristic, we'll only align our query to the reference sequences with the largest fraction of the kmers that are observed in the query sequence are also present in the reference sequence. This makes a lot of sense to use as an alignment heuristic: we're only aligning sequences when it looks like they'll have multiple length-``k`` stretches of nucleotides that are not interupted by substitutions or insertion/deletion mutations. 
+
+Here's the source code:
+
+```python
+>>> from iab.algorithms import heuristic_local_alignment_search_kmers
+...
+>>> %psource heuristic_local_alignment_search_kmers
+```
+
+```python
+>>> k = 7
+```
+
+Let's apply this and see how it does. How does the runtime and fraction of correct assignments compare to our GC content-based search and our full database search?
+
+```python
+>>> heuristic_local_alignment_search_kmers_50 = \
+>>>  functools.partial(heuristic_local_alignment_search_kmers, k=k, database_subset_size=database_subset_size)
+...
+>>> runtime, fraction_correct, data = evaluate_search(current_queries, reference_db, reference_taxonomy,
+...                                                   heuristic_local_alignment_search_kmers_50,
+...                                                   taxonomy_levels=taxonomy_levels)
+...
+>>> print('%1.2f seconds per query sequence' % runtime)
+>>> print('%1.2f%% correct answers' % (fraction_correct * 100.0))
+>>> print('Result details:')
+>>> for q_id in data.index:
+...     print(q_id)
+...     print(' ', data['Known taxonomy'][q_id])
+...     print(' ', data['Observed taxonomy'][q_id])
+...     print()
+```
+
+#### Further optimizing composition-based approaches by pre-computing reference database information <link src="HQmZgF"/>
+
+One important feature of composition-based approaches is that, becuase the reference database doesn't change very often, we can pre-compute features of the reference sequences and re-use this. This can help us to vastly decrease the runtime of our hueristic searches. For example, the computation of all of the reference database kmer frequencies is a lot of work. If we can compute that outside of our database search, we can avoid doing that step for every database search, and therefore remove that computationally expensive (i.e., slow) step of the process.
+
+Here we'll compute all of the reference database kmer frequencies. Notice that this step takes about a minute to complete. This is a minute of compute time that we can save on every database search!
+
+```python
+>>> reference_db_kmer_frequencies = {r.metadata['id']: r.kmer_frequencies(k=k, overlap=True) for r in reference_db}
+```
+
+We'll now pass our pre-computed kmer frequencies into our search function. How does the runtime and accuracy of this search compare to the searches above? This last database search that we've implemented here is very similar to how BLAST works.
+
+```python
+>>> heuristic_local_alignment_search_kmers_50 = \
+>>>  functools.partial(heuristic_local_alignment_search_kmers, reference_db_kmer_frequencies=reference_db_kmer_frequencies,
+...                    k=k, database_subset_size=database_subset_size)
+...
+>>> runtime, fraction_correct, data = evaluate_search(current_queries, reference_db, reference_taxonomy,
+...                                                   heuristic_local_alignment_search_kmers_50,
+...                                                   taxonomy_levels=taxonomy_levels)
+...
+>>> print('%1.2f seconds per query sequence' % runtime)
+>>> print('%1.2f%% correct answers' % (fraction_correct * 100.0))
+>>> print('Result details:')
+>>> for q_id in data.index:
+...     print(q_id)
+...     print(' ', data['Known taxonomy'][q_id])
+...     print(' ', data['Observed taxonomy'][q_id])
+...     print()
+```
 
 ## Is my alignment "good"? Determining whether an alignment is statistically significant. <link src='87c92f'/>
+
+** This chapter is currently in revision. It has been revised through this point, so the text from this point is still changing rapidly.**
 
 You may have noticed that the score you get back for an alignment isn't extremely informative. It's dependent on the query and reference sequence lengths (and possibly composition, depending on your substitution matrix). An important question then is: **is my alignment score good?**
 
