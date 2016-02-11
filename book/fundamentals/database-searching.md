@@ -31,7 +31,7 @@ While we'll be aligning nucleotide sequences in this chapter, the same concepts 
 
 ## Loading annotated sequences <link src="gAKBxE"/>
 
-The first thing we'll do as we learn about sequence homology searching is load some annotated sequences. The sequences that we're going to work with are derived from the [Greengenes](http://greengenes.secondgenome.com/) [13_8](ftp://greengenes.microbio.me/greengenes_release/gg_13_5/) database, and we're accessing them using the [QIIME default reference project](https://github.com/biocore/qiime-default-reference) project. Greengenes is a database of 16S rRNA gene sequences, a component of the archaeal and bacterial [ribosome](http://www.nature.com/scitable/definition/ribosome-194) (the molecular machine that drives translation of mRNA to proteins). This gene is of a lot of interest to biologists because it's one of about 200 genes that are encoded in the genomes of all known cellular organisms. We'll come back to this gene a few times in the book, notably in [Studying Biological Diversity](alias://2bb2cf). The sequences in Greengenes are taxonomically annotated, meaning that we'll have a collection of gene sequences and the taxonomic identify of the organism whose genome the sequence is found in. If we search an unannotated 16S rRNA query sequence against this database, we can make inferences about what organism our query sequence is from.
+The first thing we'll do as we learn about sequence homology searching is load some annotated sequences. The sequences that we're going to work with are derived from the [Greengenes](http://greengenes.secondgenome.com/) database, and we're accessing them using the [QIIME default reference project](https://github.com/biocore/qiime-default-reference) project. Greengenes is a database of 16S rRNA gene sequences, a component of the archaeal and bacterial [ribosome](http://www.nature.com/scitable/definition/ribosome-194) (the molecular machine that drives translation of mRNA to proteins). This gene is of a lot of interest to biologists because it's one of about 200 genes that are encoded in the genomes of all known cellular organisms. We'll come back to this gene a few times in the book, notably in [Studying Biological Diversity](alias://2bb2cf). The sequences in Greengenes are taxonomically annotated, meaning that we'll have a collection of gene sequences and the taxonomic identify of the organism whose genome the sequence is found in. If we search an unannotated 16S rRNA query sequence against this database, we can make inferences about what organism our query sequence is from.
 
 First, let's load Greengenes into a list of ``skbio.DNA`` sequence objects, and associate the taxonomy of each sequence as sequence metadata.
 
@@ -45,8 +45,6 @@ First, let's load Greengenes into a list of ``skbio.DNA`` sequence objects, and 
 ```python
 >>> import qiime_default_reference as qdr
 >>> import skbio
->>> import locale
->>> locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 ...
 >>> # Load the taxonomic data
 ... reference_taxonomy = {}
@@ -62,7 +60,7 @@ First, let's load Greengenes into a list of ``skbio.DNA`` sequence objects, and 
 ...     e.metadata['taxonomy'] = seq_tax
 ...     reference_db.append(e)
 ...
->>> print("%s sequences were loaded from the reference database." % locale.format("%d", len(reference_db), grouping=True))
+>>> print("%s sequences were loaded from the reference database." % len(reference_db))
 ```
 
 Next, we'll just inspect a couple of the sequences we loaded. Notice how the specificity of our taxonomic annotations (i.e., how many taxonomic levels are annotated and unknown) differs for different sequences.
@@ -81,7 +79,7 @@ For the sake of runtime, we're going to work through this chapter using a random
 >>> import random
 ...
 >>> reference_db = random.sample(reference_db, k=5000)
->>> print("%s sequences are present in the subsampled database." % locale.format("%d", len(reference_db), grouping=True))
+>>> print("%s sequences are present in the subsampled database." % len(reference_db))
 ```
 
 We'll also extract some sequences from Greengenes to use as query sequences in our database searches. This time we won't annotate them (to simulate not knowing what organisms they're from). We'll also trim these sequences so they're shorter than the full length references. This will simulate obtaining a partial gene sequence, as is most common with the current sequencing technologies (as of this writing), but will also help to make the examples run faster.
@@ -236,7 +234,7 @@ What we see here is pretty clearly a linear relationship: $runtime \approx const
 
 The first seems obvious, and even silly at first: perform fewer alignments. This could be achieved in a few ways. You could reduce the number of query sequences, though this might be something a researcher is resistant to: they have some collection of unknown sequences, and they want to know what they all are. You could alternatively reduce the number of reference sequences, but you might run into the same issues there: we wouldn't want to exclude reference sequences that might provide us with useful information about our query sequences. Finally, we might be able to figure out some ways to perform fewer alignments by not searching all of the query sequences against all of the reference sequences. If we could come up with some procedure to approximate which pairwise alignments were likely to be good (i.e., high scoring) and which were likely to be bad (i.e., low scoring) that is faster than performing the pairwise alignments, we could apply that procedure and only align a pair of sequences when we expect to get a high score. That could potentially allow us to reduce the number of alignments we need to perform, and therefore the runtime of the algorithm.
 
-Another approach to reducing the runtime of this process would be to create a faster implemention of the algorithm (though at some point that won't be possible anymore), use a faster computer, or run the process in parallel on multiple processors. All of these would be ways to reduce the runtime of the search by some factor $f$, where $new\ runtime \approx \frac{runtime}{f}$.
+Another approach to reducing the runtime of this process would be to create a faster implementation of the algorithm (though at some point that won't be possible anymore), use a faster computer, or run the process in parallel on multiple processors. All of these would be ways to reduce the runtime of the search by some factor $f$, where $new\ runtime \approx \frac{runtime}{f}$.
 
 In practice, for a production scale sequence database search application like BLAST, we'd combine these approaches. In the next section we'll explore ways to reduce the runtime of database searching for a fixed number of query sequences and a fixed number of reference sequences by reducing the number of pairwise alignments that the search function will perform.
 
@@ -256,12 +254,12 @@ Figure 1: Genome sequencing costs.
 >>> IPython.display.IFrame(width="763", height="371", src="https://docs.google.com/spreadsheets/d/1vUkUuZsRlLW5U05rXXUn8B2sDYwShkClRMGa8Wiu6bc/pubchart?oid=2103353397&amp;format=interactive")
 ```
 
-Figure 2: Size of GenBank.</figcaption>
+Figure 2: Size of GenBank.
 
-One way that we can deal with this problem is by recognizing that most of the alignments that are performed in a database search are unlikely to be the best alignment. An algorithm developer could therefore improve runtime by defining a heuristic (or a rule) that is applied to determine which sequences we're going to align and which sequences we're not going to align. For it to be useful, deciding whether to align a pair of sequences (i.e., applying the heurtistic) must be much faster than performing the pairwise alignment. It is important to note that if we decide to not align a query against a given reference sequence, we exclude that reference sequence as a possible result of our search. A good heuristic makes it very unlikely to exclude good alignments. When thinking about heuristic algorithms, there are some important considerations:
+One way that we can deal with this problem is by recognizing that most of the alignments that are performed in a database search are unlikely to be very good alignments. An algorithm developer could therefore improve runtime by defining a heuristic (or a rule) that is applied to determine which reference sequences are likely to result in good alignments, and only aligning the query against those. For it to be useful, making the decision to align or not (i.e., applying the heurtistic) must be *much faster* than actually performing the pairwise alignment. The heuristic also needs to make *good* choices about which reference sequences to align the query against. If the algorithm chooses to not align against a specific query, that query is ruled out as a possible result of the database search. A good heuristic for sequence homology searching therefore makes it very unlikely to exclude the best alignment(s). When thinking about heuristic algorithms in general, there are some important considerations:
 
-1. How often do I fail to get the right answer?
-2. Is my runtime reduced enough that I'm willing to tolerate not getting the best alignment this often?
+1. How often does the heuristic algorithm fail to get the right answer (in our case, does it make good choices about which reference sequences to align against)?
+2. How much faster is the heuristic than the "complete" approach, and is that reduction in runtime enough to justify not being guaranteed to get the best answer?
 
 We'll now look at a few heuristics in the context of these questions.
 
@@ -361,7 +359,7 @@ Next let's see how this compare to our random heuristic search algorithm. Try ru
 ...     print()
 ```
 
-Again, what's the runtime, and how often do we get the correct answer? Based on comparison to the full search, what do you think: is this a good heuristic?
+Again, what's the runtime, and how often do we get the correct answer? Based on comparison to the full search, what do you think: is this a good heuristic? Go back to the beginning of this section and try running this check based on fewer levels of taxonomy (i.e., decreased taxonomic specifity, such as the phylum instead of family level) and on more levels of taxonomy (i.e., increased taxonomic specificity, such as the genus instead of family level).
 
 ### Composition-based reference sequence collection <link src="P4vQ4b"/>
 
