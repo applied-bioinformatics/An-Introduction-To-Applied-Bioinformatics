@@ -127,7 +127,7 @@ We'll create this matrix and initialize it with all zeros as follows:
 
 ### Step 2: Add values to the cells in the matrix. <link src="fDXYPE"/>
 
-Next we'll the cells so if the characters at the corresponding row and column are the same the value is changed from zero to one. We can then review the resulting matrix. For clarity, we'll have ``show_table`` hide the zero values.
+Next we'll add initial values to the cells so that if the characters at the corresponding row and column are the same, the value of the cell is changed from zero to one. We can then review the resulting matrix. For clarity, we'll have ``show_table`` hide the zero values.
 
 ```python
 >>> for row_number, row_character in enumerate(seq2):
@@ -250,7 +250,7 @@ You can look up individual substitution scores as follows:
 >>> print(blosum50['W']['W'])
 ```
 
-Early work on defining protein substitution matrices was performed by Margeret Dayhoff in the 1970s (Dayhoff, Schwartz, Orcutt (1978) <i>A Model of Evolutionary Change in Proteins.</i> Atlas of Protein Sequence and Structure) and by [Henikoff and Henikoff](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC50453/) in the early 1990s. Briefly, these matrices are often defined empirically, by aligning sequences manually or through automated systems, and counting how frequent certain substitutions are. [This](https://www.ncbi.nlm.nih.gov/pubmed/15286655) is a good article on the source of the widely used substitution matrices by Sean Eddy. We'll work with BLOSUM 50 here for the remainder of this chapter.
+Early work on defining protein substitution matrices was performed by Margaret Dayhoff in the 1970s (Dayhoff, Schwartz, Orcutt (1978) <i>A Model of Evolutionary Change in Proteins.</i> Atlas of Protein Sequence and Structure) and by [Henikoff and Henikoff](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC50453/) in the early 1990s. Briefly, these matrices are often defined empirically, by aligning sequences manually or through automated systems, and counting how frequent certain substitutions are. [This](https://www.ncbi.nlm.nih.gov/pubmed/15286655) is a good article on the source of the widely used substitution matrices by Sean Eddy. We'll work with BLOSUM 50 here for the remainder of this chapter.
 
 
 ## A better approach for global pairwise alignment using the Needleman-Wunsch algorithm <link src='15efc2'/>
@@ -271,7 +271,7 @@ We'll define two protein sequences to work with in this section. After working t
 
 #### Step 1: Create blank matrices. <link src="hVbAxT"/>
 
-As we discussed earlier in this chapter, a pair of sequences can be aligned in different ways. Needleman-Wunsh provides the best alignment, as defined by its score. Here we'll compute two new matrices that together allow us to determine the highest alignment score given the sequences and the substitution matrix, and to transcribe the aligned sequences. These matrices are
+As we discussed earlier in this chapter, a pair of sequences can be aligned in different ways. Needleman-Wunsch provides the best alignment, as defined by its score. Here we'll compute two new matrices that together allow us to determine the highest alignment score given the sequences and the substitution matrix, and to transcribe the aligned sequences. These matrices are
  * the *dynamic programming matrix*, or $F$
  * and the *traceback matrix*, or $T$.
 
@@ -446,7 +446,7 @@ Global and local alignment are both used for different applications. We'll next 
 
 ## Smith-Waterman local sequence alignment <link src='c9656e'/>
 
-The algorithm that is most commonly used for performing local alignment was originally published by [Temple F. Smith and Michael S. Waterman in 1981](https://www.ncbi.nlm.nih.gov/pubmed/7265238), and is therefore referred to as Smith-Waterman alignment. In terms of the resulting alignment, the difference between Smith-Waterman and Needleman-Wuncsh is that the aligned sequences in Smith-Waterman can be a subsequences of one or both of the unaligned (input) sequences. In Needleman-Wunsch alignment, the aligned sequences will be full-length with respect to the unaligned sequences.
+The algorithm that is most commonly used for performing local alignment was originally published by [Temple F. Smith and Michael S. Waterman in 1981](https://www.ncbi.nlm.nih.gov/pubmed/7265238), and is therefore referred to as Smith-Waterman alignment. In terms of the resulting alignment, the difference between Smith-Waterman and Needleman-Wunsch is that the aligned sequences in Smith-Waterman can be a subsequences of one or both of the unaligned (input) sequences. In Needleman-Wunsch alignment, the aligned sequences will be full-length with respect to the unaligned sequences.
 
 Algorithmically, Smith-Waterman is nearly identical to Needleman-Wunsch, with three small important differences. We'll now work through Smith-Waterman alignment following the same steps that we followed for Needleman-Wunsch, and look at the differences as we go. We'll redefine our two sequences to align here. As you did for Needleman-Wunsch, after working through this example with these sequences, come back here and experiment with different sequences.
 
@@ -634,7 +634,7 @@ Take a look at how the scores differ with these additions.
 >>> HTML(show_T(seq1[0], seq2[0], traceback_matrix))
 ```
 
-While we just looked at Smith-Waterman alignment with affine gap scoring, Needleman-Wunsh is adapted in the same way for affine gap scoring.
+While we just looked at Smith-Waterman alignment with affine gap scoring, Needleman-Wunsch is adapted in the same way for affine gap scoring.
 
 The convenience functions we worked with above all take ``gap_open_penalty`` and ``gap_extend_penalty``, which we can see by calling ``help`` on the function. So, we can use those functions to explore sequence alignment with affine gap scoring.
 
@@ -692,7 +692,7 @@ From interpreting these results, it looks like this is taking a few seconds to c
 >>> %timeit local_pairwise_align_ssw(seq1, seq2)
 ```
 
-We clearly see here that the ``local_pairwise_align_ssw`` function is much faster for performing alignment than ``local_pairwise_align_nucleotide`` (be sure to compare the units of each run time!). This is because ``local_pairwise_align_ssw`` is a much more efficent implementation of Smith-Waterman alignment, and it additionally applies some cool tricks that allow it to not compute all of the values in $F$ and $T$, but still get the right answer most of the time. This is referred to as a *heuristic* approach to optimizing an algorithm. We'll spend some time defining and comparing heuristics in the Database Searching chapter, but to get you to start thinking about it, what you care about is how much a heuristic reduces the run time of an algorithm, and how often it gives you the same answer as the full algorithm. Take a minute to compare the results of the two functions we just ran:
+We clearly see here that the ``local_pairwise_align_ssw`` function is much faster for performing alignment than ``local_pairwise_align_nucleotide`` (be sure to compare the units of each run time!). This is because ``local_pairwise_align_ssw`` is a much more efficient implementation of Smith-Waterman alignment, and it additionally applies some cool tricks that allow it to not compute all of the values in $F$ and $T$, but still get the right answer most of the time. This is referred to as a *heuristic* approach to optimizing an algorithm. We'll spend some time defining and comparing heuristics in the Database Searching chapter, but to get you to start thinking about it, what you care about is how much a heuristic reduces the run time of an algorithm, and how often it gives you the same answer as the full algorithm. Take a minute to compare the results of the two functions we just ran:
 
 ```python
 >>> msa, _, _ = local_pairwise_align_nucleotide(seq1, seq2, gap_open_penalty=8, gap_extend_penalty=1)
@@ -779,7 +779,7 @@ Ultimately, we'd like to get an idea of how useful alignment would be in practic
 >>> ax
 ```
 
-This looks to be a [quadratic relationship](http://en.wikipedia.org/wiki/Quadratic_time): the increase in runtime is proportional to the square of sequence length. If you think back to the computation of $F$ and $T$, this makes sense. If our sequences are each five bases long, our matrices will have five rows and five colums, so $5 \times 5 = 25$ cells that need to be filled in by performing some numeric computations. If we double our sequences lengths to ten, our matrices will have ten rows and ten columns, so $10 \times 10 = 100$ cells that need to be filled in. Because each of the numeric computations take roughly the same amount of time (you can take that on faith, or prove it to yourself using ``timeit``), when we double our sequence length we have four times as many cells to compute.
+This looks to be a [quadratic relationship](http://en.wikipedia.org/wiki/Quadratic_time): the increase in runtime is proportional to the square of sequence length. If you think back to the computation of $F$ and $T$, this makes sense. If our sequences are each five bases long, our matrices will have five rows and five columns, so $5 \times 5 = 25$ cells that need to be filled in by performing some numeric computations. If we double our sequences lengths to ten, our matrices will have ten rows and ten columns, so $10 \times 10 = 100$ cells that need to be filled in. Because each of the numeric computations take roughly the same amount of time (you can take that on faith, or prove it to yourself using ``timeit``), when we double our sequence length we have four times as many cells to compute.
 
 When runtime scales quadratically, that can be a practical limitation for algorithm. We'd much prefer to see a linear relationship (i.e., if we double our sequence length, our runtime doubles). But this is an inherent issue with pairwise alignment, so it's one that we need to deal with.
 
@@ -799,6 +799,6 @@ One question you might have is whether developing a version of this algorithm wh
 
 Notice that the runtimes in the plot are smaller, but shape of the curve is the same. While parallelization can reduce the runtime of an algorithm, it won't change its *computational complexity* (or how its runtime scales as a function of its input size). You can explore the computational complexity of different types of algorithms in the [Big-O cheatsheet](http://bigocheatsheet.com/), though it's a fairly advanced introduction to the topic (and one that's usually covered in the second or third year for Computer Science majors).
 
-### Conclusions on the scability of pairwise sequence alignment with Smith-Waterman <link src="N9htIl"/>
+### Conclusions on the scalability of pairwise sequence alignment with Smith-Waterman <link src="N9htIl"/>
 
 These are pretty long sequences that we're working with here, and the runtime is still pretty reasonable (only a few seconds for DNA sequences around 100,000 bases), so that suggests this implementation of Smith-Waterman should work ok for aligning pairs of sequences, even if the sequences are fairly long. However, we're often interested in doing more than just pairwise alignment. For example, we may want to align many sequences to each other (which we'll explore in the Multiple Sequence Alignment chapter), or we may want to perform many pairwise alignments (which we'll explore in the Database Searching chapter). In the next chapter we'll begin exploring ways to address this scalability issue by approximating solutions to the problem.
