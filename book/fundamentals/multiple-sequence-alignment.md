@@ -60,7 +60,7 @@ However the complexity of this algorithm is much worse than for pairwise alignme
 >>> plt.ylabel('Runtime (s)')
 ```
 
-**The exponent in the $n^2$ term comes from the fact that, in pairwise alignment, if we assume our sequences are both of length $n$, there are $n \times n$ cells to fill in in the dynamic programming matrix. If we were to generalize either Smith-Waterman or Needleman-Wunsch to three sequences, we would need to create a 3 dimensional array to score and trace back the alignment.** For sequences of length $n$, we would therefore have $n \times n \times n$ cells to fill in, and our runtime versus sequence length curve would look like the following.
+The exponent in the $n^2$ term comes from the fact that, in pairwise alignment, if we assume our sequences are both of length $n$, there are $n \times n$ cells to fill in in the dynamic programming matrix. If we were to generalize either Smith-Waterman or Needleman-Wunsch to three sequences, we would need to create a 3 dimensional array to score and trace back the alignment. For sequences of length $n$, we would therefore have $n \times n \times n$ cells to fill in, and our runtime versus sequence length curve would look like the following.
 
 ```python
 >>> s3_times = [t ** 3 for t in range(25)]
@@ -91,15 +91,13 @@ And for four sequences:
 >>> plt.ylabel('Runtime (s)')
 ```
 
-We clearly have a problem here, and that is that **the runtime for multiple sequence alignment using full dynamic programming algorithms grows exponentially with the number of sequences to be aligned**. If $n$ is our sequence length, and $s$ is the number of sequences, that means that runtime is proportional to $n^s$. In pairwise alignment, $s$ is always equal to 2, so the problem is more manangeable. However, **for the general case of $s$ sequences, we really can't even consider Smith-Waterman or Needleman-Wunsch for more than just a few sequences.** The pattern in the plots above should illustrate why.
+We clearly have a problem here, and that is that the runtime for multiple sequence alignment using full dynamic programming algorithms grows exponentially with the number of sequences to be aligned. If $n$ is our sequence length, and $s$ is the number of sequences, that means that runtime is proportional to $n^s$. In pairwise alignment, $s$ is always equal to 2, so the problem is more manangeable. However, for the general case of $s$ sequences, we really can't even consider Smith-Waterman or Needleman-Wunsch for more than just a few sequences. The pattern in the plots above should illustrate why.
 
 As we explored with database searching, we need to figure out how to align fewer sequences. This is where *progressive alignment* comes in.
 
 ## Progressive alignment <link src='aa5e0a'/>
 
-<div style="float: right; margin-left: 30px;"><img title="Image by @gregcaporaso." style="float: right; margin-left: 30px;" src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/confusion.png" align=right width=330/></div>
-
-**In progressive alignment, the problem of exponential growth of runtime and space is managed by selectively aligning pairs of sequences, and aligning alignments of sequences.** What we typically do is identify a pair of closely related sequences, and align those. Then, we identify the next most closely related sequence to that initial pair, and align that sequence to the alignment. This concept of aligning a sequence to an alignment is new, and we'll come back to it in just a few minutes. The other concept of identifying the most closely related sequences, and then the next most closely related sequence, and so on should sound familar. It effectively means that we're traversing a tree. And herein lies our problem: **we need a tree to efficiently align multiple sequences, but we need an alignment to build a good tree**.
+In progressive alignment, the problem of exponential growth of runtime and space is managed by selectively aligning pairs of sequences, and aligning alignments of sequences. What we typically do is identify a pair of closely related sequences, and align those. Then, we identify the next most closely related sequence to that initial pair, and align that sequence to the alignment. This concept of aligning a sequence to an alignment is new, and we'll come back to it in just a few minutes. The other concept of identifying the most closely related sequences, and then the next most closely related sequence, and so on should sound familiar. It effectively means that we're traversing a tree. And herein lies our problem: we need a tree to efficiently align multiple sequences, but we need an alignment to build a good tree.
 
 You probably have two burning questions in your mind right now:
 
@@ -108,7 +106,7 @@ You probably have two burning questions in your mind right now:
 
 We'll explore both of those through-out the rest of this notebook. First, let's cover the process of progressive multiple sequence alignment, just assuming for a moment that we know how to do both of those things.
 
-The process of progressive multiple sequence alignment could look like the following. First, we start with some sequences and a tree representing the relationship between those sequences. We'll call this our **guide tree**, because it's going to guide us through the process of multiple sequence alignment. In progressive multiple sequence alignment, we build a multiple sequence alignment for each internal node of the tree, where the alignment at a given internal node contains all of the sequences in the clade defined by that node.
+The process of progressive multiple sequence alignment could look like the following. First, we start with some sequences and a tree representing the relationship between those sequences. We'll call this our guide tree, because it's going to guide us through the process of multiple sequence alignment. In progressive multiple sequence alignment, we build a multiple sequence alignment for each internal node of the tree, where the alignment at a given internal node contains all of the sequences in the clade defined by that node.
 
 <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/msa-tree-input.png">
 
@@ -128,11 +126,11 @@ And finally, we can compute the alignment at the root node of the tree, by align
 
 <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/msa-tree-final.png">
 
-**The alignment at the root node is our multiple sequence alignment.**
+The alignment at the root node is our multiple sequence alignment.
 
 ### Building the guide tree <link src='2d97eb'/>
 
-Let's address the first of our outstanding questions. **I mentioned above that *we need an alignment to build a good tree*. The key word here is *good*. We can build a very rough tree - one that we would never want to present as representing the actual relationships between the sequences in question - without first aligning the sequences.** Remember that building a UPGMA tree requires only a distance matrix, so if we can find a non-alignment-dependent way to compute distances between the sequences, we can build a rough UPGMA tree from them.
+Let's address the first of our outstanding questions. I mentioned above that *we need an alignment to build a good tree*. The key word here is *good*. We can build a very rough tree - one that we would never want to present as representing the actual relationships between the sequences in question - without first aligning the sequences. Remember that building a UPGMA tree requires only a distance matrix, so if we can find a non-alignment-dependent way to compute distances between the sequences, we can build a rough UPGMA tree from them.
 
 Let's compute distances between the sequences based on their *word* composition. We'll define a *word* here as `k` adjacent characters in the sequence. We can then define a function that will return all of the words in a sequence as follows. These words can be defined as being overlapping, or non-overlapping. We'll go with overlapping for this example, as the more words we have, the better our guide tree should be.
 
@@ -209,7 +207,7 @@ scikit-bio also has some basic visualization functionality for these objects. Fo
 >>> fig = guide_dm.plot(cmap='Greens')
 ```
 
-We can next use some functionality from SciPy to cluster the sequences with UPGMA, and print out a **dendrogram**.
+We can next use some functionality from SciPy to cluster the sequences with UPGMA, and print out a dendrogram.
 
 ```python
 >>> from scipy.cluster.hierarchy import average, dendrogram, to_tree

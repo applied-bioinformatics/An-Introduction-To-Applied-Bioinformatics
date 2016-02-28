@@ -367,9 +367,9 @@ Next let's see how this compare to our random heuristic search algorithm. Try ru
 ...     print()
 ```
 
-Again, what's the runtime, and how often do we get the correct answer? Based on comparison to the full search, what do you think: is this a good heuristic? 
+Again, what's the runtime, and how often do we get the correct answer? Based on comparison to the full search, what do you think: is this a good heuristic?
 
-After performing many trials of the the above searches, I get the correct genus-level assignment about half as often with the random reference database heuristic relative to the full database search. Your results might differ from that due to differences in the random selection of query and reference sequences. Try running all the cells in this section a few times. 
+After performing many trials of the the above searches, I get the correct genus-level assignment about half as often with the random reference database heuristic relative to the full database search. Your results might differ from that due to differences in the random selection of query and reference sequences. Try running all the cells in this section a few times.
 
 Go back to the beginning of this section and try running this check based on fewer levels of taxonomy (i.e., decreased taxonomic specifity, such as the phylum) and on more levels of taxonomy (i.e., increased taxonomic specificity, such as the species level). How does that impact how often we get the right answer?
 
@@ -419,7 +419,7 @@ Another metric of sequence composition is *kmer composition*. A kmer is simply a
 >>> skbio.DNA('ACCGTGACCAGTTACCAGTTTGACCAA').kmer_frequencies(k=5, overlap=True)
 ```
 
-In our next heuristic, we'll only align our query to the reference sequences with the largest fraction of the kmers that are observed in the query sequence are also present in the reference sequence. This makes a lot of sense to use as an alignment heuristic: we're only aligning sequences when it looks like they'll have multiple length-``k`` stretches of nucleotides that are not interupted by substitutions or insertion/deletion mutations. 
+In our next heuristic, we'll only align our query to the reference sequences with the largest fraction of the kmers that are observed in the query sequence are also present in the reference sequence. This makes a lot of sense to use as an alignment heuristic: we're only aligning sequences when it looks like they'll have multiple length-``k`` stretches of nucleotides that are not interupted by substitutions or insertion/deletion mutations.
 
 Here's the source code:
 
@@ -484,48 +484,102 @@ We'll now pass our pre-computed kmer frequencies into our search function. How d
 ...     print()
 ```
 
-## Is my alignment "good"? Determining whether an alignment is statistically significant. <link src='87c92f'/>
+## Determining the statistical significance of a pairwise alignment <link src='87c92f'/>
 
-** This chapter is currently in revision. It has been revised through this point, so the text from this point is still changing rapidly.**
+One thing you may have noticed is that the score you get back for a pairwise alignment is hard to interpret. It's dependent on the query and reference sequence lengths (and possibly their composition, depending on your substitution matrix). So an important question is how good a given pairwise alignment is. Here we'll learn about a statistical approach for answering that.
 
-You may have noticed that the score you get back for an alignment isn't extremely informative. It's dependent on the query and reference sequence lengths (and possibly composition, depending on your substitution matrix). An important question then is: **is my alignment score good?**
+### Metrics of alignment quality <link src="YdqCls"/>
 
-Remember that an alignment of a pair of sequences represents a hypothesis about homology between those sequences. So when we are asking whether an alignment is good, what we really want to know is: **what fraction of the time would I obtain a score at least this good if my sequences are not homologous?** If this fraction is high, then our alignment is not good. If it's low, then our alignment is good. What is defined as high and low in this context is dependent on **how often you are willing to be wrong**.
+In the examples above, we compared features like how long the alignment is (relevant for local but not global alignment), the pairwise similarity between the aligned query and reference, and the score. If you've used a system like BLAST, you'll know that there are other values that are often reported about an alignment, like the number of substitutions, or the number of insertion/deletion (or gap) positions. None of these metrics are useful on their own. Let's look at an example to see why.
 
-If being wrong 5% of the time is acceptable (i.e., you can tolerate a false positive, or calling a pair of sequences homologous when they are actually not, one in twenty times) then you'd set your *cut-off fraction* as 0.05. This fraction is usually call our **alpha**. You have to balance this with how often you can accept false negatives, or deciding that a pair of sequences are not homologous when they actually are. If alpha is high, then you will err on the side of false positives. If alpha is low, then you will err on the side of false negatives. **There is not a hard-and-fast rule for whether false positives or false negatives are better**. It's application specific, so you need to understand your application when making this decision.
+Imagine we're aligning these two sequences:
 
-In general, when might you prefer to have false positives? When might you prefer to have false negatives?
-
-**In this section, we are going to empiricially determine if a pairwise alignment is better than we would expect by chance.** For each pair of sequences, we're going to align them to determine the score of the alignment, and then we're going to align pairs of sequences that are similar to the query and reference, but that we know are not homologous. We'll do this by *shuffling* or randomizing the order of the bases in the query sequences, and performing another pairwise alignment.
-
-```python
->>> from random import shuffle, choice
->>> from collections import Counter
+```
+GAAGCAGCAC
+GAACAGAAC
 ```
 
-We're going to use python's `random.shuffle` and `random.choice` functions for this. `random.choice` randomly selects an element from a sequence, so we can use it to contruct a random sequence of length `n` as follows:
+If we tell our search algorithm that we're interested in the alignment with the fewest number of substitutions, the following alignment would get us zero substitutions, but there are a lot of bases that look homologous which are not aligned.
 
-```python
->>> n = 10
->>> seq = [choice('ACGT') for e in range(n)]
->>> print("".join(seq), Counter(seq))
+```
+GAAGCAGCAC-----
+GAA------CAGAAC
 ```
 
-`random.shuffle` randomly re-orders the order of the elements in a sequence, but keeps the composition and length of the sequence the same. Run this next cell a few times to see the sequences that are generated.
+On the other hand, if we want to find the alignment with the fewest number of gaps, this one would get us that result, but we now have a lot of substitution events, and some regions that clearly look misaligned (such as the ``CAG`` sequence in the middle of both).
 
-```python
->>> shuffle(seq)
->>> print("".join(seq), Counter(seq))
->>> shuffle(seq)
->>> print("".join(seq), Counter(seq))
+```
+GAAGCAGCAC
+GAACAGA-AC
 ```
 
-Let's generate a random query sequence. Then we'll generate 99 random variants of that sequence with ``shuffle`` and compute the pairwise alignment for each of those variants against the query sequence. We'll then look at the distribution of those scores.
+The alignment score that has been reported by our pairwise aligners helps us to balance these different features, and we can adjust the scoring scheme to weight things differently (e.g., so that gaps are penalized more or less than certain subsitutions). The problem is that the scores are hard to interpret, particularly when we have only one or a few of them.
+
+### False positives, false negatives, p-values, and $\alpha$  <link src="TjqwVY"/>
+
+Remember that an alignment of a pair of sequences represents a hypothesis about homology between those sequences. One way that we think about determining if an alignment is good or not is to ask: *what fraction of the time would I obtain a score at least this good if my sequences are not homologous?* This fraction is usually referred to as our *p-value*, and this is computed in many different ways. If our p-value is high (e.g., 25%), then our alignment is probably not very good since it means that many non-homologous pairs of sequences would achieve a score at least that high. If our p-value is low (say 0.001%), then our alignment is probably good since scores that high are achieved only infrequently.
+
+Our threshold for defining what we consider to be a high versus low p-value is dependent on how often we're willing to be wrong. We would set this value, which is usually referred to as $\alpha$, to some fraction, and if our p-value is less than $\alpha$, we say that the alignment is statistically significant. If our p-value is greater than $\alpha$, we say that our alignment is not statistically significant.
+
+There are a couple of ways that we could be wrong when we do sequence homology searching, and we need to consider these when we determine what value we want to define as $\alpha$. First, we could say a pair of sequences are homologous when they're not, which would be a *false positive* or a *type 1 error*. Or, we could say that a pair of sequences are not homologous when they are, which would be a *false negative*, or a *type 2 error*.
+
+If incurring a false positive about 5% of the time is acceptable (i.e., you're ok with calling a pair of sequences homologous when they actually are not about one in twenty times) then you'd set your $\alpha$ to 0.05. Setting $\alpha$ to a value this high likely means that the method will err on the side of false positives, and only infrequently will it say that a pair of sequences are not homologous when they actually are (i.e., achieve a false negative). If $\alpha$ were set to be very low on the other hand (say, $1 \times 10^{-50}$), then you will err on the side of false negatives. Only infrequently will you say that a pair of non-homologous sequences are homologous, but you might call many pairs of homologous sequences non-homologous. You should think of $\alpha$ as a dial. If you turn the dial toward higher values, you'll increase your false positive rate and decrease your false negative rate. If you turn the dial toward lower values, you'll decrease your false positive rate and increase your false negative rate.
+
+There is not a hard-and-fast rule for whether false positives or false negatives are better, which makes choosing $\alpha$ hard. It's application specific, so you need to understand the biological question your answering when making this decision, and the ramifications of false positives versus false negatives. In general, when might you prefer to have false positives? When might you prefer to have false negatives?
+
+### Interpreting alignment scores in context <link src="a0nqBH"/>
+
+In this section, we are going to learn about how to interpret alignment scores by empirically determining if a pairwise alignment that we obtain is better than we would expect if the pair of sequences were working with were definitely not homologous. For a given pair of sequences that we want to align, we're first going to align them and compute the score of the alignment. We're then going to align many pairs of sequences that are similar to the query and reference, but that we know are not homologous. We'll do this by shuffling or randomizing the order of the bases in the query sequences, and performing another pairwise alignment.
+
+First, we'll define a function that can generate random sequences for us. This will take a scikit-bio sequence object (either ``skbio.DNA``, ``skbio.RNA``, or ``skbio.Protein``) and a length, and it will randomly generate a sequence of that type and length for us.
 
 ```python
->>> alphabet = list(skbio.DNA.nondegenerate_chars)
->>> query_seq = skbio.DNA(''.join([choice(alphabet) for e in range(40)]))
+>>> import random
+>>> def random_sequence(moltype, length):
+...     result = []
+...     alphabet = list(moltype.nondegenerate_chars)
+...     for e in range(length):
+...         result.append(random.choice(alphabet))
+...     return moltype(''.join(result))
 ```
+
+We can now run this a few times to generate some random sequences:
+
+```python
+>>> random_sequence(skbio.DNA, 50)
+```
+
+```python
+>>> random_sequence(skbio.DNA, 50)
+```
+
+Next, we need a function that will shuffle the characters in a sequence, and give us a new sequence back. We'll use this to generate a sequence that is similar (in length and composition) to our input sequence, but which we know is not homologus. We'll use Pythons `random.shuffle` function, which randomly re-orders the order of the elements in a sequence, but keeps the composition and length of the sequence the same.
+
+```python
+>>> from iab.algorithms import shuffle_sequence
+>>> %psource shuffle_sequence
+```
+
+Now we can define a random sequence and shuffle it. Notice how the sequences are different (in their order), but their compositions (e.g., length and GC content) are the same. Shuffling will change the order of the bases, but it won't change the frequency at which each base is present - it's exactly analogous to shuffling a deck of cards.
+
+```python
+>>> seq = random_sequence(skbio.DNA, 50)
+>>> seq
+```
+
+```python
+>>> shuffle_sequence(seq)
+```
+
+Let's generate a random query sequence and align it against itself to see what that score would be.
+
+```python
+>>> query_seq = random_sequence(skbio.DNA, 50)
+>>> _, actual_score, _ = local_pairwise_align_ssw(query_seq, query_seq)
+>>> print("Score: %1.2f" % actual_score)
+```
+
+Next let's generate 99 random variants of that sequence with ``shuffle_sequence`` and compute the pairwise alignment for each of those variants against the query sequence. We'll then look at the distribution of those scores.
 
 ```python
 >>> from iab.algorithms import generate_random_score_distribution
@@ -533,31 +587,35 @@ Let's generate a random query sequence. Then we'll generate 99 random variants o
 ```
 
 ```python
->>> random_scores = generate_random_score_distribution(query_seq, query_seq)
+>>> random_scores = generate_random_score_distribution(query_seq, query_seq, 99)
 >>> print(random_scores)
 ```
 
-```python
->>> import matplotlib.pyplot as plt
-...
->>> n, bins, patches = plt.hist(random_scores, facecolor='green', alpha=0.5, bins=range(0,100,1), normed=1)
->>> plt.xlabel('Score')
->>> plt.ylabel('Frequency')
-```
-
-Next, we'll compute the score for aligning the query sequence against itself. How does the actual score compare to the random distribution of scores? What does that suggest about our alignment?
+How does the actual score of aligning the sequence to itself compare to the score of aligning it to many similar but non-homologus sequences? Let's plot these to get a better idea.
 
 ```python
->>> _, score, _ = local_pairwise_align_ssw(query_seq, query_seq)
->>> print(score)
+>>> import seaborn as sns
 ...
->>> # plot the distribution of random scores, but add in the actual score
-... n, bins, patches = plt.hist(random_scores + [score], facecolor='green', alpha=0.5, bins=range(0,100,1), normed=1)
->>> plt.xlabel('Score')
->>> plt.ylabel('Frequency')
+>>> def plot_score_distribution(actual_score, random_scores):
+...     ax = sns.distplot(random_scores, kde=False, label="Random scores", color="b")
+...     ax.plot([actual_score, actual_score], ax.get_ylim(), '--', label="Actual score")
+...     # set the range of the x axis to be zero through 110% of the actual score
+...     ax.set_xlim(0, actual_score + actual_score * 0.1)
+...     ax.legend(loc=9, fontsize='large')
+...     return ax
 ```
 
-**Let's do this experiment again, but this time quanitfy the result by computing the fraction of the random alignments that achieve equal or better scores than the random sequences.**
+```python
+>>> plot_score_distribution(actual_score, random_scores)
+```
+
+What does this tell us about our alignment score and therefore about our alignment? Is it good or bad? 
+
+We finally have information that we can use to evaluate an alignment score, and therefore to evaluate the quality of an alignment. Let's use this information to quantify the quality of the alignment by computing a p-value. As we described above, this is simply the probability that we would obtain an alignment score at least this good if the sequences being aligned are not homologus. Since we have a lot of scores now from sequences that are similar but not homologus, if we just count how many are at least as high as our actual score and divide by the number of scores we compute, that is an empirical (data-driven) way of determining our p-value. 
+
+To determine if our alignment is statistically singificant, we also need to define $\alpha$, which we must do before computing the p-value (so that our p-value doesn't impact our choice of $\alpha$). Let's define $\alpha = 0.05$, meaning that if we obtain a p-value less than 0.05 we'll consider the alignment to be statistically significant, and we'll accept the hypothesis that the sequences we alignment are homologous.
+
+Here's what all of this looks like:
 
 ```python
 >>> from iab.algorithms import fraction_better_or_equivalent_alignments
@@ -565,82 +623,131 @@ Next, we'll compute the score for aligning the query sequence against itself. Ho
 ```
 
 ```python
->>> print(fraction_better_or_equivalent_alignments(query_seq, query_seq))
+>>> print("Fraction of alignment scores at least as good as the alignment score: %r" %
+...       fraction_better_or_equivalent_alignments(query_seq, query_seq, 99))
 ```
 
-What does this tell us about the quality of our alignment?
+The fraction that we get back here is ``0.01``, which is lower than $\alpha$, so we would accept the hypothesis that our sequences are homologlous.
 
-Let's now try this for some harder cases, where the query and subject sequences are not identical.
+A few notes on these empirically defined p-values. First, here's what the formula for computing this looks like:
 
-First, let's generate a longer subject sequence at random. Then, we'll create a random query sequence and compare it. Since we're doing this in two random steps, we know that these sequences are not homologous. Does the resulting fraction reflect that?
+$p\ value = \frac{number\ of\ computed\ aligned\ scores\ greater\ than\ or\ equal\ to\ the\ actual\ alignment\ score}{number\ of\ alignment\ scores\ computed}$
+
+The numerator and the denominator both include the actual alignment score, so the lowest p-value that can be achieved is $\frac{1}{99 + 1}$, where the $1$ in the numerator corresponds to our actual alignment score (which is of course equal to itself), where the $99$ in the denominator is the number of permutations, and the $1$ in the denominator is a constant which corresponds the the computation of the actual score. If we increase the number of permutations, say to 999, we could achieve greater precision (more significant digits) in our p-value.
 
 ```python
->>> def random_sequence(moltype, length):
+>>> print("Fraction of alignment scores at least as good as the alignment score: %r" %
+...       fraction_better_or_equivalent_alignments(query_seq, query_seq, 999))
+```
+
+When we achieve the lowest possible value for a given test, as is the case here, we report the p-value as being less than that value, since we've yet to observe a random alignment score at least that high. For example, here we would report something like:
+
+*The alignment of our query and reference sequnece was statistically significant, as determined by comparing our actual alignment score to random variants ($p < 0.001$).*
+
+Let's now try this for some harder cases, where the query and subject sequences are not identical. First, let's generate a longer subject sequence at random. Then, we'll create a random query sequence and compare it. Since we're doing this in two random steps, we know that these sequences are not homologous. Does the resulting p-value reflect that?
+
+```python
+>>> sequence1 = random_sequence(skbio.DNA, 250)
+>>> sequence1
+```
+
+```python
+>>> sequence2 = random_sequence(skbio.DNA, 250)
+>>> sequence2
+```
+
+```python
+>>> print("Fraction of alignment scores at least as good as the alignment score: %r" %
+...       fraction_better_or_equivalent_alignments(sequence1,sequence2))
+```
+
+We've now looked at two extremes: where sequences are obviously homologous (because they were the same), and where sequences are obviously not homologous (because they were both independently randomly generated). Next, we'll explore the region between these, where this gets interesting. We'll now create a partially randomized sequence to create a pair of sequences where the holomogy is more obscure. We'll do this again using the Python ``random`` module, but this time we'll introduce mutations only at some positions to create a pair of sequences that are approximately ``percent_id`` identical.
+
+Let's define a function to do this, and then compute a sequence that is 95% identical to our ``sequence1``.
+
+```python
+>>> def partially_randomize_sequence(percent_id, sequence):
 ...     result = []
-...     alphabet = list(moltype.nondegenerate_chars)
-...     for e in range(length):
-...         result.append(choice(alphabet))
-...     return moltype(''.join(result))
-...
->>> subject = random_sequence(skbio.DNA, 250)
->>> query = random_sequence(skbio.DNA, 250)
-...
->>> print(query)
->>> print(subject)
-```
-
-```python
->>> print(fraction_better_or_equivalent_alignments(query,subject))
-```
-
-**We've now looked at two extremes: where sequences are obviously homologous, and where sequences are obviously not homologous. Next, we'll explore the region between these.** We'll obscure the homology of a pair of sequences by randomly introducing some number of substitutions to make them approximately ``percent_id`` equal. By doing this, we can explore how this strategy works for increasingly more distantly related pairs of sequences.
-
-```python
->>> def query_at_percent_id(percent_id, subject):
-...     result = []
-...     for b in subject:
+...     for c in sequence:
 ...         if random.random() < percent_id:
-...             result.append(str(b))
+...             result.append(str(c))
 ...         else:
 ...             # choose a base at random that is not the current base
 ...             # i.e., simulate a substitution event
-...             result.append(choice([c for c in subject.nondegenerate_chars if c != b]))
-...     return type(subject)(''.join(result))
+...             result.append(choice([r for r in sequence.nondegenerate_chars if r != c]))
+...     return sequence.__class__(''.join(result))
 ```
 
 ```python
->>> q = query_at_percent_id(0.95,subject)
->>> print(q)
->>> print(subject)
->>> print(fraction_better_or_equivalent_alignments(q,subject))
+>>> sequence1_95 = partially_randomize_sequence(0.95, sequence1)
 ```
 
 ```python
->>> q = query_at_percent_id(0.25,subject)
->>> print(q)
->>> print(subject)
->>> print(fraction_better_or_equivalent_alignments(q,subject))
+>>> sequence1
 ```
 
-In this case we know that our input sequences are "homologous" because `query` is derived from `subject`. Our method detected that homology when `query` was roughly 95% identical to `subject` (because we got a low fraction) but did not detect that homology when `query` was roughly 25% identicial to `subject`. This gives us an idea of the limit of detection of this method, and is a **real-world problem that biologists face: as sequences are more divergent from one another, detecting homology becomes increasingly difficult.**
+```python
+>>> sequence1_95
+```
 
-**If we want to gain some insight into our limit of detection, we can run a simulation.** If we simulate alignment of different pairs of sequences in steps of different percent identities, we can see where we start failing to observe homology. The following cell illustrates a very simplistic simulation, though this still takes a few minutes to run.
-
-What does this tell us about our limit of detection for homology? What are some things that we might want to do more robustly if we weren't as concerned about runtime?
+Notice how these sequences are almost identical, but have some differences. Let's apply our approach to determine it would identify these sequences as being homologous bases on $\alpha = 0.05$.
 
 ```python
->>> percent_ids = np.arange(0.0, 1.0, 0.05)
->>> num_trials = 10
+>>> print("Fraction of alignment scores at least as good as the alignment score: %r" %
+...       fraction_better_or_equivalent_alignments(sequence1, sequence1_95))
+```
+
+You likely got a significant p-value there, telling you that the sequences are homologus. 
+
+Now let's simulate much more distantly related sequences by introducing substitutions at many more sites.
+
+```python
+>>> sequence1_25 = partially_randomize_sequence(0.25, sequence1)
+```
+
+```python
+>>> sequence1
+```
+
+```python
+>>> sequence1_25
+```
+
+```python
+>>> print("Fraction of alignment scores at least as good as the alignment score: %r" %
+...       fraction_better_or_equivalent_alignments(sequence1, sequence1_25))
+```
+
+### Exploring the limit of detection of sequence homology searches <link src="n8OGGW"/>
+
+In the example above, we know that our input sequences are "homologous" because `sequence1_25` and `sequence1_95` are both derived from `sequence1`. Our method detected that homology for `sequence1_95`, when we simulated very closely related sequences, but not for ``sequence1_25``, when we simulated much more distantly related sequences. This gives us an idea of the limit of detection of this method, and is a real-world problem that biologists face: as sequences are more divergent from one another, detecting homology becomes increasingly difficult.
+
+Lets run a simulation to gain some more insight into the limit of detection of this method. We'll run this approach for pairs of sequences where we vary the ``percent_id`` parameter, and identify when our approach stops identifying sequence pairs as being homologous. This is important to know as a bioinformatician, because it tells us around what pairwise similarity we will no longer be able to identify homology using this approach.
+
+```python
+>>> # First, let's define the range of percent identities that we'll test
+... percent_ids = np.arange(0.0, 1.0, 0.05)
+>>> # Then, we'll define the number of random sequences we'll test at each percent identity
+... num_trials = 20
+>>> # Then, we'll define the sequence length that we want to work with, and num_trials random sequences
+... sequence_length = 150
+>>> random_sequences = [random_sequence(skbio.DNA, sequence_length) for i in range(num_trials)]
+...
 >>> results = []
 ...
 >>> for percent_id in percent_ids:
+...     # at each percent_id, we'll track the p-values for each trial (random sequence)
 ...     p_values = []
-...     for i in range(num_trials):
-...         subject = random_sequence(skbio.DNA, 250)
-...         q = query_at_percent_id(percent_id,subject)
-...         p = fraction_better_or_equivalent_alignments(q,subject)
+...     for sequence in random_sequences:
+...         # partially randomize the sequence, compute its p-value, and record that p-value
+...         sequence_at_percent_id = partially_randomize_sequence(percent_id, sequence)
+...         p = fraction_better_or_equivalent_alignments(sequence, sequence_at_percent_id)
 ...         p_values.append(p)
 ...     results.append((percent_id, np.median(p_values), np.mean(p_values)))
 >>> pd.DataFrame(results, columns=["Percent id between query and subject",
 ...                                "Median p-value", "Mean p-value"])
 ```
+
+What does this simulation tell us about our limit of detection for homology (i.e., how similar must a pair of sequences be for us to reliably be able to identify homology between them)? Is this higher or lower than you expected?
+
+With respect to our simulation, I took a few shortcuts here to keep the runtime low. What are some things that could be improve to make this simulation more robust, if we weren't as concerned about runtime?

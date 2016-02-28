@@ -682,37 +682,51 @@ def heuristic_local_alignment_search_gc(
     return pd.concat(results)
 
 def shuffle_sequence(sequence):
+    # generate a list of the position indices (numbers) in sequence
     randomized_order = list(range(len(sequence)))
+    # randomly rearrange the order of that list
     random.shuffle(randomized_order)
+    # return a new sequence, where the positions are shuffled
     return sequence[randomized_order]
 
-def generate_random_score_distribution(query_sequence,
-                                       subject_sequence,
+def generate_random_score_distribution(sequence1,
+                                       sequence2,
                                        n=99,
                                        aligner=local_pairwise_align_ssw):
-    result = []
+    scores = []
+    # iterate n times
     for i in range(n):
-        random_sequence = shuffle_sequence(query_sequence)
-        _, score, _ = aligner(random_sequence, subject_sequence)
-        result.append(score)
-    return result
+        # generate a randomized version of the first sequence
+        random_sequence = shuffle_sequence(sequence1)
+        # align that randomized sequence against the second sequence
+        # and save its score
+        _, score, _ = aligner(random_sequence, sequence2)
+        scores.append(score)
+    # return the n randomized alignment scores
+    return scores
 
-def fraction_better_or_equivalent_alignments(query_sequence,
-                                             subject_sequence,
+def fraction_better_or_equivalent_alignments(sequence1,
+                                             sequence2,
                                              n = 99,
                                              aligner=local_pairwise_align_ssw):
-    random_scores = generate_random_score_distribution(query_sequence,
-                                                       subject_sequence,
+    # align sequence1 and sequence2 and store the score of the alignment
+    _, actual_score, _ = aligner(sequence1, sequence2)
+    # compute the distribution of randomized scores
+    random_scores = generate_random_score_distribution(sequence1,
+                                                       sequence2,
                                                        n,
                                                        aligner=aligner)
-    _, score, _ = aligner(query_sequence, subject_sequence)
 
+    # count the number of random scores that are at least as good as our
+    # actual score
     count_better = 0
-    for e in random_scores:
-        if e >= score:
+    for s in random_scores:
+        if s >= actual_score:
             count_better += 1
-
-    return count_better / (n + 1)
+    # return the number of times we observe a score at least as good as the
+    # random score divided by the number of scores we computed. we add one
+    # to the numerator and denominator to account for our actual_score
+    return (count_better + 1) / (n + 1)
 
 
 def fraction_shared_kmers(kmer_freqs1, kmer_freqs2):
