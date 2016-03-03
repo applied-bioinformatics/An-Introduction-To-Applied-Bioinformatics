@@ -633,13 +633,19 @@ def local_alignment_search(queries, reference_db, n=5,
         # scoring alignments (this needs to be updated so we only
         # ever keep track of the n highest scoring alignments)
         best_hits = sorted(hits, key=lambda e: e[1], reverse=True)[:n]
-        # then we compile and track some information about the n best hits
-        for r_id, score, aln, r_tax in best_hits:
-            percent_similarity = (100 * (1. - aln[0].distance(aln[1])))
-            aln_length = aln.shape[1]
-            indices.append((q.metadata['id'], r_id))
-            results.append((r_tax, percent_similarity,
-                            aln_length, score))
+        if len(best_hits) == 0:
+            # if there are no hits, log that information
+            indices.append((q.metadata['id'], "no matches"))
+            results.append(("n/a", np.nan, np.nan, np.nan))
+        else:
+            # otherwise compile and track some information about the n
+            # best hits
+            for r_id, score, aln, r_tax in best_hits:
+                percent_similarity = (100 * (1. - aln[0].distance(aln[1])))
+                aln_length = aln.shape[1]
+                indices.append((q.metadata['id'], r_id))
+                results.append((r_tax, percent_similarity,
+                                aln_length, score))
     index = pd.MultiIndex.from_tuples(indices, names=['query', 'reference'])
     columns = ['reference taxonomy', 'percent similarity',
                'alignment length', 'score']
@@ -653,7 +659,8 @@ def heuristic_local_alignment_search_random(
     return local_alignment_search(queries, database_subset, n=n, aligner=aligner)
 
 def heuristic_local_alignment_search_gc(
-        queries, reference_db, p, n=5, reference_db_gc_contents=None,
+        queries, reference_db, database_subset_size, n=5,
+        reference_db_gc_contents=None,
         aligner=local_pairwise_align_ssw):
     results = []
     if reference_db_gc_contents is None:
@@ -663,45 +670,113 @@ def heuristic_local_alignment_search_gc(
         query_gc_content = q.gc_content()
         database_subset = []
         for r in reference_db:
-            ref_gc_content = r.gc_content()
-            if ref_gc_content - p < query_gc_content < ref_gc_content + p:
-                database_subset.append(r)
-        results.append(local_alignment_search([q], database_subset,
-                                              n=n, aligner=aligner))
+            ref_gc_content = reference_db_gc_contents[r.metadata['id']]
+            # find the difference in GC content between the reference and
+            # query. we'll sort and select our reference sequences by this
+            # value
+            database_subset.append((abs(ref_gc_content - query_gc_content), r))
+        database_subset.sort(key=lambda x: x[0])
+        database_subset = [e[1] for e in database_subset[:database_subset_size]]
+        results.append(local_alignment_search(
+            [q], database_subset, n=n, aligner=aligner))
     return pd.concat(results)
 
 def shuffle_sequence(sequence):
+    # generate a list of the position indices (numbers) in sequence
     randomized_order = list(range(len(sequence)))
+    # randomly rearrange the order of that list
     random.shuffle(randomized_order)
+    # return a new sequence, where the positions are shuffled
     return sequence[randomized_order]
 
-def generate_random_score_distribution(query_sequence,
-                                       subject_sequence,
+def generate_random_score_distribution(sequence1,
+                                       sequence2,
                                        n=99,
                                        aligner=local_pairwise_align_ssw):
-    result = []
+    scores = []
+    # iterate n times
     for i in range(n):
-        random_sequence = shuffle_sequence(query_sequence)
-        _, score, _ = aligner(random_sequence, subject_sequence)
-        result.append(score)
-    return result
+        # generate a randomized version of the first sequence
+        random_sequence = shuffle_sequence(sequence1)
+        # align that randomized sequence against the second sequence
+        # and save its score
+        _, score, _ = aligner(random_sequence, sequence2)
+        scores.append(score)
+    # return the n randomized alignment scores
+    return scores
 
-def fraction_better_or_equivalent_alignments(query_sequence,
-                                             subject_sequence,
+def fraction_better_or_equivalent_alignments(sequence1,
+                                             sequence2,
                                              n = 99,
                                              aligner=local_pairwise_align_ssw):
-    random_scores = generate_random_score_distribution(query_sequence,
-                                                       subject_sequence,
+    # align sequence1 and sequence2 and store the score of the alignment
+    _, actual_score, _ = aligner(sequence1, sequence2)
+    # compute the distribution of randomized scores
+    random_scores = generate_random_score_distribution(sequence1,
+                                                       sequence2,
                                                        n,
                                                        aligner=aligner)
-    _, score, _ = aligner(query_sequence, subject_sequence)
 
+    # count the number of random scores that are at least as good as our
+    # actual score
     count_better = 0
-    for e in random_scores:
-        if e >= score:
+    for s in random_scores:
+        if s >= actual_score:
             count_better += 1
+    # return the number of times we observe a score at least as good as the
+    # random score divided by the number of scores we computed. we add one
+    # to the numerator and denominator to account for our actual_score
+    return (count_better + 1) / (n + 1)
 
-    return count_better / (n + 1)
+
+def fraction_shared_kmers(kmer_freqs1, kmer_freqs2):
+    """Compute the fraction of kmers in kmer_freqs1 that are also in kmer_freqs2
+
+    Parameters
+    ----------
+    kmer_freqs1, kmer_freqs2
+
+    Returns
+    -------
+    float
+
+    Raises
+    ------
+    ValueError
+        If k < 1.
+
+    Notes
+    -----
+    k-mer counts are not incorporated in this distance metric.
+
+    """
+    sequence1_kmers = set(kmer_freqs1)
+    num_sequence1_kmers = len(sequence1_kmers)
+    sequence2_kmers = set(kmer_freqs2)
+    shared_kmers = sequence1_kmers & sequence2_kmers
+    return len(shared_kmers) / num_sequence1_kmers
+
+def heuristic_local_alignment_search_kmers(
+        queries, reference_db, database_subset_size, k, n=5,
+        reference_db_kmer_frequencies=None,
+        aligner=local_pairwise_align_ssw):
+    results = []
+    if reference_db_kmer_frequencies is None:
+        reference_db_kmer_frequencies = \
+         {r.metadata['id'] : r.kmer_frequencies(k=k, overlap=True) for r in reference_db}
+    for q in queries:
+        query_kmer_frequency = q.kmer_frequencies(k=k, overlap=True)
+        database_subset = []
+        for r in reference_db:
+            ref_kmer_frequency = reference_db_kmer_frequencies[r.metadata['id']]
+            s = fraction_shared_kmers(query_kmer_frequency, ref_kmer_frequency)
+            database_subset.append((s, r))
+        database_subset.sort(key=lambda x: x[0], reverse=True)
+        database_subset = [e[1] for e in database_subset[:database_subset_size]]
+        results.append(local_alignment_search(
+            [q], database_subset, n=n, aligner=aligner))
+    return pd.concat(results)
+
 
 ## MSA notebook
 

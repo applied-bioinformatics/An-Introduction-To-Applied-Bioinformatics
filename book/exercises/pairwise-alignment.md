@@ -11,7 +11,7 @@ You will need to be familiar with local and global alignments (see the pairwise 
 
 You should start by reading the section 4.3 [here](http://www.ncbi.nlm.nih.gov/books/NBK21129/#A6064) of *Genomes*, by TA Brown. You may find the entire chapter useful.
 
-A common process in bioinformatics is looking at the composition of microorganisms in a given environment. For instance, we could take a sample from a desk in an office, the gut of a human subject, or the Sourthern Ocean and ask what microorganisms are present in each of the different samples. The most common way to answer this question is to sequence the 16S rRNA gene. What makes this gene so useful is that it contains several conserved areas, which means that we can isolate it from the full genomes of many organisms using PCR, however it also contains highly variable regions so that we can tell the organisms apart. The sequence of the 16S rRNA therefore serves as a *fingerprint* for a microorganism. If we find it in a sample, that suggests that the organism is present in that sample.
+A common process in bioinformatics is looking at the composition of microorganisms in a given environment. For instance, we could take a sample from a desk in an office, the gut of a human subject, or the Southern Ocean and ask what microorganisms are present in each of the different samples. The most common way to answer this question is to sequence the 16S rRNA gene. What makes this gene so useful is that it contains several conserved areas, which means that we can isolate it from the full genomes of many organisms using PCR, however it also contains highly variable regions so that we can tell the organisms apart. The sequence of the 16S rRNA therefore serves as a *fingerprint* for a microorganism. If we find it in a sample, that suggests that the organism is present in that sample.
 
 ## Goals <link src="VPx832"/>
 
@@ -73,7 +73,7 @@ This next function, ``slice_sequence``, will let you let you easily extract segm
 ...
 >>>     """
 >>>     if start_pos < 0:
->>>         raise ValueError("Starting position must be greater than zero")
+>>>         raise ValueError("Starting position must be greater than zero.")
 >>>     if end_pos > len(sequence):
 >>>         raise ValueError("Ending position cannot be larger than the length of the sequence.")
 >>>     if start_pos >= end_pos:
@@ -184,7 +184,7 @@ At this point you have the necessary functions to complete the assignment. Your 
 
 The best primers will:
 
-1. Anneal to all of the 16s rRNA sequences well. This will be determined by achieving a high alignment score between the primer and all of the sequences (though it is OK for there to be some mismatches).
+1. Anneal to all of the 16S rRNA sequences well. This will be determined by achieving a high alignment score between the primer and all of the sequences (though it is OK for there to be some mismatches).
 2. They should amplify a region that is 100-400 base pairs long, due to limitations of current sequencing technology.
 3. Finally, the region that is amplified (i.e., between the primers) should be very different across all species, to allow for accurate *fingerprinting* of the different species.
 
@@ -213,7 +213,7 @@ What is the Smith-Waterman alignment score of primer `p6` against sequence `s4`?
 
 ## Question 4 <link src="r1T4fH"/>
 
-What is the best pair of primers from the list of available primers to use for amplifying the 16s region for sequencing for the purposes of identifying the organisms present?
+What is the best pair of primers from the list of available primers to use for amplifying the 16S region for sequencing for the purposes of identifying the organisms present?
 
 ## More hints <link src="RkQOgO"/>
 
@@ -223,7 +223,7 @@ The best pair of primers will amplify a region of DNA that is between 100 and 40
 
 The best pair of primers will amplify a region that is highly variable (in other words, the amplified regions across the organisms should not align well).
 
-Think about wether you want to use global or local alignments for the different steps. Are there times when you would want to use a gap penalty other than the default?
+Think about whether you want to use global or local alignments for the different steps. Are there times when you would want to use a gap penalty other than the default?
 
 The `N` character present in some of the primer sequences signifies a "degenerate" base, meaning it could be an 'A', 'T', 'G' or 'C'. You shouldn't worry about these for this exercise.
 
