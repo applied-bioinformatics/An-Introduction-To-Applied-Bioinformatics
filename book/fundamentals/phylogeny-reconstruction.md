@@ -1,7 +1,7 @@
 
 # Phylogenetic reconstruction <link src='adb2e7'/>
 
-**NOTE**: This chapter is very basic at this stage, and needs work on text and content. It is slated for expansion. In the meantime, if you're looking for extra information on this topic I recommend [Chapter 27 of *Evolution*](http://evolution-textbook.org/content/free/contents/ch27.html) (free), and [*Inferring Phylogeny* by Felsenstein](http://www.amazon.com/Inferring-Phylogenies-Joseph-Felsenstein/dp/0878931775/ref=sr_1_1?s=books&ie=UTF8&qid=1397401191&sr=1-1&keywords=inferring+phylogenies). You can add suggestions for content, note issues, and follow progress on it updates, in [issue #25](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/25).
+**NOTE**: This chapter is very basic at this stage, and needs work on text and content. It is slated for expansion. In the meantime, if you're looking for extra information on this topic I recommend [Chapter 27 of *Evolution*](http://evolution-textbook.org/content/free/contents/ch27.html) (free), and [*Inferring Phylogeny* by Felsenstein](http://www.amazon.com/Inferring-Phylogenies-Joseph-Felsenstein/dp/0878931775/ref=sr_1_1?s=books&ie=UTF8&qid=1397401191&sr=1-1&keywords=inferring+phylogenies). You can add suggestions for content, note issues, and follow progress on it updates, in [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119).
 
 What:
 
