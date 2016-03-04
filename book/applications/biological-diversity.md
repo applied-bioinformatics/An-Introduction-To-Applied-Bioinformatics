@@ -510,7 +510,7 @@ If we run through these same steps, but base our analysis on a different metadat
 
 Why do you think the distribution of distances between people has such as larger range than the distribution of distances within people in this particular example?
 
-#### Heirarchical clustering <link src='09f456'/>
+#### Hierarchical clustering <link src='09f456'/>
 
 Next, let's look at a hierarchical clustering analysis, similar to that presented in panel G above. Here I'm applying the UPGMA functionality implemented in [scipy](http://www.scipy.org/scipylib/index.html) to generate a tree which we visualize with a dendrogram. However the tips in this tree don't represent sequences or OTUs, like they did when we covered UPGMA in the [Phylogenetic reconstruction chapter](../algorithms/3-phylogeny-reconstruction.ipynb) chapter, but instead they represent samples, and samples with a smaller branch length between them are more similar in composition than samples with a longer branch length between them. (Remember that only horizontal branch length is counted - vertical branch length is just to aid in the organization of the dendrogram.)
 
@@ -752,7 +752,7 @@ Taken together, these plots and statistics suggest that soil microbial community
 
 ## PCoA versus PCA: what's the difference? <link src='163769'/>
 
-You may have also heard of a method related to PCoA, called Principal Components Analysis or PCA. There is a key difference between these methods that is important for our useds. PCoA, which is what we've been working with, performs ordination with a distance matrix as input. PCA on the other hand performs ordination with sample by observation count data, such as the OTU tables that we've been working with, as input. It achieves this by computing Euclidean distance (see [here](http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.euclidean.html#scipy.spatial.distance.euclidean)) between the samples and then running PCoA. So, if your distance metric is Euclidean, PCA and PCoA are the same. In practice however, we want to be able to use distance metrics that work better for studying biological diversity, such as Bray-Curtis or UniFrac. Therefore we typically compute distances with whatever metric we want, and then run PCoA.
+You may have also heard of a method related to PCoA, called Principal Components Analysis or PCA. There is, however, an important key difference between these methods. PCoA, which is what we've been working with, performs ordination with a distance matrix as input. PCA on the other hand performs ordination with sample by observation count data, such as the OTU tables that we've been working with, as input. It achieves this by computing Euclidean distance (see [here](http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.distance.euclidean.html#scipy.spatial.distance.euclidean)) between the samples and then running PCoA. So, if your distance metric is Euclidean, PCA and PCoA are the same. In practice however, we want to be able to use distance metrics that work better for studying biological diversity, such as Bray-Curtis or UniFrac. Therefore we typically compute distances with whatever metric we want, and then run PCoA.
 
 ## Are two different analysis approaches giving me the same result? <link src='371f0d'/>
 
