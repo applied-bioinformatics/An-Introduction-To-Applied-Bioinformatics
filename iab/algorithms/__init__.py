@@ -949,7 +949,7 @@ def progressive_msa_and_tree(sequences,
     if display_tree:
         print("\nOutput tree:")
         d = dendrogram(msa_lm, labels=msa_dm.ids, orientation='right',
-                   link_color_func=lambda x: 'black', leaf_font_size=24)
+                   link_color_func=lambda x: 'black')
     return msa, msa_tree
 
 def iterative_msa_and_tree(sequences,
