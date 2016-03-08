@@ -19,11 +19,180 @@ Phylogenetic trees are used for many other diverse applications in bioinformatic
 
 ** Pick up here **
 
-How:
+Old notes:
 
 By comparing traits of extant organisms. In our case, traits are columns in a multiple sequence alignment. Many algorithms and tools exist for achieving this, and they vary widely in runtime and quality of results. We're going to begin by learning about one of the oldest and simplest methods for doing this: *Unweighted Pair Group Method with Arithmetic Mean* or UPGMA. (Don't be scared by the name - it's actually fairly simple.)
 
 UPGMA is a heirarchical clustering algorithm. It is widely used, though it's application in phylogenetics is usually restricted to building preliminary trees to "guide" the process of multiple sequence alignment, as it makes some assumptions that don't work well for inferring relationships between organsims. We're going to start with it here however for a few reasons. First, the underlying math is very basic, so we don't need to assume anything about your background. Second, there are some other applications of UPGMA that we'll explore later, including grouping samples based on their species compositions. In general, my strategy with teaching this material is to start by giving you a basic introdution into how a process works so you can visualize and do it. From there, we can get more complex.
+
+## Simulating evolution <link src="bR7jKb"/>
+
+```python
+>>> # import some functions from python's random module - these will
+... # be used in the modeling process
+... from random import choice, randint
+>>> # import some math functions from the numpy library (note that this
+... # isn't part of the python standard library)
+... from numpy import log10, average
+>>> # import argv from the sys module to support basic command line
+... # control of this script
+... from sys import argv
+...
+>>> #####
+... # Start of function definitions
+... #####
+...
+... def count_differences(sequence1,sequence2):
+...      """Count the number of differences between two sequences of the same length
+...      """
+...      # confirm that the two sequences are the same length and throw
+...      # an error if they aren't
+...      assert len(sequence1) == len(sequence2), "Sequences differ in length"
+...      # initiate a counter for the number of differences
+...      result = 0
+...      # iterate over the two sequences and count the number of
+...      # positions which are not identical
+...      for base1,base2 in zip(sequence1,sequence2):
+...          if base1 != base2:
+...              # this is a commonly used shortcut for incrementing a count
+...              # and is equivalent to the following statement
+...              # result = result + 1
+...              result += 1
+...      return result
+...
+>>> def evolve_seq(sequence,
+...                substitution_probability=0.01,
+...                mutation_choices=['A','C','G','T']):
+...     """Return two child sequences simulating point mutations
+...
+...        An error occurs with probability substitution_probability
+...         independently at each position of each child sequence.
+...     """
+...     # Generate two lists for storing the resulting sequences
+...     r1 = []
+...     r2 = []
+...
+...     range_length = 10 ** (-1 * log10(substitution_probability))
+...
+...     for base in sequence:
+...         if randint(0,range_length) == 0:
+...             # a point mutation will occur at this position
+...             # what's wrong with the following statement?
+...             r1.append(choice(mutation_choices))
+...         else:
+...             # no point mutation at this position
+...             r1.append(base)
+...         if randint(0,range_length) == 0:
+...             # a point mutation will occur at this position
+...             # what's wrong with the following statement?
+...             r2.append(choice(mutation_choices))
+...         else:
+...             # no point mutation at this position
+...             r2.append(base)
+...     # convert the lists to strings and return them
+...     return ''.join(r1), ''.join(r2)
+...
+>>> def main(root_sequence,generations,verbose=False):
+...     # initial some values and perform some basic error checking
+...     assert generations > 0, "Must simulate one or more generations."
+...     # can you simplify the following test?
+...     for base in root_sequence:
+...         assert base != 'A' or base != 'C' or base != 'G' or base != 'T',\
+...          "Invalid base identified: %s. Only A, C, G, or T are allowed." % base
+...     # initialize a list of the previous generations sequences - this gets used
+...     # in the for loop below. since we'll start with the first generation of
+...     # children, root_sequence is the previous generation's sequence
+...     previous_generation_sequences = [root_sequence]
+...
+...     # iterate over each generation (why do we add one to generations?)
+...     for i in range(1,generations+1):
+...         # print the generation number and the current number of sequences
+...         print("Generation: %d (Number of child sequences: %d)" % (i,2**i))
+...         # create a list to store the current generation of sequences
+...         current_generation_sequences = []
+...         # create a list to store the differences in each current generation
+...         # sequence from the root sequence
+...         difference_counts = []
+...         # iterate over the sequences of the previous generation
+...         for parent_sequence in previous_generation_sequences:
+...             # evolve two child sequences
+...             r1, r2 = evolve_seq(parent_sequence)
+...             # count the differences in the first sequence (from root_sequence)
+...             r1_diffs = count_differences(root_sequence,r1)
+...             # append the count of differences to the list of difference counts
+...             difference_counts.append(r1_diffs)
+...             # add the new sequence to the list of this generation's sequences
+...             current_generation_sequences.append(r1)
+...             # count the differences in the second sequence (from root_sequence)
+...             r2_diffs = count_differences(root_sequence,r2)
+...             # append the count of differences to the list of difference counts
+...             difference_counts.append(r2_diffs)
+...             # add the new sequence to the list of this generation's sequences
+...             current_generation_sequences.append(r2)
+...             if verbose:
+...                 # if the caller specified verbose output, print the actual sequences
+...                 print("  %s %d" % (r1, r1_diffs))
+...                 print("  %s %d" % (r2, r2_diffs))
+...         # print summary information: the average number of differences in the current
+...         # generation from root_sequence
+...         print("Mean differences %1.3f\n" % average(difference_counts))
+...         # current_generation_sequences becomes the next generation's
+...         # previous_generation_sequences
+...         previous_generation_sequences = current_generation_sequences
+...
+...     # upon completion of all generations, return the last generation's sequences
+...     return previous_generation_sequences
+...
+>>> main('ACCGGGGGGAACCCATTTTACACACACACAC', 5)
+Generation: 1 (Number of child sequences: 2)
+Mean differences 1.000
+
+Generation: 2 (Number of child sequences: 4)
+Mean differences 1.250
+
+Generation: 3 (Number of child sequences: 8)
+Mean differences 1.500
+
+Generation: 4 (Number of child sequences: 16)
+Mean differences 1.562
+
+Generation: 5 (Number of child sequences: 32)
+Mean differences 1.750
+['ACCGGGGGGAACCCATTTTACTCACACACAC',
+ 'ACCGGGGGGAACCCATTTTACTCACACACAC',
+ 'ACCGGGGGGAACCCATTTTACTCACACACAC',
+ 'ACCGGGGGGAACCCATTTTACTCACACACAC',
+ 'ACCGGGGGGAACCCATTTTACTCACACACAC',
+ 'GCCGGGGGGAACCCATTTTACTCACACACAC',
+ 'ACCGGGGGGAACCCATTTTACTCACACACAC',
+ 'ACCGGGGGGAACCCATTTTACTCACACACAC',
+ 'ACCGGTGGGAACCCATTTTACTCACACACAC',
+ 'ACCGGTGGGAACCCATTTTACTCACACACAC',
+ 'ACCGGTGGGAACCCAATTTACTCACACACAC',
+ 'ACCGGTGGGAACCCATTTTACTCACACACAC',
+ 'ACCGGGGGGAACCCATTTTACTCACCCACAC',
+ 'ACCGGGGGGAACCCATTTTACTCACACACAC',
+ 'ACCGGGGGGAACCCATTTTACTTACACACAC',
+ 'ACCGGGGGGAACCCATTTTACTTACACACAC',
+ 'ACCGGGGGGTACCCATTTTACCCACACACAC',
+ 'ACCGGGGGGTACCCATTTTACCCACACACAC',
+ 'ACCGGGGGGTACCCATTTTACCCACACACAC',
+ 'ACCGGGGGGTACCCATTTTACCCACACACAC',
+ 'ACCGGGGGGAACCCATTTTACCCACACACAC',
+ 'ACCGGGGGGAACCCATTTTACCCACACACAC',
+ 'ACCGGAGGGAACCCATTTTACCCACACACAC',
+ 'ACCGGGGGGAACCCATTTTACCCACACACAC',
+ 'ACCGGGGGGAACCCATTTTATCCACACACAC',
+ 'ACCGGGGGGAACCCATTTTATCCACACACAC',
+ 'ACCGGGGGGAACCCATTTTATCCACACACAC',
+ 'ACCGGGGGGAACCCATTTTATCCACACACAC',
+ 'ACCGGGGGGAACCCATTTTATCCACACACAC',
+ 'ACCGGGGGGAACCCATTTTATCCACACACAC',
+ 'ACCGAGGGGAACCCATTTTATCCCCACACAC',
+ 'ACCGGGGGGAACCCATTTTATCCACACACAC']
+```
+
+
 
 ## Some terminology <link src='7bde92'/>
 
