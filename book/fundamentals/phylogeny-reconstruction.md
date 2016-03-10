@@ -15,7 +15,7 @@ The *individuals* represented at the tips of our trees don't necessarily have to
 
 Phylogenetic trees are used for many other diverse applications in bioinformatics, so it's therefore important that a bioinformatican have an understanding of they are built and how they should be interpreted. An additional application that we'll cover in this text is comparing the composition of communities of organisms, but we'll come back to that [later](alias://2bb2cf).
 
-## How phylogenies is reconstructed <link src="nluhSw"/>
+## How phylogenies are reconstructed <link src="nluhSw"/>
 
 Phylogenies are reconstructed using a variety of different algorithms, some of which we'll cover in this chapter. These algorithms all work by comparing a set of *features* of organisms, and inferring the evolutionary distance between those organisms based on the similarity of their features. The features that are compared can be nearly anything that is observable, either from extant organisms or fossilized representatives of extinct organisms.
 
@@ -31,7 +31,7 @@ Earlier work on understanding the relations between the spider lineages focused 
 
 More recently, several research teams have used features of spider genomes to reconstruct the spider phylogeny ([Bond et al., 2014](http://www.cell.com/current-biology/abstract/S0960-9822(14)00750-7), [Garrison et al., 2016](https://peerj.com/articles/1719/)). Using this approach, the features become the nucleotides observed at particular positions in the genome, which are observed first by sequencing specific genes that the researchers target that are present in all members of the group, and then aligning those sequences with multiple sequence alignment. This has several advantages over feature matrices derived from morphological and behavioral traits, including that many more features can be observed. For example, ([Garrison et al., 2016](https://peerj.com/articles/1719/)), compared approximately 700,000 amino acid positions from nearly 4000 loci around the genomes of 70 spider taxa. Compare the number of features here to the number mentioned in the previous paragraph. These *phylogenomic* studies have further supported the idea that orb-weaving is an ancient monophyletic trait, and have provided much finer scale information on the evolution of spiders. Supported by these data, researchers hypothesize that the loss of orb-weaving might not be that surprising. While it does provide an effective means of catching flying insects, many insects which are potential prey for spiders don't fly. Further, orb webs may attract predators of spiders, and they are easily observable signals of where a spider can be found.
 
-For the remainder of this chapter, we'll consider methods for phylogenetic reconstruction that use genome sequence data as features. 
+For the remainder of this chapter, we'll consider methods for phylogenetic reconstruction that use genome sequence data as features.
 
 ## Simulating evolution <link src="bR7jKb"/>
 
