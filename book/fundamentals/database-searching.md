@@ -515,7 +515,7 @@ GAACAGA-AC
 
 The alignment score that has been reported by our pairwise aligners helps us to balance these different features, and we can adjust the scoring scheme to weight things differently (e.g., so that gaps are penalized more or less than certain subsitutions). The problem is that the scores are hard to interpret, particularly when we have only one or a few of them.
 
-### False positives, false negatives, p-values, and $\alpha$  <link src="TjqwVY"/>
+### False positives, false negatives, p-values, and alpha  <link src="TjqwVY"/>
 
 Remember that an alignment of a pair of sequences represents a hypothesis about homology between those sequences. One way that we think about determining if an alignment is good or not is to ask: *what fraction of the time would I obtain a score at least this good if my sequences are not homologous?* This fraction is usually referred to as our *p-value*, and this is computed in many different ways. If our p-value is high (e.g., 25%), then our alignment is probably not very good since it means that many non-homologous pairs of sequences would achieve a score at least that high. If our p-value is low (say 0.001%), then our alignment is probably good since scores that high are achieved only infrequently.
 
