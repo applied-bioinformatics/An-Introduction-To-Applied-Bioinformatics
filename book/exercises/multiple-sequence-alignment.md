@@ -204,12 +204,12 @@ If you want to obtain a given sequence, you can now do so by looking up its iden
 To compute the pairwise identity for two sequences, use `pairwise_percent_id` as follows:
 
 ```python
->>> from skbio.alignment import global_pairwise_align_nucleotide
+>>> from skbio.alignment import local_pairwise_align_ssw
 ...
 >>> def pairwise_percent_id(seq1_id, seq2_id, seq_lookup):
 ...     seq1 = seq_lookup[seq1_id]
 ...     seq2 = seq_lookup[seq2_id]
-...     aln, _, _ = global_pairwise_align_nucleotide(seq1, seq2)
+...     aln, _, _ = local_pairwise_align_ssw(seq1, seq2)
 ...     return 1. - aln[0].distance(aln[1])
 ```
 
