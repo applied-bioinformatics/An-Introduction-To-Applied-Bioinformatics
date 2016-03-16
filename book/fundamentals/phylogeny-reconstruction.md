@@ -7,7 +7,9 @@ In this chapter we'll begin to explore the goals, approaches, and challenges for
 
 ## Why build phylogenies? <link src="Q4cFRp"/>
 
-Reconstructing the phylogeny of a group of individuals is useful for many reasons. Probably the most obvious of these is understanding the evolutionary relationship between a group of organisms. For example, over the past half-century we've gained great insight into the evolution of our species, *Homo sapiens*, by studying features of our closest relatives, both extant (still existing) organisms, such as the *Pan* (chimpanzees) and *Gorilla* genera, and extinct (no longer living) species, including *Homo neanderthalensis*, *Homo erectus*, *Homo habilus*, and many species in the *Australopithecus* genus. (The [Smithsonian Museum's Human Origins Initiative](http://humanorigins.si.edu/) is an excellent resource for learning more about the fascinating subject of human evolution.) Phylogenetic trees such as these are also useful for understanding evolution itself. In fact, they're so useful that the single image that Charles Darwin found important enough to include in *On the Origin of Species* was the phylogenetic tree presented in Figure 1a.
+Reconstructing the phylogeny of a group of individuals is useful for many reasons. Probably the most obvious of these is understanding the evolutionary relationship between a group of organisms. For example, over the past half-century we've gained great insight into the evolution of our species, *Homo sapiens*, by studying features of our closest relatives, both extant (still existing) organisms, such as the *Pan* (chimpanzees) and *Gorilla* genera, and extinct (no longer living) species, including *Homo neanderthalensis*, *Homo erectus*, *Homo habilus*, and many species in the *Australopithecus* genus. (The [Smithsonian Museum's Human Origins Initiative](http://humanorigins.si.edu/) is an excellent resource for learning more about the fascinating subject of human evolution.) In this time, we've also improved our understanding of the deeper branches in the tree of life. For example, [Woese and Fox (1977)](http://www.pnas.org/content/74/11/5088.full.pdf) used phylogenetic reconstruction to first illustrate that the "prokaryotes" really represented two ancient lineages which they called the eubacteria and the archaebacteria, which ultimately led to the proposal of a "three domain" tree of life composed of the three deep branching linages, the archaea, the bacteria, and the eucarya ([Woese, Kandler and Wheelis (1990)](http://www.pnas.org/content/87/12/4576.full.pdf)). 
+
+Phylogenetic trees such as these are also useful for understanding evolution itself. In fact, they're so useful that the single image that Charles Darwin found important enough to include in *On the Origin of Species* was the phylogenetic tree presented in Figure 1a.
 
 The *individuals* represented at the tips of our trees don't necessarily have to be organisms though. In another important application of phylogenetic trees, we can study the evolution of genes, which can help us gain a deeper understanding of gene function. Specifically, we can learn about families of related genes. A classic example of this is the globin family, which includes the proteins hemoglobin and myoglobin, molecules that can reversibly bind oxygen (meaning they can bind to it, and then let go of it). You've probably heard of hemoglobin (if not globins in general), as this molecule binds to oxygen where it is present in high concentration (such as in your lung) and releases it where it is present in low concentration (such as in the bicep, where it is ultimately used to power your arm). Hemoglobin and myoglobin are paralogs, meaning that they are related by a gene duplication and subsequent divergence. If you were to compare an unknown globin sequence to either of these you could detect homology, but a tree such as the one present in Figure 2, would help you understand the type of homologous relationship (i.e., whether it was orthology or paralogy).
 
@@ -23,7 +25,7 @@ As an example, let's consider the reconstruction of the phylogeny of spiders (th
 
 <figure>
     <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/phyl/book/fundamentals/images/spider-tree.png">
-    <figcaption>Figure 3: A spider phylogeny. Numbers at internal nodes correspond to the taxonomic groups described in [Table 2 of Garrison et al., 2016](https://peerj.com/articles/1719/#table-1). This image is an unmodified version of [Figure 1](https://doi.org/10.7717/peerj.1719/fig-1), presented by [Garrison et al., 2016](https://peerj.com/articles/1719/).</figcaption>
+    <figcaption>Figure 3: A spider phylogeny. Numbers at internal nodes correspond to the taxonomic groups described in [Table 2 of Garrison et al., 2016](https://peerj.com/articles/1719/#table-1). This image is an unmodified version of [Figure 1](https://doi.org/10.7717/peerj.1719/fig-1) of [Garrison et al., 2016](https://peerj.com/articles/1719/).</figcaption>
 </figure>
 <p>
 
@@ -199,7 +201,6 @@ Mean differences 1.750
  'ACCGAGGGGAACCCATTTTATCCCCACACAC',
  'ACCGGGGGGAACCCATTTTATCCACACACAC']
 ```
-
 
 ** Pick up here **
 
