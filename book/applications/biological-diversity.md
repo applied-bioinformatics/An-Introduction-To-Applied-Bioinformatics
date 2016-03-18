@@ -121,7 +121,7 @@ Imagine now that we have the same table, but some additional information about t
 
 <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/applications/images/pd_calc_tree.png">
 
-Pairing this with the table we defined above (displayed again in the cell below), given what you now now about these OTUs, which would you consider the most diverse? Are you happy with the $\alpha$ diversity conclusion that you obtained when computing the number of observed OTUs in each sample?
+Pairing this with the table we defined above (displayed again in the cell below), given what you now know about these OTUs, which would you consider the most diverse? Are you happy with the $\alpha$ diversity conclusion that you obtained when computing the number of observed OTUs in each sample?
 
 ```python
 >>> table2
