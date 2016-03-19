@@ -7,7 +7,7 @@ In this chapter we'll begin to explore the goals, approaches, and challenges for
 
 ## Why build phylogenies? <link src="Q4cFRp"/>
 
-Reconstructing the phylogeny of a group of individuals is useful for many reasons. Probably the most obvious of these is understanding the evolutionary relationship between a group of organisms. For example, over the past half-century we've gained great insight into the evolution of our species, *Homo sapiens*, by studying features of our closest relatives, both extant (still existing) organisms, such as the *Pan* (chimpanzees) and *Gorilla* genera, and extinct (no longer living) species, including *Homo neanderthalensis*, *Homo erectus*, *Homo habilus*, and many species in the *Australopithecus* genus. (The [Smithsonian Museum's Human Origins Initiative](http://humanorigins.si.edu/) is an excellent resource for learning more about the fascinating subject of human evolution.) In this time, we've also improved our understanding of the deeper branches in the tree of life. For example, [Woese and Fox (1977)](http://www.pnas.org/content/74/11/5088.full.pdf) used phylogenetic reconstruction to first illustrate that the "prokaryotes" really represented two ancient lineages which they called the eubacteria and the archaebacteria, which ultimately led to the proposal of a "three domain" tree of life composed of the three deep branching linages, the archaea, the bacteria, and the eucarya ([Woese, Kandler and Wheelis (1990)](http://www.pnas.org/content/87/12/4576.full.pdf)). 
+Reconstructing the phylogeny of a group of individuals is useful for many reasons. Probably the most obvious of these is understanding the evolutionary relationship between a group of organisms. For example, over the past half-century we've gained great insight into the evolution of our species, *Homo sapiens*, by studying features of our closest relatives, both extant (still existing) organisms, such as the *Pan* (chimpanzees) and *Gorilla* genera, and extinct (no longer living) species, including *Homo neanderthalensis*, *Homo erectus*, *Homo habilus*, and many species in the *Australopithecus* genus. (The [Smithsonian Museum's Human Origins Initiative](http://humanorigins.si.edu/) is an excellent resource for learning more about the fascinating subject of human evolution.) In this time, we've also improved our understanding of the deeper branches in the tree of life. For example, [Woese and Fox (1977)](http://www.pnas.org/content/74/11/5088.full.pdf) used phylogenetic reconstruction to first illustrate that the "prokaryotes" really represented two ancient lineages which they called the eubacteria and the archaebacteria, which ultimately led to the proposal of a "three domain" tree of life composed of the three deep branching linages, the archaea, the bacteria, and the eucarya ([Woese, Kandler and Wheelis (1990)](http://www.pnas.org/content/87/12/4576.full.pdf)).
 
 Phylogenetic trees such as these are also useful for understanding evolution itself. In fact, they're so useful that the single image that Charles Darwin found important enough to include in *On the Origin of Species* was the phylogenetic tree presented in Figure 1a.
 
@@ -21,7 +21,7 @@ Phylogenetic trees are used for many other diverse applications in bioinformatic
 
 Phylogenies are reconstructed using a variety of different algorithms, some of which we'll cover in this chapter. These algorithms all work by comparing a set of *features* of organisms, and inferring the evolutionary distance between those organisms based on the similarity of their features. The features that are compared can be nearly anything that is observable, either from extant organisms or fossilized representatives of extinct organisms.
 
-As an example, let's consider the reconstruction of the phylogeny of spiders (the order Araneae), a hypothesis of which is presented in Figure 3. Of the extant spiders, some are orb-weavers (meaning they spin circular, sticky webs), and others are not. Entomologists have debated whether orb-weaving is a monophyletic trait (meaning that it evolved one time), or whether it is polyphyletic (meaning that it evolved multiple times, such as flight, which has evolved independently in birds, flying dinosaurs, insects, and mammals). If orb-weaving is monophyletic, it would mean that over the course of evolution, extant spiders which don't weave orb webs have lost that ability. Some researchers doubt as it's a very effective means of catching prey, and losing that ability would likely constitute an evolutionary disadvantage. If orb-weaving is polyphyletic, it would means that in at least two different spider lineages, this trait arose independently, which other researchers consider to be very unlikely due to the complexity of engineering these webs.
+As an example, let's consider the reconstruction of the phylogeny of spiders (the order Araneae), a hypothesis of which is presented in Figure 3. Of the extant spiders, some are orb-weavers (meaning they spin circular, sticky webs), and others are not. Entomologists have debated whether orb-weaving is a monophyletic trait (meaning that it evolved one time), or whether it is polyphyletic (meaning that it evolved multiple times, such as flight, which has evolved independently in birds, flying dinosaurs, insects, and mammals). If orb-weaving is monophyletic, it would mean that over the course of evolution, extant spiders which don't weave orb webs have lost that ability. Some researchers doubt this as it's a very effective means of catching prey, and losing that ability would likely constitute an evolutionary disadvantage. If orb-weaving is polyphyletic, it would means that in at least two different spider lineages, this trait arose independently, which other researchers consider to be very unlikely due to the complexity of engineering these webs.
 
 <figure>
     <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/phyl/book/fundamentals/images/spider-tree.png">
@@ -31,121 +31,100 @@ As an example, let's consider the reconstruction of the phylogeny of spiders (th
 
 Earlier work on understanding the relations between the spider lineages focused on comparing traits that entomologists would observe, for example by watching spiders in action or by dissecting them. For example, in 1986 through 1991, [Johnathan Coddington](http://entomology.si.edu/StaffPages/coddington.html) published several studies that tabulated and compared about sixty features of 32 spider taxa (Coddington J. 1986. The monophyletic origin of the orb web. In: Shear W, ed. Spiders: webs, behavior, and evolution. Stanford, California: Stanford University Press. 319-363; Coddington JA. 1991. Cladistics and spider classification: araneomorph phylogeny and the monophyly of orbweavers (Araneae: Araneomorphae; Orbiculariae) Acta Zoologica Fennica 190:75-87). Features included whether a spider wraps its prey when it attacks (a behavioral trait), and how branched the spider's trachea is (a morphological trait). By determining which spiders were more similar and different across these traits, Dr. Coddington provided early evidence for the hypothesis that orb-weaving is an ancient monophyletic trait.
 
-More recently, several research teams have used features of spider genomes to reconstruct the spider phylogeny ([Bond et al., 2014](http://www.cell.com/current-biology/abstract/S0960-9822(14)00750-7), [Garrison et al., 2016](https://peerj.com/articles/1719/)). Using this approach, the features become the nucleotides observed at particular positions in the genome, which are observed first by sequencing specific genes that the researchers target that are present in all members of the group, and then aligning those sequences with multiple sequence alignment. This has several advantages over feature matrices derived from morphological and behavioral traits, including that many more features can be observed. For example, ([Garrison et al., 2016](https://peerj.com/articles/1719/)), compared approximately 700,000 amino acid positions from nearly 4000 loci around the genomes of 70 spider taxa. Compare the number of features here to the number mentioned in the previous paragraph. These *phylogenomic* studies have further supported the idea that orb-weaving is an ancient monophyletic trait, and have provided much finer scale information on the evolution of spiders. Supported by these data, researchers hypothesize that the loss of orb-weaving might not be that surprising. While it does provide an effective means of catching flying insects, many insects which are potential prey for spiders don't fly. Further, orb webs may attract predators of spiders, and they are easily observable signals of where a spider can be found.
+More recently, several research teams have used features of spider genomes to reconstruct the spider phylogeny ([Bond et al., 2014](http://www.cell.com/current-biology/abstract/S0960-9822(14)00750-7), [Garrison et al., 2016](https://peerj.com/articles/1719/)). Using this approach, the features become the nucleotides observed at particular positions in the genome, which are observed first by sequencing specific genes that the researchers target that are present in all members of the group, and then aligning those sequences with multiple sequence alignment. This has several advantages over feature matrices derived from morphological and behavioral traits, including that many more features can be observed. For example, ([Garrison et al., 2016](https://peerj.com/articles/1719/)), compared approximately 700,000 amino acid positions from nearly 4000 loci around the genomes of 70 spider taxa. Compare the number of features here to the number mentioned in the previous paragraph. These *phylogenomic* studies have further supported the idea that orb-weaving is an ancient monophyletic trait, and have provided much finer scale information on the evolution of spiders. Supported by these data, researchers hypothesize that the loss of orb-weaving might not be that surprising. While it does provide an effective means of catching flying insects, many insects which are potential prey for spiders don't fly. Further, orb webs may attract predators of spiders, as they are easily observable signals of where a spider can be found.
 
 For the remainder of this chapter, we'll consider methods for phylogenetic reconstruction that use genome sequence data as features.
 
 ## Simulating evolution <link src="bR7jKb"/>
 
+Before we jump into how to reconstruct a phylogeny from DNA sequence data, we're going to perform a simulation of the process of evolution of a DNA sequence. In this simulation, we're going to model sequence evolution with a Python function, and then we're going to run that function many times to simulate multiple generations of evolution. We'll have control over the rate at which substitutions and insertion/deletion mutations arise, and (unlike a real evolutionary process), we'll be able to inspect both the terminal sequences, which will ...
+
+```python
+>>> import numpy as np
+```
+
 ```python
 >>> # import some functions from python's random module - these will
 ... # be used in the modeling process
-... from random import choice, randint
->>> # import some math functions from the numpy library (note that this
-... # isn't part of the python standard library)
-... from numpy import log10, average
->>> # import argv from the sys module to support basic command line
-... # control of this script
-... from sys import argv
+... import random
+>>> import skbio
 ...
->>> #####
-... # Start of function definitions
-... #####
+>>> def evolve_sequence(sequence, substitution_probability, indel_probability):
+...     result = []
+...     sequence_length = len(sequence)
+...     insertion_choices = list(sequence.nondegenerate_chars)
 ...
-... def count_differences(sequence1,sequence2):
-...      """Count the number of differences between two sequences of the same length
-...      """
-...      # confirm that the two sequences are the same length and throw
-...      # an error if they aren't
-...      assert len(sequence1) == len(sequence2), "Sequences differ in length"
-...      # initiate a counter for the number of differences
-...      result = 0
-...      # iterate over the two sequences and count the number of
-...      # positions which are not identical
-...      for base1,base2 in zip(sequence1,sequence2):
-...          if base1 != base2:
-...              # this is a commonly used shortcut for incrementing a count
-...              # and is equivalent to the following statement
-...              # result = result + 1
-...              result += 1
-...      return result
-...
->>> def evolve_seq(sequence,
-...                substitution_probability=0.01,
-...                mutation_choices=['A','C','G','T']):
-...     """Return two child sequences simulating point mutations
-...
-...        An error occurs with probability substitution_probability
-...         independently at each position of each child sequence.
-...     """
-...     # Generate two lists for storing the resulting sequences
-...     r1 = []
-...     r2 = []
-...
-...     range_length = 10 ** (-1 * log10(substitution_probability))
-...
-...     for base in sequence:
-...         if randint(0,range_length) == 0:
-...             # a point mutation will occur at this position
-...             # what's wrong with the following statement?
-...             r1.append(choice(mutation_choices))
+...     result = []
+...     i = 0
+...     while i < sequence_length:
+...         current_char = sequence[i]
+...         if random.random() < substitution_probability:
+...             # simulate a substitution event by adding a character other than the current
+...             # character to the result at this position
+...             result.append(random.choice([r for r in sequence.nondegenerate_chars if r != current_char]))
+...         elif random.random() < indel_probability:
+...             # simulate either an insertion or a deletion event. the length of the insertion or
+...             # deletion is determined at random, with shorter lengths being more probable
+...             length = int(np.random.triangular(1, 1, 10))
+...             if np.random.binomial(1, 0.5) == 0:
+...                 # simulate an insertion by adding length random characters from
+...                 # this sequence's alphabet
+...                 result.extend(np.random.choice(insertion_choices, size=length))
+...                 i += 1
+...             else:
+...                 # simulate a deletion by not appending any of the next length
+...                 # characters
+...                 i += length
 ...         else:
-...             # no point mutation at this position
-...             r1.append(base)
-...         if randint(0,range_length) == 0:
-...             # a point mutation will occur at this position
-...             # what's wrong with the following statement?
-...             r2.append(choice(mutation_choices))
-...         else:
-...             # no point mutation at this position
-...             r2.append(base)
-...     # convert the lists to strings and return them
-...     return ''.join(r1), ''.join(r2)
+...             # simulate no mutation occurring
+...             result.append(str(current_char))
+...             i += 1
 ...
->>> def main(root_sequence,generations,verbose=False):
+...     return sequence.__class__(''.join(result))
+...
+>>> def evolve_generation(sequence,
+...                       substitution_probability,
+...                       indel_probability):
+...     child1 = evolve_sequence(sequence, substitution_probability, indel_probability)
+...     child2 = evolve_sequence(sequence, substitution_probability, indel_probability)
+...     return child1, child2
+...
+>>> def evolve_generations(ancestral_sequence, generations, substitution_probability,
+...                        indel_probability, verbose=False):
 ...     # initial some values and perform some basic error checking
 ...     assert generations > 0, "Must simulate one or more generations."
-...     # can you simplify the following test?
-...     for base in root_sequence:
-...         assert base != 'A' or base != 'C' or base != 'G' or base != 'T',\
-...          "Invalid base identified: %s. Only A, C, G, or T are allowed." % base
+...
 ...     # initialize a list of the previous generations sequences - this gets used
 ...     # in the for loop below. since we'll start with the first generation of
 ...     # children, root_sequence is the previous generation's sequence
-...     previous_generation_sequences = [root_sequence]
+...     ancestral_sequence.metadata['id'] = '0'
+...     previous_generation_sequences = [ancestral_sequence]
 ...
-...     # iterate over each generation (why do we add one to generations?)
-...     for i in range(1,generations+1):
+...     # iterate for each requested generation
+...     for i in range(generations):
 ...         # print the generation number and the current number of sequences
-...         print("Generation: %d (Number of child sequences: %d)" % (i,2**i))
+...         if verbose:
+...             print("Generation: %d (Number of parent sequences: %d)" % (i,2**i))
+...             print("%s (last common ancestor)" % ancestral_sequence)
+...             print("")
+...
 ...         # create a list to store the current generation of sequences
 ...         current_generation_sequences = []
-...         # create a list to store the differences in each current generation
-...         # sequence from the root sequence
-...         difference_counts = []
+...
 ...         # iterate over the sequences of the previous generation
 ...         for parent_sequence in previous_generation_sequences:
-...             # evolve two child sequences
-...             r1, r2 = evolve_seq(parent_sequence)
-...             # count the differences in the first sequence (from root_sequence)
-...             r1_diffs = count_differences(root_sequence,r1)
-...             # append the count of differences to the list of difference counts
-...             difference_counts.append(r1_diffs)
-...             # add the new sequence to the list of this generation's sequences
-...             current_generation_sequences.append(r1)
-...             # count the differences in the second sequence (from root_sequence)
-...             r2_diffs = count_differences(root_sequence,r2)
-...             # append the count of differences to the list of difference counts
-...             difference_counts.append(r2_diffs)
-...             # add the new sequence to the list of this generation's sequences
-...             current_generation_sequences.append(r2)
+...             # evolve two child sequences - currently the mutation probabilities are
+...             # constant, but should update that to change with generations
+...             r1, r2 = evolve_generation(parent_sequence, substitution_probability, indel_probability)
+...             r1.metadata['id'] = '%s.1' % (parent_sequence.metadata['id'])
+...             r2.metadata['id'] = '%s.2' % (parent_sequence.metadata['id'])
+...             current_generation_sequences.extend([r1, r2])
 ...             if verbose:
 ...                 # if the caller specified verbose output, print the actual sequences
-...                 print("  %s %d" % (r1, r1_diffs))
-...                 print("  %s %d" % (r2, r2_diffs))
-...         # print summary information: the average number of differences in the current
-...         # generation from root_sequence
-...         print("Mean differences %1.3f\n" % average(difference_counts))
+...                 print("%s (parent)" % parent_sequence)
+...                 print("%s (child 1)" % r1)
+...                 print("%s (child 2)" % r2)
+...                 print("")
 ...         # current_generation_sequences becomes the next generation's
 ...         # previous_generation_sequences
 ...         previous_generation_sequences = current_generation_sequences
@@ -153,53 +132,19 @@ For the remainder of this chapter, we'll consider methods for phylogenetic recon
 ...     # upon completion of all generations, return the last generation's sequences
 ...     return previous_generation_sequences
 ...
->>> main('ACCGGGGGGAACCCATTTTACACACACACAC', 5)
-Generation: 1 (Number of child sequences: 2)
-Mean differences 1.000
+>>> _ = evolve_generations(skbio.DNA('ACCGGGGGGAACCCATTTTACACACACACAC'), 3, 0.3, 0.1, verbose=True)
+```
 
-Generation: 2 (Number of child sequences: 4)
-Mean differences 1.250
+```python
+>>> sequences = evolve_generations(skbio.DNA('ACCGGGGGGAACCCATTTTACACACACACAC'), 4, 0.1, 0.05)
+```
 
-Generation: 3 (Number of child sequences: 8)
-Mean differences 1.500
-
-Generation: 4 (Number of child sequences: 16)
-Mean differences 1.562
-
-Generation: 5 (Number of child sequences: 32)
-Mean differences 1.750
-['ACCGGGGGGAACCCATTTTACTCACACACAC',
- 'ACCGGGGGGAACCCATTTTACTCACACACAC',
- 'ACCGGGGGGAACCCATTTTACTCACACACAC',
- 'ACCGGGGGGAACCCATTTTACTCACACACAC',
- 'ACCGGGGGGAACCCATTTTACTCACACACAC',
- 'GCCGGGGGGAACCCATTTTACTCACACACAC',
- 'ACCGGGGGGAACCCATTTTACTCACACACAC',
- 'ACCGGGGGGAACCCATTTTACTCACACACAC',
- 'ACCGGTGGGAACCCATTTTACTCACACACAC',
- 'ACCGGTGGGAACCCATTTTACTCACACACAC',
- 'ACCGGTGGGAACCCAATTTACTCACACACAC',
- 'ACCGGTGGGAACCCATTTTACTCACACACAC',
- 'ACCGGGGGGAACCCATTTTACTCACCCACAC',
- 'ACCGGGGGGAACCCATTTTACTCACACACAC',
- 'ACCGGGGGGAACCCATTTTACTTACACACAC',
- 'ACCGGGGGGAACCCATTTTACTTACACACAC',
- 'ACCGGGGGGTACCCATTTTACCCACACACAC',
- 'ACCGGGGGGTACCCATTTTACCCACACACAC',
- 'ACCGGGGGGTACCCATTTTACCCACACACAC',
- 'ACCGGGGGGTACCCATTTTACCCACACACAC',
- 'ACCGGGGGGAACCCATTTTACCCACACACAC',
- 'ACCGGGGGGAACCCATTTTACCCACACACAC',
- 'ACCGGAGGGAACCCATTTTACCCACACACAC',
- 'ACCGGGGGGAACCCATTTTACCCACACACAC',
- 'ACCGGGGGGAACCCATTTTATCCACACACAC',
- 'ACCGGGGGGAACCCATTTTATCCACACACAC',
- 'ACCGGGGGGAACCCATTTTATCCACACACAC',
- 'ACCGGGGGGAACCCATTTTATCCACACACAC',
- 'ACCGGGGGGAACCCATTTTATCCACACACAC',
- 'ACCGGGGGGAACCCATTTTATCCACACACAC',
- 'ACCGAGGGGAACCCATTTTATCCCCACACAC',
- 'ACCGGGGGGAACCCATTTTATCCACACACAC']
+```python
+>>> %matplotlib inline
+>>> from skbio.alignment import global_pairwise_align_nucleotide
+>>> from iab.algorithms import progressive_msa_and_tree
+>>> msa, tree = progressive_msa_and_tree(sequences, pairwise_aligner=global_pairwise_align_nucleotide,
+...                                      display_tree=True, display_aln=True)
 ```
 
 ** Pick up here **
