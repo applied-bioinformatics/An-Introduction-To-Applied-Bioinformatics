@@ -1005,3 +1005,94 @@ def iterative_msa_and_tree(sequences,
              display_tree=display_tree and display)
 
     return previous_iter_msa, previous_iter_tree
+
+def random_sequence(moltype, length):
+    result = []
+    alphabet = list(moltype.nondegenerate_chars)
+    for e in range(length):
+        result.append(random.choice(alphabet))
+    return moltype(''.join(result))
+
+## Sequence simulation
+def evolve_sequence(sequence, substitution_probability, indel_probability):
+    result = []
+    sequence_length = len(sequence)
+    insertion_choices = list(sequence.nondegenerate_chars)
+
+    result = []
+    i = 0
+    while i < sequence_length:
+        current_char = sequence[i]
+        if random.random() < substitution_probability:
+            # simulate a substitution event by adding a character other than the current
+            # character to the result at this position
+            result.append(random.choice([r for r in sequence.nondegenerate_chars if r != current_char]))
+        elif random.random() < indel_probability:
+            # simulate either an insertion or a deletion event. the length of the insertion or
+            # deletion is determined at random, with shorter lengths being more probable
+            length = int(np.random.triangular(1, 1, 10))
+            if np.random.binomial(1, 0.5) == 0:
+                # simulate an insertion by adding length random characters from
+                # this sequence's alphabet
+                result.extend(np.random.choice(insertion_choices, size=length))
+                i += 1
+            else:
+                # simulate a deletion by not appending any of the next length
+                # characters
+                i += length
+        else:
+            # simulate no mutation occurring
+            result.append(str(current_char))
+            i += 1
+
+    return sequence.__class__(''.join(result))
+
+def evolve_generation(sequence,
+                      substitution_probability,
+                      indel_probability):
+    child1 = evolve_sequence(sequence, substitution_probability, indel_probability)
+    child2 = evolve_sequence(sequence, substitution_probability, indel_probability)
+    return child1, child2
+
+def evolve_generations(ancestral_sequence, generations, substitution_probability,
+                       indel_probability, verbose=False):
+    # initial some values and perform some basic error checking
+    assert generations > 0, "Must simulate one or more generations."
+
+    # initialize a list of the previous generations sequences - this gets used
+    # in the for loop below. since we'll start with the first generation of
+    # children, root_sequence is the previous generation's sequence
+    ancestral_sequence.metadata['id'] = '0'
+    previous_generation_sequences = [ancestral_sequence]
+
+    # iterate for each requested generation
+    for i in range(generations):
+        # print the generation number and the current number of sequences
+        if verbose:
+            print("Generation: %d (Number of parent sequences: %d)" % (i,2**i))
+            print("%s (last common ancestor)" % ancestral_sequence)
+            print("")
+
+        # create a list to store the current generation of sequences
+        current_generation_sequences = []
+
+        # iterate over the sequences of the previous generation
+        for parent_sequence in previous_generation_sequences:
+            # evolve two child sequences - currently the mutation probabilities are
+            # constant, but should update that to change with generations
+            r1, r2 = evolve_generation(parent_sequence, substitution_probability, indel_probability)
+            r1.metadata['id'] = '%s.1' % (parent_sequence.metadata['id'])
+            r2.metadata['id'] = '%s.2' % (parent_sequence.metadata['id'])
+            current_generation_sequences.extend([r1, r2])
+            if verbose:
+                # if the caller specified verbose output, print the actual sequences
+                print("%s (parent id: %s)" % (parent_sequence, parent_sequence.metadata['id']))
+                print("%s (child 1 id: %s)" % (r1, r1.metadata['id']))
+                print("%s (child 2 id: %s)" % (r2, r2.metadata['id']))
+                print("")
+        # current_generation_sequences becomes the next generation's
+        # previous_generation_sequences
+        previous_generation_sequences = current_generation_sequences
+
+    # upon completion of all generations, return the last generation's sequences
+    return previous_generation_sequences
