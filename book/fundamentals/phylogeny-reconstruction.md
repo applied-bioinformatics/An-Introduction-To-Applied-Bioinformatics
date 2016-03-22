@@ -37,107 +37,244 @@ For the remainder of this chapter, we'll consider methods for phylogenetic recon
 
 ## Simulating evolution <link src="bR7jKb"/>
 
-Before we jump into how to reconstruct a phylogeny from DNA sequence data, we're going to perform a simulation of the process of evolution of a DNA sequence. In this simulation, we're going to model sequence evolution with a Python function, and then we're going to run that function many times to simulate multiple generations of evolution. We'll have control over the rate at which substitutions and insertion/deletion mutations arise, and (unlike a real evolutionary process), we'll be able to inspect both the terminal sequences, which will ...
+Before we jump into how to reconstruct a phylogeny from DNA sequence data, we're going to perform a simulation of the process of evolution of a DNA sequence. In this simulation, we're going to model sequence evolution with a Python function, and then we're going to run that function to simulate multiple generations of evolution.
+
+Bioinformatics developers often use simulations to understand how their algorithms work, as they unqiuely provide an opportunity to know what the correct answer is. This provides a way to compare algorithms to each other to figure out which performs best under which circumstances. In our simulation we're going to have control over the starting sequence, and the probability of incurring a substitution mutation or an insertion/deletion mutation at each position of the sequence in each generation. This would, for example, let us understand whether different algorithms for phylogenetic reconstruction are better or worse for more closely or distantly related sequences. 
+
+Our simulation will works as follows. We'll have one function that we primarily interact with called ``evolve_generations``. This will take a starting sequence and the number of generations that we want to simulate. It will also the probability that we want a substitution mutation to occur at each position in the starting sequence, and the probability that we want either an insertion or deletion mutation to occur at each position. In each generation, every sequence will spawn two new sequences, randomly incurring mutations at the prescribed rates. This effectively simulates a clonal process of reproduction, a form of asexual reproduction common in single cellular organisms, where a parent cell divides into two cells, each containing a copy of the parent's genome with some errors introduced. 
+
+Let's inspect this code and then run our simulation beginning with a random sequence.
 
 ```python
->>> import numpy as np
+>>> %pylab inline
+...
+>>> from IPython.core import page
+>>> page.page = print
+Populating the interactive namespace from numpy and matplotlib
 ```
 
+First we'll look at the function used to simulate the evolution of a single sequence. This is where most of the important evolutionary modeling of sequence evolution happens.
+
 ```python
->>> # import some functions from python's random module - these will
-... # be used in the modeling process
-... import random
+>>> from iab.algorithms import evolve_sequence
+>>> %psource evolve_sequence
+[0;32mdef[0m [0mevolve_sequence[0m[0;34m([0m[0msequence[0m[0;34m,[0m [0msubstitution_probability[0m[0;34m,[0m [0mindel_probability[0m[0;34m)[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m    [0mresult[0m [0;34m=[0m [0;34m[[0m[0;34m][0m[0;34m[0m
+[0;34m[0m    [0msequence_length[0m [0;34m=[0m [0mlen[0m[0;34m([0m[0msequence[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m    [0minsertion_choices[0m [0;34m=[0m [0mlist[0m[0;34m([0m[0msequence[0m[0;34m.[0m[0mnondegenerate_chars[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m[0;34m[0m
+[0;34m[0m    [0mresult[0m [0;34m=[0m [0;34m[[0m[0;34m][0m[0;34m[0m
+[0;34m[0m    [0mi[0m [0;34m=[0m [0;36m0[0m[0;34m[0m
+[0;34m[0m    [0;32mwhile[0m [0mi[0m [0;34m<[0m [0msequence_length[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m        [0mcurrent_char[0m [0;34m=[0m [0msequence[0m[0;34m[[0m[0mi[0m[0;34m][0m[0;34m[0m
+[0;34m[0m        [0;32mif[0m [0mrandom[0m[0;34m.[0m[0mrandom[0m[0;34m([0m[0;34m)[0m [0;34m<[0m [0msubstitution_probability[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m            [0;31m# simulate a substitution event by adding a character other than the current[0m[0;34m[0m
+[0;34m[0m            [0;31m# character to the result at this position[0m[0;34m[0m
+[0;34m[0m            [0mresult[0m[0;34m.[0m[0mappend[0m[0;34m([0m[0mrandom[0m[0;34m.[0m[0mchoice[0m[0;34m([0m[0;34m[[0m[0mr[0m [0;32mfor[0m [0mr[0m [0;32min[0m [0msequence[0m[0;34m.[0m[0mnondegenerate_chars[0m [0;32mif[0m [0mr[0m [0;34m!=[0m [0mcurrent_char[0m[0;34m][0m[0;34m)[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m        [0;32melif[0m [0mrandom[0m[0;34m.[0m[0mrandom[0m[0;34m([0m[0;34m)[0m [0;34m<[0m [0mindel_probability[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m            [0;31m# simulate either an insertion or a deletion event. the length of the insertion or[0m[0;34m[0m
+[0;34m[0m            [0;31m# deletion is determined at random, with shorter lengths being more probable[0m[0;34m[0m
+[0;34m[0m            [0mlength[0m [0;34m=[0m [0mint[0m[0;34m([0m[0mnp[0m[0;34m.[0m[0mrandom[0m[0;34m.[0m[0mtriangular[0m[0;34m([0m[0;36m1[0m[0;34m,[0m [0;36m1[0m[0;34m,[0m [0;36m10[0m[0;34m)[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m            [0;32mif[0m [0mnp[0m[0;34m.[0m[0mrandom[0m[0;34m.[0m[0mbinomial[0m[0;34m([0m[0;36m1[0m[0;34m,[0m [0;36m0.5[0m[0;34m)[0m [0;34m==[0m [0;36m0[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m                [0;31m# simulate an insertion by adding length random characters from[0m[0;34m[0m
+[0;34m[0m                [0;31m# this sequence's alphabet[0m[0;34m[0m
+[0;34m[0m                [0mresult[0m[0;34m.[0m[0mextend[0m[0;34m([0m[0mnp[0m[0;34m.[0m[0mrandom[0m[0;34m.[0m[0mchoice[0m[0;34m([0m[0minsertion_choices[0m[0;34m,[0m [0msize[0m[0;34m=[0m[0mlength[0m[0;34m)[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m                [0mi[0m [0;34m+=[0m [0;36m1[0m[0;34m[0m
+[0;34m[0m            [0;32melse[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m                [0;31m# simulate a deletion by not appending any of the next length[0m[0;34m[0m
+[0;34m[0m                [0;31m# characters[0m[0;34m[0m
+[0;34m[0m                [0mi[0m [0;34m+=[0m [0mlength[0m[0;34m[0m
+[0;34m[0m        [0;32melse[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m            [0;31m# simulate no mutation occurring[0m[0;34m[0m
+[0;34m[0m            [0mresult[0m[0;34m.[0m[0mappend[0m[0;34m([0m[0mstr[0m[0;34m([0m[0mcurrent_char[0m[0;34m)[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m            [0mi[0m [0;34m+=[0m [0;36m1[0m[0;34m[0m
+[0;34m[0m[0;34m[0m
+[0;34m[0m    [0;32mreturn[0m [0msequence[0m[0;34m.[0m[0m__class__[0m[0;34m([0m[0;34m''[0m[0;34m.[0m[0mjoin[0m[0;34m([0m[0mresult[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0m
+```
+
+Next, take a look at the function that models a single generation of a single sequence. This is where the clonal reproduction (i.e., one parent sequence becoming two child sequences) occurs.
+
+```python
+>>> from iab.algorithms import evolve_generation
+>>> %psource evolve_generation
+[0;32mdef[0m [0mevolve_generation[0m[0;34m([0m[0msequence[0m[0;34m,[0m[0;34m[0m
+[0;34m[0m                      [0msubstitution_probability[0m[0;34m,[0m[0;34m[0m
+[0;34m[0m                      [0mindel_probability[0m[0;34m)[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m    [0mchild1[0m [0;34m=[0m [0mevolve_sequence[0m[0;34m([0m[0msequence[0m[0;34m,[0m [0msubstitution_probability[0m[0;34m,[0m [0mindel_probability[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m    [0mchild2[0m [0;34m=[0m [0mevolve_sequence[0m[0;34m([0m[0msequence[0m[0;34m,[0m [0msubstitution_probability[0m[0;34m,[0m [0mindel_probability[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m    [0;32mreturn[0m [0mchild1[0m[0;34m,[0m [0mchild2[0m[0;34m[0m[0m
+```
+
+Finally, take a look at our entry point function. This is where we provide the parameters of our simulation, including the starting sequence, the number of generations, and the mutation probabilities. Notice how each of these functions builds on the prior functions.
+
+```python
+>>> from iab.algorithms import evolve_generations
+>>> %psource evolve_generations
+[0;32mdef[0m [0mevolve_generations[0m[0;34m([0m[0mancestral_sequence[0m[0;34m,[0m [0mgenerations[0m[0;34m,[0m [0msubstitution_probability[0m[0;34m,[0m[0;34m[0m
+[0;34m[0m                       [0mindel_probability[0m[0;34m,[0m [0mverbose[0m[0;34m=[0m[0;32mFalse[0m[0;34m)[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m    [0;31m# initial some values and perform some basic error checking[0m[0;34m[0m
+[0;34m[0m    [0;32massert[0m [0mgenerations[0m [0;34m>[0m [0;36m0[0m[0;34m,[0m [0;34m"Must simulate one or more generations."[0m[0;34m[0m
+[0;34m[0m[0;34m[0m
+[0;34m[0m    [0;31m# initialize a list of the previous generations sequences - this gets used[0m[0;34m[0m
+[0;34m[0m    [0;31m# in the for loop below. since we'll start with the first generation of[0m[0;34m[0m
+[0;34m[0m    [0;31m# children, root_sequence is the previous generation's sequence[0m[0;34m[0m
+[0;34m[0m    [0mancestral_sequence[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m [0;34m=[0m [0;34m'0'[0m[0;34m[0m
+[0;34m[0m    [0mprevious_generation_sequences[0m [0;34m=[0m [0;34m[[0m[0mancestral_sequence[0m[0;34m][0m[0;34m[0m
+[0;34m[0m[0;34m[0m
+[0;34m[0m    [0;31m# iterate for each requested generation[0m[0;34m[0m
+[0;34m[0m    [0;32mfor[0m [0mi[0m [0;32min[0m [0mrange[0m[0;34m([0m[0mgenerations[0m[0;34m)[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m        [0;31m# print the generation number and the current number of sequences[0m[0;34m[0m
+[0;34m[0m        [0;32mif[0m [0mverbose[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m            [0mprint[0m[0;34m([0m[0;34m"Generation: %d (Number of parent sequences: %d)"[0m [0;34m%[0m [0;34m([0m[0mi[0m[0;34m,[0m[0;36m2[0m[0;34m**[0m[0mi[0m[0;34m)[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m            [0mprint[0m[0;34m([0m[0;34m"%s (last common ancestor)"[0m [0;34m%[0m [0mancestral_sequence[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m            [0mprint[0m[0;34m([0m[0;34m""[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m[0;34m[0m
+[0;34m[0m        [0;31m# create a list to store the current generation of sequences[0m[0;34m[0m
+[0;34m[0m        [0mcurrent_generation_sequences[0m [0;34m=[0m [0;34m[[0m[0;34m][0m[0;34m[0m
+[0;34m[0m[0;34m[0m
+[0;34m[0m        [0;31m# iterate over the sequences of the previous generation[0m[0;34m[0m
+[0;34m[0m        [0;32mfor[0m [0mparent_sequence[0m [0;32min[0m [0mprevious_generation_sequences[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m            [0;31m# evolve two child sequences - currently the mutation probabilities are[0m[0;34m[0m
+[0;34m[0m            [0;31m# constant, but should update that to change with generations[0m[0;34m[0m
+[0;34m[0m            [0mr1[0m[0;34m,[0m [0mr2[0m [0;34m=[0m [0mevolve_generation[0m[0;34m([0m[0mparent_sequence[0m[0;34m,[0m [0msubstitution_probability[0m[0;34m,[0m [0mindel_probability[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m            [0mr1[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m [0;34m=[0m [0;34m'%s.1'[0m [0;34m%[0m [0;34m([0m[0mparent_sequence[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m[0;34m)[0m[0;34m[0m
+[0;34m[0m            [0mr2[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m [0;34m=[0m [0;34m'%s.2'[0m [0;34m%[0m [0;34m([0m[0mparent_sequence[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m[0;34m)[0m[0;34m[0m
+[0;34m[0m            [0mcurrent_generation_sequences[0m[0;34m.[0m[0mextend[0m[0;34m([0m[0;34m[[0m[0mr1[0m[0;34m,[0m [0mr2[0m[0;34m][0m[0;34m)[0m[0;34m[0m
+[0;34m[0m            [0;32mif[0m [0mverbose[0m[0;34m:[0m[0;34m[0m
+[0;34m[0m                [0;31m# if the caller specified verbose output, print the actual sequences[0m[0;34m[0m
+[0;34m[0m                [0mprint[0m[0;34m([0m[0;34m"%s (parent id: %s)"[0m [0;34m%[0m [0;34m([0m[0mparent_sequence[0m[0;34m,[0m [0mparent_sequence[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m[0;34m)[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m                [0mprint[0m[0;34m([0m[0;34m"%s (child 1 id: %s)"[0m [0;34m%[0m [0;34m([0m[0mr1[0m[0;34m,[0m [0mr1[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m[0;34m)[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m                [0mprint[0m[0;34m([0m[0;34m"%s (child 2 id: %s)"[0m [0;34m%[0m [0;34m([0m[0mr2[0m[0;34m,[0m [0mr2[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m[0;34m)[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m                [0mprint[0m[0;34m([0m[0;34m""[0m[0;34m)[0m[0;34m[0m
+[0;34m[0m        [0;31m# current_generation_sequences becomes the next generation's[0m[0;34m[0m
+[0;34m[0m        [0;31m# previous_generation_sequences[0m[0;34m[0m
+[0;34m[0m        [0mprevious_generation_sequences[0m [0;34m=[0m [0mcurrent_generation_sequences[0m[0;34m[0m
+[0;34m[0m[0;34m[0m
+[0;34m[0m    [0;31m# upon completion of all generations, return the last generation's sequences[0m[0;34m[0m
+[0;34m[0m    [0;32mreturn[0m [0mprevious_generation_sequences[0m[0;34m[0m[0m
+```
+
+Now we'll run our simulation. We'll start with a random DNA sequence, and then evolve three generations. Before running this, can you predict how many child sequences we'll end up with after three generations? 
+
+When we call ``evolve_generations``, we'll pass the parameter ``verbose=True``. This will tell the function to print out some information throughout the process. This will let us inspect our evolutionary process: something that is impossible to do with real sequences.
+
+```python
+>>> from iab.algorithms import random_sequence
 >>> import skbio
-...
->>> def evolve_sequence(sequence, substitution_probability, indel_probability):
-...     result = []
-...     sequence_length = len(sequence)
-...     insertion_choices = list(sequence.nondegenerate_chars)
-...
-...     result = []
-...     i = 0
-...     while i < sequence_length:
-...         current_char = sequence[i]
-...         if random.random() < substitution_probability:
-...             # simulate a substitution event by adding a character other than the current
-...             # character to the result at this position
-...             result.append(random.choice([r for r in sequence.nondegenerate_chars if r != current_char]))
-...         elif random.random() < indel_probability:
-...             # simulate either an insertion or a deletion event. the length of the insertion or
-...             # deletion is determined at random, with shorter lengths being more probable
-...             length = int(np.random.triangular(1, 1, 10))
-...             if np.random.binomial(1, 0.5) == 0:
-...                 # simulate an insertion by adding length random characters from
-...                 # this sequence's alphabet
-...                 result.extend(np.random.choice(insertion_choices, size=length))
-...                 i += 1
-...             else:
-...                 # simulate a deletion by not appending any of the next length
-...                 # characters
-...                 i += length
-...         else:
-...             # simulate no mutation occurring
-...             result.append(str(current_char))
-...             i += 1
-...
-...     return sequence.__class__(''.join(result))
-...
->>> def evolve_generation(sequence,
-...                       substitution_probability,
-...                       indel_probability):
-...     child1 = evolve_sequence(sequence, substitution_probability, indel_probability)
-...     child2 = evolve_sequence(sequence, substitution_probability, indel_probability)
-...     return child1, child2
-...
->>> def evolve_generations(ancestral_sequence, generations, substitution_probability,
-...                        indel_probability, verbose=False):
-...     # initial some values and perform some basic error checking
-...     assert generations > 0, "Must simulate one or more generations."
-...
-...     # initialize a list of the previous generations sequences - this gets used
-...     # in the for loop below. since we'll start with the first generation of
-...     # children, root_sequence is the previous generation's sequence
-...     ancestral_sequence.metadata['id'] = '0'
-...     previous_generation_sequences = [ancestral_sequence]
-...
-...     # iterate for each requested generation
-...     for i in range(generations):
-...         # print the generation number and the current number of sequences
-...         if verbose:
-...             print("Generation: %d (Number of parent sequences: %d)" % (i,2**i))
-...             print("%s (last common ancestor)" % ancestral_sequence)
-...             print("")
-...
-...         # create a list to store the current generation of sequences
-...         current_generation_sequences = []
-...
-...         # iterate over the sequences of the previous generation
-...         for parent_sequence in previous_generation_sequences:
-...             # evolve two child sequences - currently the mutation probabilities are
-...             # constant, but should update that to change with generations
-...             r1, r2 = evolve_generation(parent_sequence, substitution_probability, indel_probability)
-...             r1.metadata['id'] = '%s.1' % (parent_sequence.metadata['id'])
-...             r2.metadata['id'] = '%s.2' % (parent_sequence.metadata['id'])
-...             current_generation_sequences.extend([r1, r2])
-...             if verbose:
-...                 # if the caller specified verbose output, print the actual sequences
-...                 print("%s (parent)" % parent_sequence)
-...                 print("%s (child 1)" % r1)
-...                 print("%s (child 2)" % r2)
-...                 print("")
-...         # current_generation_sequences becomes the next generation's
-...         # previous_generation_sequences
-...         previous_generation_sequences = current_generation_sequences
-...
-...     # upon completion of all generations, return the last generation's sequences
-...     return previous_generation_sequences
-...
->>> _ = evolve_generations(skbio.DNA('ACCGGGGGGAACCCATTTTACACACACACAC'), 3, 0.3, 0.1, verbose=True)
+>>> sequence = random_sequence(skbio.DNA, 50)
 ```
 
 ```python
->>> sequences = evolve_generations(skbio.DNA('ACCGGGGGGAACCCATTTTACACACACACAC'), 4, 0.1, 0.05)
+>>> sequences = evolve_generations(sequence, 3, 0.1, 0.05, verbose=True)
+Generation: 0 (Number of parent sequences: 1)
+TCCCTGAGAAGGCTCAATCGGTGGGTCAGACGGCCTAAACAGAGTTGTCA (last common ancestor)
+
+TCCCTGAGAAGGCTCAATCGGTGGGTCAGACGGCCTAAACAGAGTTGTCA (parent id: 0)
+TCCCTGAGAAGGCTGCAATCGGTGGGTCAGACGGCCCTAAACAGAGTTGATCA (child 1 id: 0.1)
+TTCCTGAGGTACAACCGGTGTTCTGTAGGACGTGCCTCCCAACACGTTGCTC (child 2 id: 0.2)
+
+Generation: 1 (Number of parent sequences: 2)
+TCCCTGAGAAGGCTCAATCGGTGGGTCAGACGGCCTAAACAGAGTTGTCA (last common ancestor)
+
+TCCCTGAGAAGGCTGCAATCGGTGGGTCAGACGGCCCTAAACAGAGTTGATCA (parent id: 0.1)
+TCACTGACGAAGGCGGGTCAATTCGAGTGGGTCAGACGGCCCTAAACAGAGTTGAT (child 1 id: 0.1.1)
+ACACCCTGAGAAGGCTCGCAATATCGGGTGGGTCAAGACGGCCCCTAAAAAAATCAGAGTTGATGATGGTA (child 2 id: 0.1.2)
+
+TTCCTGAGGTACAACCGGTGTTCTGTAGGACGTGCCTCCCAACACGTTGCTC (parent id: 0.2)
+TTGTCCATGAGGTACCAACCGGCTGTTCTGTAGGTAAGTGCGGTGCCTCCGCAACACGTTGCTC (child 1 id: 0.2.1)
+GTTCCTGCAGGTACAACCGTGTTGTTCTGGTAGGACGTGCCCGACATCGTTTCACTC (child 2 id: 0.2.2)
+
+Generation: 2 (Number of parent sequences: 4)
+TCCCTGAGAAGGCTCAATCGGTGGGTCAGACGGCCTAAACAGAGTTGTCA (last common ancestor)
+
+TCACTGACGAAGGCGGGTCAATTCGAGTGGGTCAGACGGCCCTAAACAGAGTTGAT (parent id: 0.1.1)
+TCACTGACGAAGGCCGGGGTCCAATTCGAGTGGGTCAGACGGCGCCCTAAAACAGAGTTATCCGAT (child 1 id: 0.1.1.1)
+TCACTGACGAAGACGGGTCAAGGTCGAGCTGGGTCAGACCGGCGTCTAAACAGAGTCATGAT (child 2 id: 0.1.1.2)
+
+ACACCCTGAGAAGGCTCGCAATATCGGGTGGGTCAAGACGGCCCCTAAAAAAATCAGAGTTGATGATGGTA (parent id: 0.1.2)
+TACCACCCTGACAGGCTCGCAATATGCGGGTGTGCGTGTCAAGACGGCCCAAAAAAATTCTAGAGTTCGATGAATGGTA (child 1 id: 0.1.2.1)
+ACACCCTGAGAGCTGGGCTCGCAATTATCGGGTGGGTCAAGAACAGGCCCCCTCAAAAAAATAGAGTTGATGACTGGTA (child 2 id: 0.1.2.2)
+
+TTGTCCATGAGGTACCAACCGGCTGTTCTGTAGGTAAGTGCGGTGCCTCCGCAACACGTTGCTC (parent id: 0.2.1)
+GTCCAATGAGGCTACCACACCGGGTTCGGTCATAGGTAAGTGCGGTGCCTCCCAAGCACGTTGCTC (child 1 id: 0.2.1.1)
+TTGCAGTGAGGTACCAACCCGGCTGTTTGTAGGTAAGTGCGGGTGACCTCCGCTAGACACGTTGCTC (child 2 id: 0.2.1.2)
+
+GTTCCTGCAGGTACAACCGTGTTGTTCTGGTAGGACGTGCCCGACATCGTTTCACTC (parent id: 0.2.2)
+GTTCTCTGCACGGTATCCCTGACCCTGTGTCTGTTCTGGTGAGGACGTGGCCCCGACATCGTTTCACCACTC (child 1 id: 0.2.2.1)
+GATGTCCTGCAGGTACAACTCGTGTTGTTCTGGTAGGGACGTGCCCGATTCTAATCGTTTCACTC (child 2 id: 0.2.2.2)
 ```
+
+We now have a new variable, sequences, which contains the child sequences from the last generation. Take a minute to look at the ids of the parent and child sequences above, and the ids of a couple of the final generation sequences. These ids are constructed so that each sequence contains the identifiers of its ancestral sequences, and then either ``1`` or ``2``. Notice that all sequence identifiers start with ``0``, the identifier of the last common ancestor (or our starting sequence) of all of the sequences. These identifiers will help us interpret whether the phylogenies that we reconstruct accurately represent the evolutionary relationships between the sequences. 
+
+Also, notice that at this point we only have the sequences from the last generation. We no longer have the ancestral sequences (which would correspond to the internal nodes in the tree). This models the real world, were we only have sequences from extant organisms, but not their ancestors.
+
+Take a minute to compare the two sequences below. What types of mutations happened over the course of their evolution?
+
+```python
+>>> print(len(sequences))
+8
+```
+
+```python
+>>> sequences[0]
+DNA
+--------------------------------------------------------------------
+Metadata:
+    'id': '0.1.1.1'
+Stats:
+    length: 66
+    has gaps: False
+    has degenerates: False
+    has non-degenerates: True
+    GC-content: 56.06%
+--------------------------------------------------------------------
+0  TCACTGACGA AGGCCGGGGT CCAATTCGAG TGGGTCAGAC GGCGCCCTAA AACAGAGTTA
+60 TCCGAT
+```
+
+```python
+>>> sequences[-1]
+DNA
+--------------------------------------------------------------------
+Metadata:
+    'id': '0.2.2.2'
+Stats:
+    length: 65
+    has gaps: False
+    has degenerates: False
+    has non-degenerates: True
+    GC-content: 50.77%
+--------------------------------------------------------------------
+0  GATGTCCTGC AGGTACAACT CGTGTTGTTC TGGTAGGGAC GTGCCCGATT CTAATCGTTT
+60 CACTC
+```
+
+Based on our simulation, we can clearly see that these sequences have a true phylogeny: each sequence is derived from exactly one other sequence, and the evolution of all of the sequences traces back to starting sequence that we provided. Our goal with the algorithms we'll study for the rest of this chapter is to reconstruct that phylogeny given only the last generation of sequences. We'll use the fact that we know the true phylogeny to help us evaluate the relative performance of the different methods.
+
+### A cautionary word about simulations <link src="Wbhke4"/>
+
+While simulations are extremely powerful for comparing algorithms, they can also be misleading. This is because when we model evolution we simplify the evolutionary process. For example, in the simulation above, we assume that the rate of substitution mutations doesn't change in different parts of our phylogeny. Imagine in the real-world that the environment changed drastically for some descendants (for example, if a geological event created new thermal vents in a lake they inhabited, resulting in an increase in mean water temperature), but not for others. The descendants who experience the environmental change might have an increased rate of substitutions as their genomes adapt to the new environment. The increased substitution rate may be temporary or permenant. 
+
+If we use our simulation code to evalutate phylogeny reconstruction algorithms, it will tell us nothing about which algorithms better handle different evolutionary rates in different branches of the tree. This is one limitation of our simulation that we know about, but because we don't have a perfect understanding of sequence evolution, there are limitations that we don't know about. For this reason, you always want to understand what assumptions a simulation is making, and consider those when determining how confident you are in the results of an evaulation based on simulation. One assumption that our simulation is making is that the evolutionary rate is constant across all branches of the tree. What are some other assumptions that are being made? 
+
+The alternative to simulations for algorithm comparison is to work with real data. The trade-off however is that with real data we don't know what the right answer is (in our case, the correct phylogeny) so it's harder to determine which algorithms are doing better or worse. The take-away message here is that neither approach is perfect, and often researchers will use a combination of simulated and real data to evaluate algorithms.
+
+## Distance-based approaches to phylogenetic reconstruction <link src="XrznYP"/>
+
+### Alignment-free approaches <link src="AwMFiX"/>
+
+```python
+>>> from iab.algorithms import guide_tree_from_sequences
+```
+
+```python
+>>> guide_tree_from_sequences(sequences, display_tree=True)
+<scipy.cluster.hierarchy.ClusterNode at 0x10bcd2518>
+```
+
+### Alignment-based approaches <link src="xAIbfm"/>
+
+Next, let's use progressive multiple sequence alignment to
 
 ```python
 >>> %matplotlib inline
@@ -145,6 +282,21 @@ Before we jump into how to reconstruct a phylogeny from DNA sequence data, we're
 >>> from iab.algorithms import progressive_msa_and_tree
 >>> msa, tree = progressive_msa_and_tree(sequences, pairwise_aligner=global_pairwise_align_nucleotide,
 ...                                      display_tree=True, display_aln=True)
+TabularMSA[DNA]
+-----------------------------------------------------------------------
+Stats:
+    sequence count: 8
+    position count: 486
+-----------------------------------------------------------------------
+--------------------------------- ... ---------------------------------
+GATGTCCTGCAGGTACAACTCGTGTTGTTCTGG ... ---------------------------------
+...
+--------------------------------- ... ---------------------------------
+--------------------------------- ... ---------------------------------
+
+Output tree:
+/Users/caporaso/miniconda3/envs/iab/lib/python3.4/site-packages/skbio/alignment/_pairwise.py:601: EfficiencyWarning: You're using skbio's python implementation of Needleman-Wunsch alignment. This is known to be very slow (e.g., thousands of times slower than a native C implementation). We'll be adding a faster version soon (see https://github.com/biocore/scikit-bio/issues/254 to track progress on this).
+  "to track progress on this).", EfficiencyWarning)
 ```
 
 ** Pick up here **
