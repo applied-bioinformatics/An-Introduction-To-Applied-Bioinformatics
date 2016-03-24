@@ -3,17 +3,23 @@
 
 In this chapter we'll begin to explore the goals, approaches, and challenges for creating phylogenetic trees, or phylogenies. Phylogenies, such as the two presented in Figure 1, represent hypotheses about the evolutionary history of a group of individuals, who are represented by the *tips* in the tree. You can explore an interactive version of the three-domain tree presented in Figure 1b online, through the [Interactive Tree of Life project](http://itol.embl.de/itol.cgi#).
 
+<table border=0>
+<tr>
+<td>
 <figure>
     <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/Darwins_tree_of_life_1859.png">
     <figcaption><b>Figure 1a</b>: Evolutionary tree presented by Charles Darwin in <i>On the Origin of Species</i>.</figcaption>
 </figure>
-<p>
-
+</td>
+<td>
 <figure>
-    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/Pace_Big_Tree.png">
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/Pace_Big_Tree.png" width=50%>
     <figcaption><b>Figure 1b</b>: A hypothesis of evolutionary relationships between the three domains of life. This image was created by the <a href="http://pacelab.colorado.edu/PI_NormPace.html">Norman Pace Laboratory.</a></figcaption>
 </figure>
-<p>
+</td>
+</tr>
+
+</table>
 
 
 ## Why build phylogenies? <link src="Q4cFRp"/>
@@ -43,7 +49,6 @@ As an example, let's consider the reconstruction of the phylogeny of spiders (th
     <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-monophyly.png">
     <figcaption><b>Figure 3</b>: Example phylogeny illustrating a monophyletic trait shared by a group of organisms. In a monophyletic group, the last common ancestor was also member of the group (e.g., multicellular organisms).</figcaption>
  </figure>
-
 
 <figure>
     <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-polyphyly.png">
