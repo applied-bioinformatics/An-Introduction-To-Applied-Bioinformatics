@@ -3,7 +3,18 @@
 
 In this chapter we'll begin to explore the goals, approaches, and challenges for creating phylogenetic trees, or phylogenies. Phylogenies, such as the two presented in Figure 1, represent hypotheses about the evolutionary history of a group of individuals, who are represented by the *tips* in the tree. You can explore an interactive version of the three-domain tree presented in Figure 1b online, through the [Interactive Tree of Life project](http://itol.embl.de/itol.cgi#).
 
-** Figure 1: Add (a) the Darwin OoS tree and (b) the Pace three domain tree. **
+<figure>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/Darwins_tree_of_life_1859.png">
+    <figcaption><b>Figure 1a</b>: Evolutionary tree presented by Charles Darwin in <i>On the Origin of Species</i>.</figcaption>
+</figure>
+<p>
+
+<figure>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/Pace_Big_Tree.png">
+    <figcaption><b>Figure 1b</b>: A hypothesis of evolutionary relationships between the three domains of life. This image was created by the <a href="http://pacelab.colorado.edu/PI_NormPace.html">Norman Pace Laboratory.</a></figcaption>
+</figure>
+<p>
+
 
 ## Why build phylogenies? <link src="Q4cFRp"/>
 
@@ -13,7 +24,11 @@ Phylogenetic trees such as these are also useful for understanding evolution its
 
 The *individuals* represented at the tips of our trees don't necessarily have to be organisms though. In another important application of phylogenetic trees, we can study the evolution of genes, which can help us gain a deeper understanding of gene function. Specifically, we can learn about families of related genes. A classic example of this is the globin family, which includes the proteins hemoglobin and myoglobin, molecules that can reversibly bind oxygen (meaning they can bind to it, and then let go of it). You've probably heard of hemoglobin (if not globins in general), as this molecule binds to oxygen where it is present in high concentration (such as in your lung) and releases it where it is present in low concentration (such as in the bicep, where it is ultimately used to power your arm). Hemoglobin and myoglobin are paralogs, meaning that they are related by a gene duplication and subsequent divergence. If you were to compare an unknown globin sequence to either of these you could detect homology, but a tree such as the one present in Figure 2, would help you understand the type of homologous relationship (i.e., whether it was orthology or paralogy).
 
-** Figure 2: Add a globin tree with organism and gene names. **
+<figure>
+    <img src="https://static-content.springer.com/image/art%3A10.1186%2F1471-2148-6-31/MediaObjects/12862_2005_Article_216_Fig5_HTML.jpg">
+    <figcaption><b>Figure 2</b>: A tree representing members of the globin gene family from diverse taxa. This image is an unmodified reproduction of Figure 5 from <a href="http://bmcevolbiol.biomedcentral.com/articles/10.1186/1471-2148-6-31"><i>A phylogenomic profile of globins</i></a> by Vinogradov et al (2006).
+
+<p>
 
 Phylogenetic trees are used for many other diverse applications in bioinformatics, so it's therefore important that a bioinformatican have an understanding of they are built and how they should be interpreted. An additional application that we'll cover in this text is comparing the composition of communities of organisms, but we'll come back to that [later](alias://2bb2cf).
 
@@ -26,13 +41,13 @@ As an example, let's consider the reconstruction of the phylogeny of spiders (th
 
 <figure>
     <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-monophyly.png">
-    <figcaption>Figure 3: Example phylogeny illustrating a monophyletic trait shared by a group of organisms. In a monophyletic group, the last common ancestor was also member of the group (e.g., multicellular organisms).</figcaption>
+    <figcaption><b>Figure 3</b>: Example phylogeny illustrating a monophyletic trait shared by a group of organisms. In a monophyletic group, the last common ancestor was also member of the group (e.g., multicellular organisms).</figcaption>
  </figure>
 
 
 <figure>
     <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-polyphyly.png">
-    <figcaption>Figure 4: Example phylogeny illustrating a polyphyletic trait shared by a group of organisms. In a polyphyletic group the last common ancestor was not a member of the group (e.g., flying animals).</figcaption>
+    <figcaption><b>Figure 4</b>: Example phylogeny illustrating a polyphyletic trait shared by a group of organisms. In a polyphyletic group the last common ancestor was not a member of the group (e.g., flying animals).</figcaption>
 </figure>
 
 <p>
@@ -42,8 +57,8 @@ Earlier work on understanding the relations between the spider lineages focused 
 More recently, several research teams have used features of spider genomes to reconstruct the spider phylogeny ([Bond et al., 2014](http://www.cell.com/current-biology/abstract/S0960-9822(14)00750-7), [Garrison et al., 2016](https://peerj.com/articles/1719/)). Using this approach, the features become the nucleotides observed at particular positions in the genome, which are observed first by sequencing specific genes that the researchers target that are present in all members of the group, and then aligning those sequences with multiple sequence alignment. This has several advantages over feature matrices derived from morphological and behavioral traits, including that many more features can be observed. For example, ([Garrison et al., 2016](https://peerj.com/articles/1719/)), compared approximately 700,000 amino acid positions from nearly 4000 loci around the genomes of 70 spider taxa. Compare the number of features here to the number mentioned in the previous paragraph. These *phylogenomic* studies have further supported the idea that orb-weaving is an ancient monophyletic trait, and have provided much finer scale information on the evolution of spiders. Supported by these data, researchers hypothesize that the loss of orb-weaving might not be that surprising. While it does provide an effective means of catching flying insects, many insects which are potential prey for spiders don't fly. Further, orb webs may attract predators of spiders, as they are easily observable signals of where a spider can be found.
 
 <figure>
-    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/phyl/book/fundamentals/images/spider-tree.png">
-    <figcaption>Figure 5: A spider phylogeny. Numbers at internal nodes correspond to the taxonomic groups described in <a href="https://peerj.com/articles/1719/#table-1">Table 1 of Garrison et al., 2016</a>. This image is an unmodified version of <a href="https://doi.org/10.7717/peerj.1719/fig-1">Figure 1</a> of <a href="https://peerj.com/articles/1719/">Garrison et al., 2016</a>.</figcaption>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/spider-tree.png">
+    <figcaption><b>Figure 5</b>: A spider phylogeny. Numbers at internal nodes correspond to the taxonomic groups described in <a href="https://peerj.com/articles/1719/#table-1">Table 1 of Garrison et al., 2016</a>. This image is an unmodified version of <a href="https://doi.org/10.7717/peerj.1719/fig-1">Figure 1</a> of <a href="https://peerj.com/articles/1719/">Garrison et al., 2016</a>.</figcaption>
 </figure>
 <p>
 
@@ -55,7 +70,7 @@ Next, let's cover a few terms using the tree diagram in Figure 6.
 
 <figure>
     <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-schematic1.png">
-    <figcaption>Figure 6: A schematic of a phylogenetic tree illustrating important terms.
+    <figcaption><b>Figure 6</b>: A schematic of a phylogenetic tree illustrating important terms.
 </figure>
 
 <p>
@@ -144,7 +159,7 @@ In our simulation, each sequence is directly derived from exactly one sequence f
 
 <figure>
     <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/sequence-evo-tree.png">
-    <figcaption>Figure 7: Schematic of a simulated evolutionary process. Bases in red indicate mutation since the last common ancestor. The bottom panel illustrates the real-world equivalent of our final product, where we wouldn't know the true phylogeny (indicated by the dashed branches), the sequence of the last common ancestor, or what positions have changed since the last common ancestor.</figcaption>
+    <figcaption><b>Figure 7</b>: Schematic of a simulated evolutionary process. Bases in red indicate mutation since the last common ancestor. The bottom panel illustrates the real-world equivalent of our final product, where we wouldn't know the true phylogeny (indicated by the dashed branches), the sequence of the last common ancestor, or what positions have changed since the last common ancestor.</figcaption>
 </figure>
 
 ### A cautionary word about simulations <link src="Wbhke4"/>
@@ -469,7 +484,7 @@ Step 3.4: At this stage, there is only one distance below the diagonal in our di
 ...                link_color_func=lambda x: 'black')
 ```
 
-### Phylogenetic reconstruction with neighbor-joining
+### Phylogenetic reconstruction with neighbor-joining <link src="JlqeYq"/>
 
 This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 5.2.2 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic. You can also refer to the [scikit-bio implementation of Neighbor Joining](http://scikit-bio.org/docs/latest/generated/skbio.tree.nj.html), which will be used here (the source code is linked from that page).
 
