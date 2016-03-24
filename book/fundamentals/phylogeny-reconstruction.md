@@ -44,19 +44,40 @@ More recently, several research teams have used features of spider genomes to re
 
 <figure>
     <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/phyl/book/fundamentals/images/spider-tree.png">
-    <figcaption>Figure 5: A spider phylogeny. Numbers at internal nodes correspond to the taxonomic groups described in [Table 2 of Garrison et al., 2016](https://peerj.com/articles/1719/#table-1). This image is an unmodified version of [Figure 1](https://doi.org/10.7717/peerj.1719/fig-1) of [Garrison et al., 2016](https://peerj.com/articles/1719/).</figcaption>
+    <figcaption>Figure 5: A spider phylogeny. Numbers at internal nodes correspond to the taxonomic groups described in <a href="https://peerj.com/articles/1719/#table-1">Table 1 of Garrison et al., 2016</a>. This image is an unmodified version of <a href="https://doi.org/10.7717/peerj.1719/fig-1">Figure 1</a> of <a href="https://peerj.com/articles/1719/">Garrison et al., 2016</a>.</figcaption>
 </figure>
 <p>
 
 For the remainder of this chapter, we'll consider methods for phylogenetic reconstruction that use genome sequence data as features.
 
+## Some terminology <link src='7bde92'/>
+
+Next, let's cover a few terms using the tree diagram in Figure 6.
+
+<figure>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-schematic1.png">
+    <figcaption>Figure 6: A schematic of a phylogenetic tree illustrating important terms.
+</figure>
+
+<p>
+
+*Terminal nodes or tips* typically represent extant organisms, also frequently called operational taxonomic units or OTUs. OTU is a generic way of referring to a grouping of organisms (such as a species, a genus, or a phylum), without specifically identifying what that grouping is.
+
+*Internal nodes* in a phylogenetic tree represent hypothetical ancestors. We postulate their existence but often don't have direct evidence. The *root node* is the internal node from which all other nodes in the tree descend. This is often referred to as the *last common ancestor (LCA)* of the OTUs represented in the tree. In a universal tree of life, the LCA is often referred to as *LUCA*, the *last universal common ancestor*. All nodes in the tree can be referred to as OTUs.
+
+*Branches* connect the nodes in the tree, and generally represent time or some amount of evolutionary change between the OTUs. The specific meaning of the branches will be dependent on the method that was used to build the phylogenetic tree.
+
+A *clade* in a tree refers to some node (either internal or terminal) and all nodes "below" it (i.e., toward the tips).
+
+We'll use all of these terms below as we begin to explore phylogenetic trees.
+
 ## Simulating evolution <link src="bR7jKb"/>
 
 Before we jump into how to reconstruct a phylogeny from DNA sequence data, we're going to perform a simulation of the process of evolution of a DNA sequence. In this simulation, we're going to model sequence evolution with a Python function, and then we're going to run that function to simulate multiple generations of evolution.
 
-Bioinformatics developers often use simulations to understand how their algorithms work, as they unqiuely provide an opportunity to know what the correct answer is. This provides a way to compare algorithms to each other to figure out which performs best under which circumstances. In our simulation we're going to have control over the starting sequence, and the probability of incurring a substitution mutation or an insertion/deletion mutation at each position of the sequence in each generation. This would, for example, let us understand whether different algorithms for phylogenetic reconstruction are better or worse for more closely or distantly related sequences.
+Bioinformatics developers often use simulations to understand how their algorithms work, as they uniquely provide an opportunity to know what the correct answer is. This provides a way to compare algorithms to each other to figure out which performs best under which circumstances. In our simulation we're going to have control over the starting sequence, and the probability of incurring a substitution mutation or an insertion/deletion mutation at each position of the sequence in each generation. This would, for example, let us understand whether different algorithms for phylogenetic reconstruction are better or worse for more closely or distantly related sequences.
 
-Our simulation will works as follows. We'll have one function that we primarily interact with called ``evolve_generations``. This will take a starting sequence and the number of generations that we want to simulate. It will also the probability that we want a substitution mutation to occur at each position in the starting sequence, and the probability that we want either an insertion or deletion mutation to occur at each position. In each generation, every sequence will spawn two new sequences, randomly incurring mutations at the prescribed rates. This effectively simulates a clonal process of reproduction, a form of asexual reproduction common in single cellular organisms, where a parent cell divides into two cells, each containing a copy of the parent's genome with some errors introduced.
+Our simulation will works as follows. We'll have one function that we primarily interact with called ``evolve_generations``. This will take a starting sequence and the number of generations that we want to simulate. It will also take the probability that we want a substitution mutation to occur at each position in the starting sequence, and the probability that we want either an insertion or deletion mutation to occur at each position. In each generation, every sequence will spawn two new sequences, randomly incurring mutations at the prescribed rates. This effectively simulates a clonal process of reproduction, a form of asexual reproduction common in single cellular organisms, where a parent cell divides into two cells, each containing a copy of the parent's genome with some errors introduced.
 
 Let's inspect this code and then run our simulation beginning with a random sequence.
 
@@ -120,11 +141,11 @@ Take a minute to compare the two sequences below. What types of mutations happen
 >>> sequences[-1]
 ```
 
-Based on our simulation, we can clearly see that these sequences have a true phylogeny: each sequence is derived from exactly one other sequence, and the evolution of all of the sequences traces back to starting sequence that we provided. Our goal with the algorithms we'll study for the rest of this chapter is to reconstruct that phylogeny given only the last generation of sequences. We'll use the fact that we know the true phylogeny to help us evaluate the relative performance of the different methods.
+In our simulation, each sequence is directly derived from exactly one sequence from the previous generation, and the evolution of all of the sequences traces back to starting sequence that we provided. This means that our final sequences are all homologous. And because we have modeled this process, we know where each sequence fits in relation to all of the other sequences in the phylogeny. Our goal with the algorithms we'll study for the rest of this chapter is to reconstruct that phylogeny given only the last generation of sequences. We'll use the fact that we know the true phylogeny to help us evaluate the relative performance of the different methods.
 
 <figure>
     <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/sequence-evo-tree.png">
-    <figcaption>Figure 6: Schematic of a simulated evolutionary process. Bases in red indicate mutation since the last common ancestor. The bottom panel illustrates the real-world equivalent of our final product, where we wouldn't know the true phylogeny (indicated by the dashed branches), the sequence of the last common ancestor, or what positions have changed since the last common ancestor.</figcaption>
+    <figcaption>Figure 7: Schematic of a simulated evolutionary process. Bases in red indicate mutation since the last common ancestor. The bottom panel illustrates the real-world equivalent of our final product, where we wouldn't know the true phylogeny (indicated by the dashed branches), the sequence of the last common ancestor, or what positions have changed since the last common ancestor.</figcaption>
 </figure>
 
 
@@ -136,44 +157,19 @@ If we use our simulation code to evaluate phylogeny reconstruction algorithms, i
 
 On the opposite end of the spectrum from simulations for algorithm comparison is comparisons based on real data. The trade-off however is that with real data we don't know what the right answer is (in our case, the correct phylogeny) so it's harder to determine which algorithms are doing better or worse. The take-away message here is that neither approach is perfect, and often researchers will use a combination of simulated and real data to evaluate algorithms.
 
-## Some terminology <link src='7bde92'/>
-
-**OLD TEXT**
-
-**Terminal nodes, tips or leaves** extant organisms, frequently called operational taxonomic units or OTUs. OTUs are families of related organisms.
-
-**Internal nodes** hypothetical ancestors - we postulate their existence but often don't have direct evidence.
-
-**Clade** a node and all nodes "below" it (i.e., toward the tips)
-
-**Root** the internal node defining the clade which contains all nodes in the tree
-
-**Branches** representative of the distance between the nodes.
-
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-schematic1.png">
-
-
 ## Parsimony-based approaches to phylogenetic reconstruction <link src="7WKikt"/>
+
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 8 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic.
 
 ### How many possible phylogenies are there for a given collection of sequences? <link src="DguiCU"/>
 
-**OLD TEXT**
-
-How many (rooted) trees are there for `n` sequences? This topic is discussed in detail in Chapter 3 of [Inferring Phylogenies](http://www.amazon.com/Inferring-Phylogenies-Joseph-Felsenstein/dp/0878931775/ref=sr_1_1?s=books&ie=UTF8&qid=1393288952&sr=1-1&keywords=inferring+phylogenies), the definitive text on this topic, but the basic answer is **a lot**.
-
-Because of the massive number of possible trees for any reasonable number of sequences, we can't just search all trees to figure out which one best matches our data. Instead, we must take a heuristic approach to tree building. Some design features of heuristic methods that are used in practice are that they:
-
-1. Look at a subset of the possible trees, and don't guarantee to find the best tree.
-2. Scale to trees for many OTUs (how well they scale depends on the method, and there is a lot of variability)
-3. Often provide a single tree, so do not include information on how likely other tree topologies are (we'll talk about methods, such as bootstrapping, to address this).
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 3 of [Inferring Phylogenies](http://www.amazon.com/Inferring-Phylogenies-Joseph-Felsenstein/dp/0878931775/ref=sr_1_1?s=books&ie=UTF8&qid=1393288952&sr=1-1&keywords=inferring+phylogenies), the definitive text on this topic.
 
 ## Distance-based approaches to phylogenetic reconstruction <link src="XrznYP"/>
 
-The first approaches we'll take for phylogenetic reconstruction rely on computing distances between sequences...
+The first approaches we'll take for phylogenetic reconstruction rely on computing distances between sequences. **This section is currently being written. What currently follows is an outline derived from an earlier version of this chapter.** You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, an additional resource that you may find useful is the UPGMA section of [Richard Edwards's teaching website](http://www.southampton.ac.uk/~re1u06/teaching/upgma/).
 
 ### Distances and distance matrices <link src='c11a4e'/>
-
-**OLD TEXT**
 
 Computing a UPGMA tree for a group of sequences relies on first computing *distances* between each pair of those sequences. A *distance*, in this sense, is a technical term. It's a measure of dissimilarity between two items, `x` and `y`, which meets a few criteria:
 
@@ -474,7 +470,11 @@ Step 3.4: At this stage, there is only one distance below the diagonal in our di
 
 ### Phylogenetic reconstruction with neighbor-joining
 
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 5.2.2 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic. You can also refer to the [scikit-bio implementation of Neighbor Joining](http://scikit-bio.org/docs/latest/generated/skbio.tree.nj.html), which will be used here (the source code is linked from that page).
+
 ### Limitations of distance-based approaches <link src="4hDWma"/>
+
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119).
 
 ## Statistical approaches to phylogenetic reconstruction <link src="VLXTEL"/>
 
