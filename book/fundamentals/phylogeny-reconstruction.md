@@ -18,11 +18,10 @@ In this chapter we'll begin to explore the goals, approaches, and challenges for
 </tr>
 <tr >
 <td colspan=2>
-<b>Figure 1a</b>: Evolutionary tree presented by Charles Darwin in <i>On the Origin of Species</i>. <b>Figure 1b</b>: A hypothesis of evolutionary relationships between the three domains of life. This image was created by the <a href="http://pacelab.colorado.edu/PI_NormPace.html">Norman Pace Laboratory.</a> 
+<b>Figure 1a</b>: Evolutionary tree presented by Charles Darwin in <i>On the Origin of Species</i>. <b>Figure 1b</b>: A hypothesis of evolutionary relationships between the three domains of life. This image was created by the <a href="http://pacelab.colorado.edu/PI_NormPace.html">Norman Pace Laboratory.</a>
 </td>
 </tr>
 </table>
-
 
 ## Why build phylogenies? <link src="Q4cFRp"/>
 
@@ -33,7 +32,7 @@ Phylogenetic trees such as these are also useful for understanding evolution its
 The *individuals* represented at the tips of our trees don't necessarily have to be organisms though. In another important application of phylogenetic trees, we can study the evolution of genes, which can help us gain a deeper understanding of gene function. Specifically, we can learn about families of related genes. A classic example of this is the globin family, which includes the proteins hemoglobin and myoglobin, molecules that can reversibly bind oxygen (meaning they can bind to it, and then let go of it). You've probably heard of hemoglobin (if not globins in general), as this molecule binds to oxygen where it is present in high concentration (such as in your lung) and releases it where it is present in low concentration (such as in the bicep, where it is ultimately used to power your arm). Hemoglobin and myoglobin are paralogs, meaning that they are related by a gene duplication and subsequent divergence. If you were to compare an unknown globin sequence to either of these you could detect homology, but a tree such as the one present in Figure 2, would help you understand the type of homologous relationship (i.e., whether it was orthology or paralogy).
 
 <figure>
-    <img src="https://static-content.springer.com/image/art%3A10.1186%2F1471-2148-6-31/MediaObjects/12862_2005_Article_216_Fig5_HTML.jpg">
+    <img src="https://static-content.springer.com/image/art%3A10.1186%2F1471-2148-6-31/MediaObjects/12862_2005_Article_216_Fig5_HTML.jpg"   width=50%>
     <figcaption><b>Figure 2</b>: A tree representing members of the globin gene family from diverse taxa. This image is an unmodified reproduction of Figure 5 from <a href="http://bmcevolbiol.biomedcentral.com/articles/10.1186/1471-2148-6-31"><i>A phylogenomic profile of globins</i></a> by Vinogradov et al (2006).
 
 <p>
@@ -169,6 +168,17 @@ In our simulation, each sequence is directly derived from exactly one sequence f
     <figcaption><b>Figure 7</b>: Schematic of a simulated evolutionary process. Bases in red indicate mutation since the last common ancestor. The bottom panel illustrates the real-world equivalent of our final product, where we wouldn't know the true phylogeny (indicated by the dashed branches), the sequence of the last common ancestor, or what positions have changed since the last common ancestor.</figcaption>
 </figure>
 
+```python
+>>> %matplotlib inline
+...
+>>> import numpy as np
+>>> sequences = evolve_generations(sequence, 10, 0.01, 0.005, verbose=False)
+```
+
+```python
+>>> sequences = np.random.choice(sequences, 10, replace=False)
+```
+
 ### A cautionary word about simulations <link src="Wbhke4"/>
 
 While simulations are extremely powerful for comparing algorithms, they can also be misleading. This is because when we model evolution we simplify the evolutionary process. For example, in the simulation above, we assume that the rate of substitution mutations doesn't change in different parts of our phylogeny. Imagine in the real-world that the environment changed drastically for some descendants (for example, if a geological event created new thermal vents in a lake they inhabited, resulting in an increase in mean water temperature), but not for others. The descendants who experience the environmental change might have an increased rate of substitutions as their genomes adapt to the new environment. The increased substitution rate may be temporary or permanent.
@@ -271,62 +281,21 @@ The conditions of a distance matrix listed above lead to a few specific features
 
 ### Alignment-free distances between sequences <link src='9d757a'/>
 
-**OLD TEXT**
-
 ```python
 >>> from iab.algorithms import guide_tree_from_sequences
-```
-
-```python
+...
 >>> guide_tree_from_sequences(sequences, display_tree=True)
-```
-
-Most often, distances between pairs of sequences are derived from a multiple sequence alignment. These differ from the pairwise alignments that we've looked at thus far, but use the same underlying algorithms (and we'll be coming back to this in the next chapter).
-
-Let's load up some aligned sequences, and compute a distance matrix. For now, we'll compute distances between the sequences using the ``hamming`` function that we worked with in the pairwise alignment chapter.
-
-```python
->>> from skbio import TabularMSA, DNA
->>> import scipy.spatial.distance
-...
->>> aln = TabularMSA([DNA('ACCGTGAAGCCAATAC', {'id': 's1'}),
-...                   DNA('A-CGTGCAACCATTAC', {'id': 's2'}),
-...                   DNA('AGCGTGCAGCCAATAC', {'id': 's3'}),
-...                   DNA('AGGGTGCCGC-AATAC', {'id': 's4'}),
-...                   DNA('AGGGTGCCAC-AATAC', {'id': 's5'})])
-```
-
-```python
->>> def hamming(seq1, seq2):
-...     return float(scipy.spatial.distance.hamming(seq1.values, seq2.values))
-...
->>> master_dm = DistanceMatrix.from_iterable(aln, metric=hamming, key='id')
->>> print(master_dm)
-```
-
-Once we have these distances, we can cluster the sequences based on their similiaries/dissimilarities. This is the first process that we'll explore for tree building.
-
-**NOTE:** The example below assumes that each value in this distance matrix is multiplied by the sequence length, so we'll do that here and work work with the resulting distance matrix.
-
-```python
->>> master_dm = DistanceMatrix(master_dm.data*16, master_dm.ids)
->>> print(master_dm)
 ```
 
 ### Alignment-based distances between sequences <link src="xAIbfm"/>
 
-**OLD TEXT**
-
-Next, let's use progressive multiple sequence alignment to
-
 ```python
->>> # Currently working on speeding this up...
-...
-... # %matplotlib inline
-... # from skbio.alignment import global_pairwise_align_nucleotide
-... # from iab.algorithms import progressive_msa_and_tree
-... # msa, tree = progressive_msa_and_tree(sequences, pairwise_aligner=global_pairwise_align_nucleotide,
-... #                                      display_tree=True, display_aln=True)
+>>> from skbio.alignment import global_pairwise_align_nucleotide
+>>> from iab.algorithms import progressive_msa_and_tree
+>>> from functools import partial
+>>> gpa = partial(global_pairwise_align_nucleotide, penalize_terminal_gaps=True)
+>>> msa, tree = progressive_msa_and_tree(sequences, pairwise_aligner=gpa,
+...                                      display_tree=True, display_aln=True)
 ```
 
 ### Phylogenetic reconstruction with UPGMA <link src='73d028'/>
