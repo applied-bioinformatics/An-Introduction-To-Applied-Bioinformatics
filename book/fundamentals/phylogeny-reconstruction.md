@@ -37,7 +37,6 @@ As an example, let's consider the reconstruction of the phylogeny of spiders (th
 
 <p>
 
-
 Earlier work on understanding the relations between the spider lineages focused on comparing traits that entomologists would observe, for example by watching spiders in action or by dissecting them. For example, in 1986 through 1991, [Johnathan Coddington](http://entomology.si.edu/StaffPages/coddington.html) published several studies that tabulated and compared about sixty features of 32 spider taxa (Coddington J. 1986. The monophyletic origin of the orb web. In: Shear W, ed. Spiders: webs, behavior, and evolution. Stanford, California: Stanford University Press. 319-363; Coddington JA. 1991. Cladistics and spider classification: araneomorph phylogeny and the monophyly of orbweavers (Araneae: Araneomorphae; Orbiculariae) Acta Zoologica Fennica 190:75-87). Features included whether a spider wraps its prey when it attacks (a behavioral trait), and how branched the spider's trachea is (a morphological trait). By determining which spiders were more similar and different across these traits, Dr. Coddington provided early evidence for the hypothesis that orb-weaving is an ancient monophyletic trait.
 
 More recently, several research teams have used features of spider genomes to reconstruct the spider phylogeny ([Bond et al., 2014](http://www.cell.com/current-biology/abstract/S0960-9822(14)00750-7), [Garrison et al., 2016](https://peerj.com/articles/1719/)). Using this approach, the features become the nucleotides observed at particular positions in the genome, which are observed first by sequencing specific genes that the researchers target that are present in all members of the group, and then aligning those sequences with multiple sequence alignment. This has several advantages over feature matrices derived from morphological and behavioral traits, including that many more features can be observed. For example, ([Garrison et al., 2016](https://peerj.com/articles/1719/)), compared approximately 700,000 amino acid positions from nearly 4000 loci around the genomes of 70 spider taxa. Compare the number of features here to the number mentioned in the previous paragraph. These *phylogenomic* studies have further supported the idea that orb-weaving is an ancient monophyletic trait, and have provided much finer scale information on the evolution of spiders. Supported by these data, researchers hypothesize that the loss of orb-weaving might not be that surprising. While it does provide an effective means of catching flying insects, many insects which are potential prey for spiders don't fly. Further, orb webs may attract predators of spiders, as they are easily observable signals of where a spider can be found.
@@ -148,7 +147,6 @@ In our simulation, each sequence is directly derived from exactly one sequence f
     <figcaption>Figure 7: Schematic of a simulated evolutionary process. Bases in red indicate mutation since the last common ancestor. The bottom panel illustrates the real-world equivalent of our final product, where we wouldn't know the true phylogeny (indicated by the dashed branches), the sequence of the last common ancestor, or what positions have changed since the last common ancestor.</figcaption>
 </figure>
 
-
 ### A cautionary word about simulations <link src="Wbhke4"/>
 
 While simulations are extremely powerful for comparing algorithms, they can also be misleading. This is because when we model evolution we simplify the evolutionary process. For example, in the simulation above, we assume that the rate of substitution mutations doesn't change in different parts of our phylogeny. Imagine in the real-world that the environment changed drastically for some descendants (for example, if a geological event created new thermal vents in a lake they inhabited, resulting in an increase in mean water temperature), but not for others. The descendants who experience the environmental change might have an increased rate of substitutions as their genomes adapt to the new environment. The increased substitution rate may be temporary or permanent.
@@ -156,6 +154,8 @@ While simulations are extremely powerful for comparing algorithms, they can also
 If we use our simulation code to evaluate phylogeny reconstruction algorithms, it will tell us nothing about which algorithms better handle different evolutionary rates in different branches of the tree. This is one limitation of our simulation that we know about, but because we don't have a perfect understanding of sequence evolution, there are limitations that we don't know about. For this reason, you always want to understand what assumptions a simulation is making, and consider those when determining how confident you are in the results of an evaluation based on simulation. One assumption that our simulation is making is that the evolutionary rate is constant across all branches of the tree. What are some other assumptions that are being made?
 
 On the opposite end of the spectrum from simulations for algorithm comparison is comparisons based on real data. The trade-off however is that with real data we don't know what the right answer is (in our case, the correct phylogeny) so it's harder to determine which algorithms are doing better or worse. The take-away message here is that neither approach is perfect, and often researchers will use a combination of simulated and real data to evaluate algorithms.
+
+**NOTE: The text below here gets very rough as these sections are currently being written or re-written.**
 
 ## Parsimony-based approaches to phylogenetic reconstruction <link src="7WKikt"/>
 
@@ -298,11 +298,13 @@ Once we have these distances, we can cluster the sequences based on their simili
 Next, let's use progressive multiple sequence alignment to
 
 ```python
->>> %matplotlib inline
->>> from skbio.alignment import global_pairwise_align_nucleotide
->>> from iab.algorithms import progressive_msa_and_tree
->>> msa, tree = progressive_msa_and_tree(sequences, pairwise_aligner=global_pairwise_align_nucleotide,
-...                                      display_tree=True, display_aln=True)
+>>> # Currently working on speeding this up...
+...
+... # %matplotlib inline
+... # from skbio.alignment import global_pairwise_align_nucleotide
+... # from iab.algorithms import progressive_msa_and_tree
+... # msa, tree = progressive_msa_and_tree(sequences, pairwise_aligner=global_pairwise_align_nucleotide,
+... #                                      display_tree=True, display_aln=True)
 ```
 
 ### Phylogenetic reconstruction with UPGMA <link src='73d028'/>
@@ -466,7 +468,6 @@ Step 3.4: At this stage, there is only one distance below the diagonal in our di
 >>> d = dendrogram(lm, labels=master_dm.ids, orientation='right',
 ...                link_color_func=lambda x: 'black')
 ```
-
 
 ### Phylogenetic reconstruction with neighbor-joining
 
