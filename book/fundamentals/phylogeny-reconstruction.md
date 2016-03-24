@@ -1,71 +1,190 @@
 
 # Phylogenetic reconstruction <link src='adb2e7'/>
 
-**NOTE**: This chapter is very basic at this stage, and needs work on text and content. It is slated for expansion. In the meantime, if you're looking for extra information on this topic I recommend [Chapter 27 of *Evolution*](http://evolution-textbook.org/content/free/contents/ch27.html) (free), and [*Inferring Phylogeny* by Felsenstein](http://www.amazon.com/Inferring-Phylogenies-Joseph-Felsenstein/dp/0878931775/ref=sr_1_1?s=books&ie=UTF8&qid=1397401191&sr=1-1&keywords=inferring+phylogenies). You can add suggestions for content, note issues, and follow progress on it updates, in [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119).
+In this chapter we'll begin to explore the goals, approaches, and challenges for creating phylogenetic trees, or phylogenies. Phylogenies, such as the two presented in Figure 1, represent hypotheses about the evolutionary history of a group of individuals, who are represented by the *tips* in the tree. You can explore an interactive version of the three-domain tree presented in Figure 1b online, through the [Interactive Tree of Life project](http://itol.embl.de/itol.cgi#).
 
-What:
+<figure>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/Darwins_tree_of_life_1859.png">
+    <figcaption><b>Figure 1a</b>: Evolutionary tree presented by Charles Darwin in <i>On the Origin of Species</i>.</figcaption>
+</figure>
+<p>
 
-The process of inferring the evolutionary relationships between organisms or groups of organisms, and usually representing that information as a tree.
+<figure>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/Pace_Big_Tree.png">
+    <figcaption><b>Figure 1b</b>: A hypothesis of evolutionary relationships between the three domains of life. This image was created by the <a href="http://pacelab.colorado.edu/PI_NormPace.html">Norman Pace Laboratory.</a></figcaption>
+</figure>
+<p>
 
-Why:
 
-1. Make functional inferences about genes.
-2. Understand relationships between organisms (and therefore possible similarities between them).
-3. Compare the composition of communities of organisms (but we'll come back to this).
+## Why build phylogenies? <link src="Q4cFRp"/>
 
-How:
+Reconstructing the phylogeny of a group of individuals is useful for many reasons. Probably the most obvious of these is understanding the evolutionary relationship between a group of organisms. For example, over the past half-century we've gained great insight into the evolution of our species, *Homo sapiens*, by studying features of our closest relatives, both extant (still existing) organisms, such as the *Pan* (chimpanzees) and *Gorilla* genera, and extinct (no longer living) species, including *Homo neanderthalensis*, *Homo erectus*, *Homo habilus*, and many species in the *Australopithecus* genus. (The [Smithsonian Museum's Human Origins Initiative](http://humanorigins.si.edu/) is an excellent resource for learning more about the fascinating subject of human evolution.) In this time, we've also improved our understanding of the deeper branches in the tree of life. For example, [Woese and Fox (1977)](http://www.pnas.org/content/74/11/5088.full.pdf) used phylogenetic reconstruction to first illustrate that the "prokaryotes" really represented two ancient lineages which they called the eubacteria and the archaebacteria, which ultimately led to the proposal of a "three domain" tree of life composed of the three deep branching linages, the archaea, the bacteria, and the eucarya ([Woese, Kandler and Wheelis (1990)](http://www.pnas.org/content/87/12/4576.full.pdf)).
 
-By comparing traits of extant organisms. In our case, traits are columns in a multiple sequence alignment. Many algorithms and tools exist for achieving this, and they vary widely in runtime and quality of results. We're going to begin by learning about one of the oldest and simplest methods for doing this: *Unweighted Pair Group Method with Arithmetic Mean* or UPGMA. (Don't be scared by the name - it's actually fairly simple.)
+Phylogenetic trees such as these are also useful for understanding evolution itself. In fact, they're so useful that the single image that Charles Darwin found important enough to include in *On the Origin of Species* was the phylogenetic tree presented in Figure 1a.
 
-UPGMA is a heirarchical clustering algorithm. It is widely used, though it's application in phylogenetics is usually restricted to building preliminary trees to "guide" the process of multiple sequence alignment, as it makes some assumptions that don't work well for inferring relationships between organsims. We're going to start with it here however for a few reasons. First, the underlying math is very basic, so we don't need to assume anything about your background. Second, there are some other applications of UPGMA that we'll explore later, including grouping samples based on their species compositions. In general, my strategy with teaching this material is to start by giving you a basic introdution into how a process works so you can visualize and do it. From there, we can get more complex.
+The *individuals* represented at the tips of our trees don't necessarily have to be organisms though. In another important application of phylogenetic trees, we can study the evolution of genes, which can help us gain a deeper understanding of gene function. Specifically, we can learn about families of related genes. A classic example of this is the globin family, which includes the proteins hemoglobin and myoglobin, molecules that can reversibly bind oxygen (meaning they can bind to it, and then let go of it). You've probably heard of hemoglobin (if not globins in general), as this molecule binds to oxygen where it is present in high concentration (such as in your lung) and releases it where it is present in low concentration (such as in the bicep, where it is ultimately used to power your arm). Hemoglobin and myoglobin are paralogs, meaning that they are related by a gene duplication and subsequent divergence. If you were to compare an unknown globin sequence to either of these you could detect homology, but a tree such as the one present in Figure 2, would help you understand the type of homologous relationship (i.e., whether it was orthology or paralogy).
+
+<figure>
+    <img src="https://static-content.springer.com/image/art%3A10.1186%2F1471-2148-6-31/MediaObjects/12862_2005_Article_216_Fig5_HTML.jpg">
+    <figcaption><b>Figure 2</b>: A tree representing members of the globin gene family from diverse taxa. This image is an unmodified reproduction of Figure 5 from <a href="http://bmcevolbiol.biomedcentral.com/articles/10.1186/1471-2148-6-31"><i>A phylogenomic profile of globins</i></a> by Vinogradov et al (2006).
+
+<p>
+
+Phylogenetic trees are used for many other diverse applications in bioinformatics, so it's therefore important that a bioinformatican have an understanding of they are built and how they should be interpreted. An additional application that we'll cover in this text is comparing the composition of communities of organisms, but we'll come back to that [later](alias://2bb2cf).
+
+## How phylogenies are reconstructed <link src="nluhSw"/>
+
+Phylogenies are reconstructed using a variety of different algorithms, some of which we'll cover in this chapter. These algorithms all work by comparing a set of *features* of organisms, and inferring the evolutionary distance between those organisms based on the similarity of their features. The features that are compared can be nearly anything that is observable, either from extant organisms or fossilized representatives of extinct organisms.
+
+As an example, let's consider the reconstruction of the phylogeny of spiders (the order Araneae), a hypothesis of which is presented in Figure 3. Of the extant spiders, some are orb-weavers (meaning they spin circular, sticky webs), and others are not. Entomologists have debated whether orb-weaving is a monophyletic trait (meaning that it evolved one time), or whether it is polyphyletic (meaning that it evolved multiple times, such as flight, which has evolved independently in birds, flying dinosaurs, insects, and mammals). If orb-weaving is monophyletic, it would mean that over the course of evolution, extant spiders which don't weave orb webs have lost that ability. Some researchers doubt this as it's a very effective means of catching prey, and losing that ability would likely constitute an evolutionary disadvantage. If orb-weaving is polyphyletic, it would means that in at least two different spider lineages, this trait arose independently, which other researchers consider to be very unlikely due to the complexity of engineering these webs. Examples of the evolution of monophyletic and polyphyletic traits are presented in Figures 3 and 4, respectively.
+
+
+<figure>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-monophyly.png">
+    <figcaption><b>Figure 3</b>: Example phylogeny illustrating a monophyletic trait shared by a group of organisms. In a monophyletic group, the last common ancestor was also member of the group (e.g., multicellular organisms).</figcaption>
+ </figure>
+
+
+<figure>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-polyphyly.png">
+    <figcaption><b>Figure 4</b>: Example phylogeny illustrating a polyphyletic trait shared by a group of organisms. In a polyphyletic group the last common ancestor was not a member of the group (e.g., flying animals).</figcaption>
+</figure>
+
+<p>
+
+Earlier work on understanding the relations between the spider lineages focused on comparing traits that entomologists would observe, for example by watching spiders in action or by dissecting them. For example, in 1986 through 1991, [Johnathan Coddington](http://entomology.si.edu/StaffPages/coddington.html) published several studies that tabulated and compared about sixty features of 32 spider taxa (Coddington J. 1986. The monophyletic origin of the orb web. In: Shear W, ed. Spiders: webs, behavior, and evolution. Stanford, California: Stanford University Press. 319-363; Coddington JA. 1991. Cladistics and spider classification: araneomorph phylogeny and the monophyly of orbweavers (Araneae: Araneomorphae; Orbiculariae) Acta Zoologica Fennica 190:75-87). Features included whether a spider wraps its prey when it attacks (a behavioral trait), and how branched the spider's trachea is (a morphological trait). By determining which spiders were more similar and different across these traits, Dr. Coddington provided early evidence for the hypothesis that orb-weaving is an ancient monophyletic trait.
+
+More recently, several research teams have used features of spider genomes to reconstruct the spider phylogeny ([Bond et al., 2014](http://www.cell.com/current-biology/abstract/S0960-9822(14)00750-7), [Garrison et al., 2016](https://peerj.com/articles/1719/)). Using this approach, the features become the nucleotides observed at particular positions in the genome, which are observed first by sequencing specific genes that the researchers target that are present in all members of the group, and then aligning those sequences with multiple sequence alignment. This has several advantages over feature matrices derived from morphological and behavioral traits, including that many more features can be observed. For example, ([Garrison et al., 2016](https://peerj.com/articles/1719/)), compared approximately 700,000 amino acid positions from nearly 4000 loci around the genomes of 70 spider taxa. Compare the number of features here to the number mentioned in the previous paragraph. These *phylogenomic* studies have further supported the idea that orb-weaving is an ancient monophyletic trait, and have provided much finer scale information on the evolution of spiders. Supported by these data, researchers hypothesize that the loss of orb-weaving might not be that surprising. While it does provide an effective means of catching flying insects, many insects which are potential prey for spiders don't fly. Further, orb webs may attract predators of spiders, as they are easily observable signals of where a spider can be found.
+
+<figure>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/spider-tree.png">
+    <figcaption><b>Figure 5</b>: A spider phylogeny. Numbers at internal nodes correspond to the taxonomic groups described in <a href="https://peerj.com/articles/1719/#table-1">Table 1 of Garrison et al., 2016</a>. This image is an unmodified version of <a href="https://doi.org/10.7717/peerj.1719/fig-1">Figure 1</a> of <a href="https://peerj.com/articles/1719/">Garrison et al., 2016</a>.</figcaption>
+</figure>
+<p>
+
+For the remainder of this chapter, we'll consider methods for phylogenetic reconstruction that use genome sequence data as features.
 
 ## Some terminology <link src='7bde92'/>
 
-Here's the goal (well, *a* goal, but this is the basic idea):
+Next, let's cover a few terms using the tree diagram in Figure 6.
 
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/basic-rooted-tree1.jpg" width=600>
+<figure>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-schematic1.png">
+    <figcaption><b>Figure 6</b>: A schematic of a phylogenetic tree illustrating important terms.
+</figure>
 
-Each *leaf* (or *tip*, or *terminal node*) in this tree represents a sequence, and the length of the horizonal branches between them indicate their dissimilarity to one another. This is a *rooted tree*, which means that it includes an assumption about the last common ancestor of all sequences represented in the tree.
+<p>
 
-Note that the vertical lines in this tree are used for layout purposes only - they do not represent dissimilarity between sequences.
+*Terminal nodes or tips* typically represent extant organisms, also frequently called operational taxonomic units or OTUs. OTU is a generic way of referring to a grouping of organisms (such as a species, a genus, or a phylum), without specifically identifying what that grouping is.
 
-An **unrooted tree**, like the following, doesn't include an assumption about the last common ancestor of all sequences:
+*Internal nodes* in a phylogenetic tree represent hypothetical ancestors. We postulate their existence but often don't have direct evidence. The *root node* is the internal node from which all other nodes in the tree descend. This is often referred to as the *last common ancestor (LCA)* of the OTUs represented in the tree. In a universal tree of life, the LCA is often referred to as *LUCA*, the *last universal common ancestor*. All nodes in the tree can be referred to as OTUs.
 
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/basic-unrooted-tree1.jpg" width=600>
+*Branches* connect the nodes in the tree, and generally represent time or some amount of evolutionary change between the OTUs. The specific meaning of the branches will be dependent on the method that was used to build the phylogenetic tree.
 
-**Terminal nodes, tips or leaves** extant organisms, frequently called operational taxonomic units or OTUs. OTUs are families of related organisms.
+A *clade* in a tree refers to some node (either internal or terminal) and all nodes "below" it (i.e., toward the tips).
 
-**Internal nodes** hypothetical ancestors - we postulate their existence but often don't have direct evidence.
+We'll use all of these terms below as we begin to explore phylogenetic trees.
 
-**Clade** a node and all nodes "below" it (i.e., toward the tips)
+## Simulating evolution <link src="bR7jKb"/>
 
-**Root** the internal node defining the clade which contains all nodes in the tree
+Before we jump into how to reconstruct a phylogeny from DNA sequence data, we're going to perform a simulation of the process of evolution of a DNA sequence. In this simulation, we're going to model sequence evolution with a Python function, and then we're going to run that function to simulate multiple generations of evolution.
 
-**Branches** representative of the distance between the nodes.
+Bioinformatics developers often use simulations to understand how their algorithms work, as they uniquely provide an opportunity to know what the correct answer is. This provides a way to compare algorithms to each other to figure out which performs best under which circumstances. In our simulation we're going to have control over the starting sequence, and the probability of incurring a substitution mutation or an insertion/deletion mutation at each position of the sequence in each generation. This would, for example, let us understand whether different algorithms for phylogenetic reconstruction are better or worse for more closely or distantly related sequences.
 
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-schematic1.png">
+Our simulation will works as follows. We'll have one function that we primarily interact with called ``evolve_generations``. This will take a starting sequence and the number of generations that we want to simulate. It will also take the probability that we want a substitution mutation to occur at each position in the starting sequence, and the probability that we want either an insertion or deletion mutation to occur at each position. In each generation, every sequence will spawn two new sequences, randomly incurring mutations at the prescribed rates. This effectively simulates a clonal process of reproduction, a form of asexual reproduction common in single cellular organisms, where a parent cell divides into two cells, each containing a copy of the parent's genome with some errors introduced.
 
-**Monophyletic group** the last common ancestor was a member of the group (e.g., multicellular organisms)
+Let's inspect this code and then run our simulation beginning with a random sequence.
 
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-monophyly.png">
+```python
+>>> %pylab inline
+...
+>>> from IPython.core import page
+>>> page.page = print
+```
 
-**Polyphyletic group** the last common ancestor was not a member of the group (e.g., flying animals)
+First we'll look at the function used to simulate the evolution of a single sequence. This is where most of the important evolutionary modeling of sequence evolution happens.
 
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/tree-polyphyly.png">
+```python
+>>> from iab.algorithms import evolve_sequence
+>>> %psource evolve_sequence
+```
 
-We assume that as time progresses, sequences will diverge such that more similar sequences have diverged more recently. The problem of phylogenetic reconstruction however is that we only have the tips. We don't have sequences for the internal nodes, and so we use modern sequences to develop a hypothesis about the evolutionary history of a sequence (and hopefully of the organisms who encode those sequences in their genomes).
+Next, take a look at the function that models a single generation of a single sequence. This is where the clonal reproduction (i.e., one parent sequence becoming two child sequences) occurs.
 
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/sequence-evo-tree.png">
+```python
+>>> from iab.algorithms import evolve_generation
+>>> %psource evolve_generation
+```
 
-How many (rooted) trees are there for `n` sequences? This topic is discussed in detail in Chapter 3 of [Inferring Phylogenies](http://www.amazon.com/Inferring-Phylogenies-Joseph-Felsenstein/dp/0878931775/ref=sr_1_1?s=books&ie=UTF8&qid=1393288952&sr=1-1&keywords=inferring+phylogenies), the definitive text on this topic, but the basic answer is **a lot**.
+Finally, take a look at our entry point function. This is where we provide the parameters of our simulation, including the starting sequence, the number of generations, and the mutation probabilities. Notice how each of these functions builds on the prior functions.
 
-Because of the massive number of possible trees for any reasonable number of sequences, we can't just search all trees to figure out which one best matches our data. Instead, we must take a heurtistic approach to tree building. Some design features of heurtistic methods that are used in practice are that they:
+```python
+>>> from iab.algorithms import evolve_generations
+>>> %psource evolve_generations
+```
 
-1. Look at a subset of the possible trees, and don't guarantee to find the best tree.
-2. Scale to trees for many OTUs (how well they scale depends on the method, and there is a lot of variability)
-3. Often provide a single tree, so do not include information on how likely other tree topologies are (we'll talk about methods, such as bootstrapping, to address this).
+Now we'll run our simulation. We'll start with a random DNA sequence, and then evolve three generations. Before running this, can you predict how many child sequences we'll end up with after three generations?
 
-## Distances and distance matrices <link src='c11a4e'/>
+When we call ``evolve_generations``, we'll pass the parameter ``verbose=True``. This will tell the function to print out some information throughout the process. This will let us inspect our evolutionary process: something that is impossible to do with real sequences.
+
+```python
+>>> from iab.algorithms import random_sequence
+>>> import skbio
+>>> sequence = random_sequence(skbio.DNA, 50)
+```
+
+```python
+>>> sequences = evolve_generations(sequence, 3, 0.1, 0.05, verbose=True)
+```
+
+We now have a new variable, sequences, which contains the child sequences from the last generation. Take a minute to look at the ids of the parent and child sequences above, and the ids of a couple of the final generation sequences. These ids are constructed so that each sequence contains the identifiers of its ancestral sequences, and then either ``1`` or ``2``. Notice that all sequence identifiers start with ``0``, the identifier of the last common ancestor (or our starting sequence) of all of the sequences. These identifiers will help us interpret whether the phylogenies that we reconstruct accurately represent the evolutionary relationships between the sequences.
+
+Also, notice that at this point we only have the sequences from the last generation. We no longer have the ancestral sequences (which would correspond to the internal nodes in the tree). This models the real world, were we only have sequences from extant organisms, but not their ancestors.
+
+Take a minute to compare the two sequences below. What types of mutations happened over the course of their evolution?
+
+```python
+>>> print(len(sequences))
+```
+
+```python
+>>> sequences[0]
+```
+
+```python
+>>> sequences[-1]
+```
+
+In our simulation, each sequence is directly derived from exactly one sequence from the previous generation, and the evolution of all of the sequences traces back to starting sequence that we provided. This means that our final sequences are all homologous. And because we have modeled this process, we know where each sequence fits in relation to all of the other sequences in the phylogeny. Our goal with the algorithms we'll study for the rest of this chapter is to reconstruct that phylogeny given only the last generation of sequences. We'll use the fact that we know the true phylogeny to help us evaluate the relative performance of the different methods.
+
+<figure>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/sequence-evo-tree.png">
+    <figcaption><b>Figure 7</b>: Schematic of a simulated evolutionary process. Bases in red indicate mutation since the last common ancestor. The bottom panel illustrates the real-world equivalent of our final product, where we wouldn't know the true phylogeny (indicated by the dashed branches), the sequence of the last common ancestor, or what positions have changed since the last common ancestor.</figcaption>
+</figure>
+
+### A cautionary word about simulations <link src="Wbhke4"/>
+
+While simulations are extremely powerful for comparing algorithms, they can also be misleading. This is because when we model evolution we simplify the evolutionary process. For example, in the simulation above, we assume that the rate of substitution mutations doesn't change in different parts of our phylogeny. Imagine in the real-world that the environment changed drastically for some descendants (for example, if a geological event created new thermal vents in a lake they inhabited, resulting in an increase in mean water temperature), but not for others. The descendants who experience the environmental change might have an increased rate of substitutions as their genomes adapt to the new environment. The increased substitution rate may be temporary or permanent.
+
+If we use our simulation code to evaluate phylogeny reconstruction algorithms, it will tell us nothing about which algorithms better handle different evolutionary rates in different branches of the tree. This is one limitation of our simulation that we know about, but because we don't have a perfect understanding of sequence evolution, there are limitations that we don't know about. For this reason, you always want to understand what assumptions a simulation is making, and consider those when determining how confident you are in the results of an evaluation based on simulation. One assumption that our simulation is making is that the evolutionary rate is constant across all branches of the tree. What are some other assumptions that are being made?
+
+On the opposite end of the spectrum from simulations for algorithm comparison is comparisons based on real data. The trade-off however is that with real data we don't know what the right answer is (in our case, the correct phylogeny) so it's harder to determine which algorithms are doing better or worse. The take-away message here is that neither approach is perfect, and often researchers will use a combination of simulated and real data to evaluate algorithms.
+
+**NOTE: The text below here gets very rough as these sections are currently being written or re-written.**
+
+## Parsimony-based approaches to phylogenetic reconstruction <link src="7WKikt"/>
+
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 8 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic.
+
+### How many possible phylogenies are there for a given collection of sequences? <link src="DguiCU"/>
+
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 3 of [Inferring Phylogenies](http://www.amazon.com/Inferring-Phylogenies-Joseph-Felsenstein/dp/0878931775/ref=sr_1_1?s=books&ie=UTF8&qid=1393288952&sr=1-1&keywords=inferring+phylogenies), the definitive text on this topic.
+
+## Distance-based approaches to phylogenetic reconstruction <link src="XrznYP"/>
+
+The first approaches we'll take for phylogenetic reconstruction rely on computing distances between sequences. **This section is currently being written. What currently follows is an outline derived from an earlier version of this chapter.** You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, an additional resource that you may find useful is the UPGMA section of [Richard Edwards's teaching website](http://www.southampton.ac.uk/~re1u06/teaching/upgma/).
+
+### Distances and distance matrices <link src='c11a4e'/>
 
 Computing a UPGMA tree for a group of sequences relies on first computing *distances* between each pair of those sequences. A *distance*, in this sense, is a technical term. It's a measure of dissimilarity between two items, `x` and `y`, which meets a few criteria:
 
@@ -143,7 +262,17 @@ One feature that this gets us is nicer printing.
 
 The conditions of a distance matrix listed above lead to a few specific features: the distance matrix is symmetric (if you flip the upper triangle over the diagonal, the values are the same as those in the lower triangle), the distance matrix is *hollow* (the diagonal is all zeros), and there are no negative values.
 
-## Computing the distance between pairs of sequences. <link src='9d757a'/>
+### Alignment-free distances between sequences <link src='9d757a'/>
+
+**OLD TEXT**
+
+```python
+>>> from iab.algorithms import guide_tree_from_sequences
+```
+
+```python
+>>> guide_tree_from_sequences(sequences, display_tree=True)
+```
 
 Most often, distances between pairs of sequences are derived from a multiple sequence alignment. These differ from the pairwise alignments that we've looked at thus far, but use the same underlying algorithms (and we'll be coming back to this in the next chapter).
 
@@ -177,7 +306,28 @@ Once we have these distances, we can cluster the sequences based on their simili
 >>> print(master_dm)
 ```
 
-## Hierarchical clustering with UPGMA <link src='73d028'/>
+### Alignment-based distances between sequences <link src="xAIbfm"/>
+
+**OLD TEXT**
+
+Next, let's use progressive multiple sequence alignment to
+
+```python
+>>> # Currently working on speeding this up...
+...
+... # %matplotlib inline
+... # from skbio.alignment import global_pairwise_align_nucleotide
+... # from iab.algorithms import progressive_msa_and_tree
+... # msa, tree = progressive_msa_and_tree(sequences, pairwise_aligner=global_pairwise_align_nucleotide,
+... #                                      display_tree=True, display_aln=True)
+```
+
+### Phylogenetic reconstruction with UPGMA <link src='73d028'/>
+
+**OLD TEXT**
+
+UPGMA is a heirarchical clustering algorithm. It is widely used, though it's application in phylogenetics is usually restricted to building preliminary trees to "guide" the process of multiple sequence alignment, as it makes some assumptions that don't work well for inferring relationships between organsims. We're going to start with it here however for a few reasons. First, the underlying math is very basic, so we don't need to assume anything about your background. Second, there are some other applications of UPGMA that we'll explore later, including grouping samples based on their species compositions. In general, my strategy with teaching this material is to start by giving you a basic introdution into how a process works so you can visualize and do it. From there, we can get more complex.
+
 
 Unweighted Pair-Group Method with Arithmetic mean
 
@@ -333,6 +483,36 @@ Step 3.4: At this stage, there is only one distance below the diagonal in our di
 >>> d = dendrogram(lm, labels=master_dm.ids, orientation='right',
 ...                link_color_func=lambda x: 'black')
 ```
+
+### Phylogenetic reconstruction with neighbor-joining <link src="JlqeYq"/>
+
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 5.2.2 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic. You can also refer to the [scikit-bio implementation of Neighbor Joining](http://scikit-bio.org/docs/latest/generated/skbio.tree.nj.html), which will be used here (the source code is linked from that page).
+
+### Limitations of distance-based approaches <link src="4hDWma"/>
+
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119).
+
+## Statistical approaches to phylogenetic reconstruction <link src="VLXTEL"/>
+
+### Bayesian methods <link src="pTnwaZ"/>
+
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 7 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic.
+
+### Maximum likelihood methods <link src="pTnwaZ"/>
+
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 6 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic.
+
+## Rooted versus unrooted trees <link src="HCGmey"/>
+
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/basic-rooted-tree1.jpg" width=600>
+
+Each *leaf* (or *tip*, or *terminal node*) in this tree represents a sequence, and the length of the horizontal branches between them indicate their dissimilarity to one another. This is a *rooted tree*, which means that it includes an assumption about the last common ancestor of all sequences represented in the tree.
+
+Note that the vertical lines in this tree are used for layout purposes only - they do not represent dissimilarity between sequences.
+
+An **unrooted tree**, like the following, doesn't include an assumption about the last common ancestor of all sequences:
+
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/basic-unrooted-tree1.jpg" width=600>
 
 ## Acknowledgements <link src='99ad11'/>
 
