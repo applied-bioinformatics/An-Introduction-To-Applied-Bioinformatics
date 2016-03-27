@@ -107,7 +107,6 @@ Let's inspect this code and then run our simulation beginning with a random sequ
 ...
 >>> from IPython.core import page
 >>> page.page = print
-Populating the interactive namespace from numpy and matplotlib
 ```
 
 First we'll look at the function used to simulate the evolution of a single sequence. This is where most of the important evolutionary modeling of sequence evolution happens.
@@ -115,38 +114,6 @@ First we'll look at the function used to simulate the evolution of a single sequ
 ```python
 >>> from iab.algorithms import evolve_sequence
 >>> %psource evolve_sequence
-[0;32mdef[0m [0mevolve_sequence[0m[0;34m([0m[0msequence[0m[0;34m,[0m [0msubstitution_probability[0m[0;34m,[0m [0mindel_probability[0m[0;34m)[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m    [0mresult[0m [0;34m=[0m [0;34m[[0m[0;34m][0m[0;34m[0m
-[0;34m[0m    [0msequence_length[0m [0;34m=[0m [0mlen[0m[0;34m([0m[0msequence[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m    [0minsertion_choices[0m [0;34m=[0m [0mlist[0m[0;34m([0m[0msequence[0m[0;34m.[0m[0mnondegenerate_chars[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m[0;34m[0m
-[0;34m[0m    [0mresult[0m [0;34m=[0m [0;34m[[0m[0;34m][0m[0;34m[0m
-[0;34m[0m    [0mi[0m [0;34m=[0m [0;36m0[0m[0;34m[0m
-[0;34m[0m    [0;32mwhile[0m [0mi[0m [0;34m<[0m [0msequence_length[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m        [0mcurrent_char[0m [0;34m=[0m [0msequence[0m[0;34m[[0m[0mi[0m[0;34m][0m[0;34m[0m
-[0;34m[0m        [0;32mif[0m [0mrandom[0m[0;34m.[0m[0mrandom[0m[0;34m([0m[0;34m)[0m [0;34m<[0m [0msubstitution_probability[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m            [0;31m# simulate a substitution event by adding a character other than the current[0m[0;34m[0m
-[0;34m[0m            [0;31m# character to the result at this position[0m[0;34m[0m
-[0;34m[0m            [0mresult[0m[0;34m.[0m[0mappend[0m[0;34m([0m[0mrandom[0m[0;34m.[0m[0mchoice[0m[0;34m([0m[0;34m[[0m[0mr[0m [0;32mfor[0m [0mr[0m [0;32min[0m [0msequence[0m[0;34m.[0m[0mnondegenerate_chars[0m [0;32mif[0m [0mr[0m [0;34m!=[0m [0mcurrent_char[0m[0;34m][0m[0;34m)[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m        [0;32melif[0m [0mrandom[0m[0;34m.[0m[0mrandom[0m[0;34m([0m[0;34m)[0m [0;34m<[0m [0mindel_probability[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m            [0;31m# simulate either an insertion or a deletion event. the length of the insertion or[0m[0;34m[0m
-[0;34m[0m            [0;31m# deletion is determined at random, with shorter lengths being more probable[0m[0;34m[0m
-[0;34m[0m            [0mlength[0m [0;34m=[0m [0mint[0m[0;34m([0m[0mnp[0m[0;34m.[0m[0mrandom[0m[0;34m.[0m[0mtriangular[0m[0;34m([0m[0;36m1[0m[0;34m,[0m [0;36m1[0m[0;34m,[0m [0;36m10[0m[0;34m)[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m            [0;32mif[0m [0mnp[0m[0;34m.[0m[0mrandom[0m[0;34m.[0m[0mbinomial[0m[0;34m([0m[0;36m1[0m[0;34m,[0m [0;36m0.5[0m[0;34m)[0m [0;34m==[0m [0;36m0[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m                [0;31m# simulate an insertion by adding length random characters from[0m[0;34m[0m
-[0;34m[0m                [0;31m# this sequence's alphabet[0m[0;34m[0m
-[0;34m[0m                [0mresult[0m[0;34m.[0m[0mextend[0m[0;34m([0m[0mnp[0m[0;34m.[0m[0mrandom[0m[0;34m.[0m[0mchoice[0m[0;34m([0m[0minsertion_choices[0m[0;34m,[0m [0msize[0m[0;34m=[0m[0mlength[0m[0;34m)[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m                [0mi[0m [0;34m+=[0m [0;36m1[0m[0;34m[0m
-[0;34m[0m            [0;32melse[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m                [0;31m# simulate a deletion by not appending any of the next length[0m[0;34m[0m
-[0;34m[0m                [0;31m# characters[0m[0;34m[0m
-[0;34m[0m                [0mi[0m [0;34m+=[0m [0mlength[0m[0;34m[0m
-[0;34m[0m        [0;32melse[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m            [0;31m# simulate no mutation occurring[0m[0;34m[0m
-[0;34m[0m            [0mresult[0m[0;34m.[0m[0mappend[0m[0;34m([0m[0mstr[0m[0;34m([0m[0mcurrent_char[0m[0;34m)[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m            [0mi[0m [0;34m+=[0m [0;36m1[0m[0;34m[0m
-[0;34m[0m[0;34m[0m
-[0;34m[0m    [0;32mreturn[0m [0msequence[0m[0;34m.[0m[0m__class__[0m[0;34m([0m[0;34m''[0m[0;34m.[0m[0mjoin[0m[0;34m([0m[0mresult[0m[0;34m)[0m[0;34m)[0m[0;34m[0m[0m
 ```
 
 Next, take a look at the function that models a single generation of a single sequence. This is where the clonal reproduction (i.e., one parent sequence becoming two child sequences) occurs.
@@ -154,12 +121,6 @@ Next, take a look at the function that models a single generation of a single se
 ```python
 >>> from iab.algorithms import evolve_generation
 >>> %psource evolve_generation
-[0;32mdef[0m [0mevolve_generation[0m[0;34m([0m[0msequence[0m[0;34m,[0m[0;34m[0m
-[0;34m[0m                      [0msubstitution_probability[0m[0;34m,[0m[0;34m[0m
-[0;34m[0m                      [0mindel_probability[0m[0;34m)[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m    [0mchild1[0m [0;34m=[0m [0mevolve_sequence[0m[0;34m([0m[0msequence[0m[0;34m,[0m [0msubstitution_probability[0m[0;34m,[0m [0mindel_probability[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m    [0mchild2[0m [0;34m=[0m [0mevolve_sequence[0m[0;34m([0m[0msequence[0m[0;34m,[0m [0msubstitution_probability[0m[0;34m,[0m [0mindel_probability[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m    [0;32mreturn[0m [0mchild1[0m[0;34m,[0m [0mchild2[0m[0;34m[0m[0m
 ```
 
 Finally, take a look at our entry point function. This is where we provide the parameters of our simulation, including the starting sequence, the number of generations, and the mutation probabilities. Notice how each of these functions builds on the prior functions.
@@ -167,48 +128,6 @@ Finally, take a look at our entry point function. This is where we provide the p
 ```python
 >>> from iab.algorithms import evolve_generations
 >>> %psource evolve_generations
-[0;32mdef[0m [0mevolve_generations[0m[0;34m([0m[0mancestral_sequence[0m[0;34m,[0m [0mgenerations[0m[0;34m,[0m [0msubstitution_probability[0m[0;34m,[0m[0;34m[0m
-[0;34m[0m                       [0mindel_probability[0m[0;34m,[0m [0mverbose[0m[0;34m=[0m[0;32mFalse[0m[0;34m)[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m    [0;31m# initial some values and perform some basic error checking[0m[0;34m[0m
-[0;34m[0m    [0;32massert[0m [0mgenerations[0m [0;34m>[0m [0;36m0[0m[0;34m,[0m [0;34m"Must simulate one or more generations."[0m[0;34m[0m
-[0;34m[0m[0;34m[0m
-[0;34m[0m    [0;31m# initialize a list of the previous generations sequences - this gets used[0m[0;34m[0m
-[0;34m[0m    [0;31m# in the for loop below. since we'll start with the first generation of[0m[0;34m[0m
-[0;34m[0m    [0;31m# children, root_sequence is the previous generation's sequence[0m[0;34m[0m
-[0;34m[0m    [0mancestral_sequence[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m [0;34m=[0m [0;34m'0'[0m[0;34m[0m
-[0;34m[0m    [0mprevious_generation_sequences[0m [0;34m=[0m [0;34m[[0m[0mancestral_sequence[0m[0;34m][0m[0;34m[0m
-[0;34m[0m[0;34m[0m
-[0;34m[0m    [0;31m# iterate for each requested generation[0m[0;34m[0m
-[0;34m[0m    [0;32mfor[0m [0mi[0m [0;32min[0m [0mrange[0m[0;34m([0m[0mgenerations[0m[0;34m)[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m        [0;31m# print the generation number and the current number of sequences[0m[0;34m[0m
-[0;34m[0m        [0;32mif[0m [0mverbose[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m            [0mprint[0m[0;34m([0m[0;34m"Generation: %d (Number of parent sequences: %d)"[0m [0;34m%[0m [0;34m([0m[0mi[0m[0;34m,[0m[0;36m2[0m[0;34m**[0m[0mi[0m[0;34m)[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m            [0mprint[0m[0;34m([0m[0;34m"%s (last common ancestor)"[0m [0;34m%[0m [0mancestral_sequence[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m            [0mprint[0m[0;34m([0m[0;34m""[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m[0;34m[0m
-[0;34m[0m        [0;31m# create a list to store the current generation of sequences[0m[0;34m[0m
-[0;34m[0m        [0mcurrent_generation_sequences[0m [0;34m=[0m [0;34m[[0m[0;34m][0m[0;34m[0m
-[0;34m[0m[0;34m[0m
-[0;34m[0m        [0;31m# iterate over the sequences of the previous generation[0m[0;34m[0m
-[0;34m[0m        [0;32mfor[0m [0mparent_sequence[0m [0;32min[0m [0mprevious_generation_sequences[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m            [0;31m# evolve two child sequences - currently the mutation probabilities are[0m[0;34m[0m
-[0;34m[0m            [0;31m# constant, but should update that to change with generations[0m[0;34m[0m
-[0;34m[0m            [0mr1[0m[0;34m,[0m [0mr2[0m [0;34m=[0m [0mevolve_generation[0m[0;34m([0m[0mparent_sequence[0m[0;34m,[0m [0msubstitution_probability[0m[0;34m,[0m [0mindel_probability[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m            [0mr1[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m [0;34m=[0m [0;34m'%s.1'[0m [0;34m%[0m [0;34m([0m[0mparent_sequence[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m[0;34m)[0m[0;34m[0m
-[0;34m[0m            [0mr2[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m [0;34m=[0m [0;34m'%s.2'[0m [0;34m%[0m [0;34m([0m[0mparent_sequence[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m[0;34m)[0m[0;34m[0m
-[0;34m[0m            [0mcurrent_generation_sequences[0m[0;34m.[0m[0mextend[0m[0;34m([0m[0;34m[[0m[0mr1[0m[0;34m,[0m [0mr2[0m[0;34m][0m[0;34m)[0m[0;34m[0m
-[0;34m[0m            [0;32mif[0m [0mverbose[0m[0;34m:[0m[0;34m[0m
-[0;34m[0m                [0;31m# if the caller specified verbose output, print the actual sequences[0m[0;34m[0m
-[0;34m[0m                [0mprint[0m[0;34m([0m[0;34m"%s (parent id: %s)"[0m [0;34m%[0m [0;34m([0m[0mparent_sequence[0m[0;34m,[0m [0mparent_sequence[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m[0;34m)[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m                [0mprint[0m[0;34m([0m[0;34m"%s (child 1 id: %s)"[0m [0;34m%[0m [0;34m([0m[0mr1[0m[0;34m,[0m [0mr1[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m[0;34m)[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m                [0mprint[0m[0;34m([0m[0;34m"%s (child 2 id: %s)"[0m [0;34m%[0m [0;34m([0m[0mr2[0m[0;34m,[0m [0mr2[0m[0;34m.[0m[0mmetadata[0m[0;34m[[0m[0;34m'id'[0m[0;34m][0m[0;34m)[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m                [0mprint[0m[0;34m([0m[0;34m""[0m[0;34m)[0m[0;34m[0m
-[0;34m[0m        [0;31m# current_generation_sequences becomes the next generation's[0m[0;34m[0m
-[0;34m[0m        [0;31m# previous_generation_sequences[0m[0;34m[0m
-[0;34m[0m        [0mprevious_generation_sequences[0m [0;34m=[0m [0mcurrent_generation_sequences[0m[0;34m[0m
-[0;34m[0m[0;34m[0m
-[0;34m[0m    [0;31m# upon completion of all generations, return the last generation's sequences[0m[0;34m[0m
-[0;34m[0m    [0;32mreturn[0m [0mprevious_generation_sequences[0m[0;34m[0m[0m
 ```
 
 Now we'll run our simulation. We'll start with a random DNA sequence, and then evolve three generations. Before running this, can you predict how many child sequences we'll end up with after three generations?
@@ -223,42 +142,6 @@ When we call ``evolve_generations``, we'll pass the parameter ``verbose=True``. 
 
 ```python
 >>> sequences = evolve_generations(sequence, 3, 0.1, 0.05, verbose=True)
-Generation: 0 (Number of parent sequences: 1)
-TGGTTAACAGGAAAGTACGCGACCCCGATGCCAAAGAACGTTCTTCCATT (last common ancestor)
-
-TGGTTAACAGGAAAGTACGCGACCCCGATGCCAAAGAACGTTCTTCCATT (parent id: 0)
-TGGTTAACAGGAAAGTACGCTGCGACCTCCAGACTGAGAAGAACGTTCTTTCCATT (child 1 id: 0.1)
-TGGATCTAACCAACGCAGATCCCCCAAAGGAACGTTCCGAGTT (child 2 id: 0.2)
-
-Generation: 1 (Number of parent sequences: 2)
-TGGTTAACAGGAAAGTACGCGACCCCGATGCCAAAGAACGTTCTTCCATT (last common ancestor)
-
-TGGTTAACAGGAAAGTACGCTGCGACCTCCAGACTGAGAAGAACGTTCTTTCCATT (parent id: 0.1)
-TGGTTAACAGAGAAAGTACGCTGCGACCAGACTGAGAAGAGTTCATTTCC (child 1 id: 0.1.1)
-TTAACAGGAAACGTACGATCTGCGACCTCCCACGACTGAGCAAGAACTCTCATTCTCATT (child 2 id: 0.1.2)
-
-TGGATCTAACCAACGCAGATCCCCCAAAGGAACGTTCCGAGTT (parent id: 0.2)
-TGGATCTAAACAACGCAGATCCCCGCTTGGTAAAGGAACGTAACCGAAGTT (child 1 id: 0.2.1)
-TGGGATCTAACCGACCGCAGATCCCCCCAAAGGAACGTTCCCGAGTT (child 2 id: 0.2.2)
-
-Generation: 2 (Number of parent sequences: 4)
-TGGTTAACAGGAAAGTACGCGACCCCGATGCCAAAGAACGTTCTTCCATT (last common ancestor)
-
-TGGTTAACAGAGAAAGTACGCTGCGACCAGACTGAGAAGAGTTCATTTCC (parent id: 0.1.1)
-TGGTTAACCAGAGAAAGATAGCTGGCGACCAGACTAGGAGAAGAGCATCGCCTCATTTCC (child 1 id: 0.1.1.1)
-TGGTTAAACAGAGAAAGTACGCTGCGACCAGACCGTGAGAAGTAGTTCTCATTTCCC (child 2 id: 0.1.1.2)
-
-TTAACAGGAAACGTACGATCTGCGACCTCCCACGACTGAGCAAGAACTCTCATTCTCATT (parent id: 0.1.2)
-TTAAGTATTAGGAACACGATAGTACAACGATCTAGCGACGAGTTCCCACAGTTACTGAAAGAACTCGTAACATATTTCTCATT (child 1 id: 0.1.2.1)
-ATTAACAGGAAACGTATCGCTGCGACCTCCAAGTGCACGACTGGAGGCGGGGATATAAAGAACTCTCATTCATCACTT (child 2 id: 0.1.2.2)
-
-TGGATCTAAACAACGCAGATCCCCGCTTGGTAAAGGAACGTAACCGAAGTT (parent id: 0.2.1)
-TGGGATCTAAACAACTAGCAGATCTCCCGCTTGGTTAATAGGTAACTGTAACCGAAGTT (child 1 id: 0.2.1.1)
-TGGATCAACGCAGATAGGCGAAAGAGTAACCGTAACCGAA (child 2 id: 0.2.1.2)
-
-TGGGATCTAACCGACCGCAGATCCCCCCAAAGGAACGTTCCCGAGTT (parent id: 0.2.2)
-TGGGATCTCAACCCGCACCATCCCAAAGGCCAACGTTCCT (child 1 id: 0.2.2.1)
-AGGGGGATCTTAACCGACCGCAGATCCCCCCAAAAGGAACGTTCCCGAGTTAT (child 2 id: 0.2.2.2)
 ```
 
 We now have a new variable, sequences, which contains the child sequences from the last generation. Take a minute to look at the ids of the parent and child sequences above, and the ids of a couple of the final generation sequences. These ids are constructed so that each sequence contains the identifiers of its ancestral sequences, and then either ``1`` or ``2``. Notice that all sequence identifiers start with ``0``, the identifier of the last common ancestor (or our starting sequence) of all of the sequences. These identifiers will help us interpret whether the phylogenies that we reconstruct accurately represent the evolutionary relationships between the sequences.
@@ -269,39 +152,14 @@ Take a minute to compare the two sequences below. What types of mutations happen
 
 ```python
 >>> print(len(sequences))
-8
 ```
 
 ```python
 >>> sequences[0]
-DNA
--------------------------------------------------------------------
-Metadata:
-    'id': '0.1.1.1'
-Stats:
-    length: 60
-    has gaps: False
-    has degenerates: False
-    has non-degenerates: True
-    GC-content: 50.00%
--------------------------------------------------------------------
-0 TGGTTAACCA GAGAAAGATA GCTGGCGACC AGACTAGGAG AAGAGCATCG CCTCATTTCC
 ```
 
 ```python
 >>> sequences[-1]
-DNA
-------------------------------------------------------------
-Metadata:
-    'id': '0.2.2.2'
-Stats:
-    length: 53
-    has gaps: False
-    has degenerates: False
-    has non-degenerates: True
-    GC-content: 54.72%
-------------------------------------------------------------
-0 AGGGGGATCT TAACCGACCG CAGATCCCCC CAAAAGGAAC GTTCCCGAGT TAT
 ```
 
 In our simulation, each sequence is directly derived from exactly one sequence from the previous generation, and the evolution of all of the sequences traces back to starting sequence that we provided. This means that our final sequences are all homologous. And because we have modeled this process, we know where each sequence fits in relation to all of the other sequences in the phylogeny. Our goal with the algorithms we'll study for the rest of this chapter is to reconstruct that phylogeny given only the last generation of sequences. We'll use the fact that we know the true phylogeny to help us evaluate the relative performance of the different methods.
@@ -364,8 +222,6 @@ We can then access the values in the distance matrix directly, view the distance
 ```python
 >>> print(dm['a', 'b'])
 >>> print(dm['b', 'c'])
-1.0
-3.0
 ```
 
 ```python
@@ -397,8 +253,6 @@ One alignment-based distance metric that we've looked at is Hamming distance. Th
 >>> gpa = partial(global_pairwise_align_nucleotide, penalize_terminal_gaps=True)
 ...
 >>> sequences_aligned = progressive_msa(sequences, pairwise_aligner=gpa)
-/Users/caporaso/miniconda3/envs/iab/lib/python3.4/site-packages/skbio/alignment/_pairwise.py:601: EfficiencyWarning: You're using skbio's python implementation of Needleman-Wunsch alignment. This is known to be very slow (e.g., thousands of times slower than a native C implementation). We'll be adding a faster version soon (see https://github.com/biocore/scikit-bio/issues/254 to track progress on this).
-  "to track progress on this).", EfficiencyWarning)
 ```
 
 ```python
@@ -428,19 +282,16 @@ One alignment-based distance metric that we've looked at is Hamming distance. Th
 ...
 >>> kmer_tree= tree_from_distance_matrix(kmer_dm, metric='upgma')
 >>> ete3.Tree(str(kmer_tree), format=1).render("%%inline", tree_style=ts)
-<IPython.core.display.Image object>
 ```
 
 ```python
 >>> hamming_tree = tree_from_distance_matrix(hamming_dm, metric='upgma')
 >>> ete3.Tree(str(hamming_tree), format=1).render("%%inline", tree_style=ts)
-<IPython.core.display.Image object>
 ```
 
 ```python
 >>> hamming_tree = tree_from_distance_matrix(hamming_dm, metric='nj')
 >>> ete3.Tree(str(hamming_tree), format=1).render("%%inline", tree_style=ts)
-<IPython.core.display.Image object>
 ```
 
 **OLD TEXT**
