@@ -336,7 +336,7 @@ We can view the guide tree in [newick format](http://scikit-bio.org/docs/latest/
 ```
 
 ```python
->>> msa = progressive_msa(query_sequences, guide_tree, pairwise_aligner=global_pairwise_align_nucleotide)
+>>> msa = progressive_msa(query_sequences, pairwise_aligner=global_pairwise_align_nucleotide, guide_tree=guide_tree)
 >>> print(msa)
 ```
 
@@ -372,7 +372,7 @@ And we can wrap this all up in a single convenience function:
 ```
 
 ```python
->>> msa = progressive_msa(query_sequences, guide_tree, pairwise_aligner=global_pairwise_align_nucleotide)
+>>> msa = progressive_msa(query_sequences, pairwise_aligner=global_pairwise_align_nucleotide, guide_tree=guide_tree)
 ```
 
 ```python

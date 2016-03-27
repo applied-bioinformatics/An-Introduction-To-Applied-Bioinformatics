@@ -11,8 +11,9 @@ import random
 
 import numpy as np
 import pandas as pd
+import scipy as sp
 import tabulate
-from scipy.cluster.hierarchy import average, dendrogram, to_tree
+from scipy.cluster.hierarchy import to_tree
 import skbio
 from skbio import Sequence, DNA, TabularMSA, TreeNode, DistanceMatrix
 from skbio.alignment import local_pairwise_align_ssw
@@ -840,21 +841,26 @@ def guide_tree_from_sequences(sequences,
     """
     guide_dm = DistanceMatrix.from_iterable(
                     sequences, metric=metric, key='id')
-    guide_lm = average(guide_dm.condensed_form())
+    guide_lm = sp.cluster.hierarchy.average(guide_dm.condensed_form())
     guide_tree = to_tree(guide_lm)
     if display_tree:
-        guide_d = dendrogram(guide_lm, labels=guide_dm.ids, orientation='right',
+        guide_d = sp.cluster.hierarchy.dendrogram(guide_lm, labels=guide_dm.ids, orientation='right',
                link_color_func=lambda x: 'black')
     return guide_tree
 
-def progressive_msa(sequences, guide_tree, pairwise_aligner):
+def progressive_msa(sequences, pairwise_aligner, guide_tree=None,
+                    metric=kmer_distance):
     """ Perform progressive msa of sequences
 
     Parameters
     ----------
     sequences : skbio.SequenceCollection
         The sequences to be aligned.
-    guide_tree : skbio.TreeNode
+    metric : function, optional
+      Function that returns a single distance value when given a pair of
+      skbio.Sequence objects. This will be used to build a guide tree if one
+      is not provided.
+    guide_tree : skbio.TreeNode, optional
         The tree that should be used to guide the alignment process.
     pairwise_aligner : function
         Function that should be used to perform the pairwise alignments,
@@ -867,17 +873,24 @@ def progressive_msa(sequences, guide_tree, pairwise_aligner):
     skbio.TabularMSA
 
     """
+
+    if guide_tree is None:
+        guide_dm = DistanceMatrix.from_iterable(
+                        sequences, metric=metric, key='id')
+        guide_lm = sp.cluster.hierarchy.average(guide_dm.condensed_form())
+        guide_tree = TreeNode.from_linkage_matrix(guide_lm, guide_dm.ids)
+
     seq_lookup = {s.metadata['id']: s for i, s in enumerate(sequences)}
     c1, c2 = guide_tree.children
     if c1.is_tip():
         c1_aln = seq_lookup[c1.name]
     else:
-        c1_aln = progressive_msa(sequences, c1, pairwise_aligner)
+        c1_aln = progressive_msa(sequences, pairwise_aligner, c1)
 
     if c2.is_tip():
         c2_aln = seq_lookup[c2.name]
     else:
-        c2_aln = progressive_msa(sequences, c2, pairwise_aligner)
+        c2_aln = progressive_msa(sequences, pairwise_aligner, c2)
 
     alignment, _, _ = pairwise_aligner(c1_aln, c2_aln)
     # this is a temporary hack as the aligners in skbio 0.4.1 are dropping
@@ -897,6 +910,19 @@ def progressive_msa(sequences, guide_tree, pairwise_aligner):
             alignment[len_c1_aln + i].metadata = c2_aln[i].metadata
 
     return alignment
+
+def tree_from_distance_matrix(dm, metric):
+    if metric == "upgma":
+        lm = sp.cluster.hierarchy.average(dm.condensed_form())
+        tree = TreeNode.from_linkage_matrix(lm, dm.ids)
+    elif metric == "nj":
+        tree = skbio.tree.nj(dm)
+    else:
+        raise ValueError("Unknown metric: %s. Supported metrics are 'upgma' and 'nj'." % metric)
+
+    return tree
+
+
 
 def progressive_msa_and_tree(sequences,
                              pairwise_aligner,
@@ -931,24 +957,18 @@ def progressive_msa_and_tree(sequences,
     skbio.TreeNode
 
     """
-    if guide_tree is None:
-        guide_dm = DistanceMatrix.from_iterable(
-                        sequences, metric=metric, key='id')
-        guide_lm = average(guide_dm.condensed_form())
-        guide_tree = TreeNode.from_linkage_matrix(guide_lm, guide_dm.ids)
-
-    msa = progressive_msa(sequences, guide_tree,
-                          pairwise_aligner=pairwise_aligner)
+    msa = progressive_msa(sequences, pairwise_aligner=pairwise_aligner,
+                          guide_tree=guide_tree)
 
     if display_aln:
         print(msa)
 
     msa_dm = DistanceMatrix.from_iterable(msa, metric=metric, key='id')
-    msa_lm = average(msa_dm.condensed_form())
+    msa_lm = sp.cluster.hierarchy.average(msa_dm.condensed_form())
     msa_tree = TreeNode.from_linkage_matrix(msa_lm, msa_dm.ids)
     if display_tree:
         print("\nOutput tree:")
-        d = dendrogram(msa_lm, labels=msa_dm.ids, orientation='right',
+        d = sp.cluster.hierarchy.dendrogram(msa_lm, labels=msa_dm.ids, orientation='right',
                    link_color_func=lambda x: 'black')
     return msa, msa_tree
 
