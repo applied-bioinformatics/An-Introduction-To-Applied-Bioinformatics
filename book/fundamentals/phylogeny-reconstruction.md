@@ -280,7 +280,7 @@ One alignment-based distance metric that we've looked at is Hamming distance. Th
 ```python
 >>> from iab.algorithms import tree_from_distance_matrix
 ...
->>> kmer_tree= tree_from_distance_matrix(kmer_dm, metric='upgma')
+>>> kmer_tree = tree_from_distance_matrix(kmer_dm, metric='upgma')
 >>> ete3.Tree(str(kmer_tree), format=1).render("%%inline", tree_style=ts)
 ```
 
