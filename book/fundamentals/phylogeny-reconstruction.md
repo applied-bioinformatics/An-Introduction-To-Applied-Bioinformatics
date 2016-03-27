@@ -269,8 +269,7 @@ One alignment-based distance metric that we've looked at is Hamming distance. Th
 ... # http://etetoolkit.org/docs/latest/tutorial/tutorial_drawing.html
 ... # If you come up with a nicer style, I'd be interested in seeing that in a pull
 ... # request.
-... import ete3
-...
+>>> import ete3
 >>> ts = ete3.TreeStyle()
 >>> ts.show_leaf_name = True
 >>> ts.scale = 500
