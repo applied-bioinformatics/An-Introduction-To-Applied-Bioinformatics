@@ -1,5 +1,5 @@
 runipy
-https://github.com/rossant/ipymd/archive/master.zip
+ipymd
 https://github.com/gregcaporaso/build-iab/archive/master.zip
 qiime-default-reference <0.2.0
 tabulate

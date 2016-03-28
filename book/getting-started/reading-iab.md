@@ -39,7 +39,9 @@ There are two ways to read *An Introduction To Applied Bioinformatics*:
 
 IAB is split into four different sections: *Getting started*, *Fundamentals*, *Applications*, and *Wrapping up*. You should start reading IAB by working through the *Getting started* and *Fundamentals* chapters in order. You should then read the *Applications* chapters and *Wrapping up* in any order, based on your own interest.
 
-## Installation <link src='96d24f'/>
+## Local installation <link src='96d24f'/>
+
+*This step is not required for readers using Binder.*
 
 If you're going to read *An Introduction to Applied Bioinformatics* interactively (recommended), you'll need to install it. The easiest way to install IAB is using [``conda``](http://conda.pydata.org/docs/intro.html), a free package and environment manager for Python. You'll first need to install Miniconda following the instructions [here](http://conda.pydata.org/docs/install/quick.html#miniconda-quick-install-requirements).
 
