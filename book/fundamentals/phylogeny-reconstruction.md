@@ -263,12 +263,9 @@ One alignment-based distance metric that we've looked at is Hamming distance. Th
 
 ### Phylogenetic reconstruction with UPGMA <link src='73d028'/>
 
+As we now start computing phylogenetic trees, we're going to need a way to visualize them. We'll use the ete3 Python package for this, and in the next cell we'll configure the ``TreeStyle`` which is used to define how the trees we visualize will look. If you'd like to experiment with other views, you can modify the code in this cell according to the [ete3 documentation](http://etetoolkit.org/docs/latest/tutorial/tutorial_drawing.html). If you come up with a nicer style, I'd be interested in seeing that in a pull request. You can post screenshots to [IAB issue #213](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/213) before creating a pull request so I can see what the new style looks like.
+
 ```python
->>> # Configure ete3 TreeStyle. To customize the Tree representations presented
-... # below, you can modify the code in this cell according to the ete3 documentation:
-... # http://etetoolkit.org/docs/latest/tutorial/tutorial_drawing.html
-... # If you come up with a nicer style, I'd be interested in seeing that in a pull
-... # request.
 >>> import ete3
 >>> ts = ete3.TreeStyle()
 >>> ts.show_leaf_name = True
@@ -278,7 +275,6 @@ One alignment-based distance metric that we've looked at is Hamming distance. Th
 
 ```python
 >>> from iab.algorithms import tree_from_distance_matrix
-...
 >>> kmer_tree = tree_from_distance_matrix(kmer_dm, metric='upgma')
 >>> ete3.Tree(str(kmer_tree), format=1).render("%%inline", tree_style=ts)
 ```
