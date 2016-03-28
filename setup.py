@@ -57,5 +57,6 @@ setup(name='An-Introduction-To-Applied-Bioinformatics',
                         'pandas',
                         'markdown2 >= 2.3.0',
                         'tabulate',
-                        'networkx >= 1.9.1'],
+                        'networkx >= 1.9.1',
+                        'ete3'],
       classifiers=classifiers)

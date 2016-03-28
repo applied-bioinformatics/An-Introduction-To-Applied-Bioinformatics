@@ -3,3 +3,4 @@ https://github.com/rossant/ipymd/archive/master.zip
 https://github.com/gregcaporaso/build-iab/archive/master.zip
 qiime-default-reference <0.2.0
 tabulate
+ete3
