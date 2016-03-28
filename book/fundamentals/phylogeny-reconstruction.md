@@ -190,6 +190,26 @@ If we use our simulation code to evaluate phylogeny reconstruction algorithms, i
 
 On the opposite end of the spectrum from simulations for algorithm comparison is comparisons based on real data. The trade-off however is that with real data we don't know what the right answer is (in our case, the correct phylogeny) so it's harder to determine which algorithms are doing better or worse. The take-away message here is that neither approach is perfect, and often researchers will use a combination of simulated and real data to evaluate algorithms.
 
+## Visualizing trees with ete3 <link src="WWRxKR"/>
+
+As we now start computing phylogenetic trees, we're going to need a way to visualize them. We'll use the ete3 Python package for this, and in the next cell we'll configure the ``TreeStyle`` which is used to define how the trees we visualize will look. If you'd like to experiment with other views, you can modify the code in this cell according to the [ete3 documentation](http://etetoolkit.org/docs/latest/tutorial/tutorial_drawing.html). If you come up with a nicer style, I'd be interested in seeing that in a pull request. You can post screenshots to [IAB issue #213](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/213) before creating a pull request so I can see what the new style looks like.
+
+```python
+>>> import ete3
+>>> ts = ete3.TreeStyle()
+>>> ts.show_leaf_name = True
+>>> ts.scale = 250
+>>> ts.branch_vertical_margin = 15
+```
+
+We can apply this ``TreeStyle`` to a random tree as follows. Any changes that you make to the ``TreeStyle`` above will impact this tree and all following trees in this chapter. Experiment with this - it's fun!
+
+```python
+>>> t = ete3.Tree()
+>>> t.populate(10)
+>>> t.render("%%inline", tree_style=ts)
+```
+
 ## Distance-based approaches to phylogenetic reconstruction <link src="XrznYP"/>
 
 The next approaches we'll take for phylogenetic reconstruction rely on computing distances between sequences. We've previously discussed distances between sequences in a few places in the text. We'll begin this section by formalizing the term *distance*, and introducing the concept of a distance matrix.
@@ -263,15 +283,167 @@ One alignment-based distance metric that we've looked at is Hamming distance. Th
 
 ### Phylogenetic reconstruction with UPGMA <link src='73d028'/>
 
-As we now start computing phylogenetic trees, we're going to need a way to visualize them. We'll use the ete3 Python package for this, and in the next cell we'll configure the ``TreeStyle`` which is used to define how the trees we visualize will look. If you'd like to experiment with other views, you can modify the code in this cell according to the [ete3 documentation](http://etetoolkit.org/docs/latest/tutorial/tutorial_drawing.html). If you come up with a nicer style, I'd be interested in seeing that in a pull request. You can post screenshots to [IAB issue #213](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/213) before creating a pull request so I can see what the new style looks like.
+The first algorithm we'll look at for reconstructing phylogenetic trees is called UPGMA, which stands for *Unweighted Pair-Group Method with Arithmetic mean*. While that name sounds complex, it's actually a straightforward algorithm, which is why we're starting with it. After we work through the algorithm, we'll come back to the name as it'll make more sense then.
+
+UPGMA is a generic hierarchical clustering algorithm. It's not specific to reconstructing biological trees, but rather is used for interpreting any type of distance matrix. It is fairly widely used for building phylogenetic trees, though **it's application in phylogenetics is usually restricted to building preliminary trees to "guide" the process of multiple sequence alignment. The reason for this is that it's fast, but it makes some assumptions that don't work well for inferring relationships between organisms, which we'll discuss after working through the algorithm.**
+
+UPGMA starts with a distance matrix, and works through the following steps to create a tree.
+
+**Step 1**: Find the smallest distance in the matrix and define a clade containing only those members. Draw that clade, and set the total length of the branch connecting the tips to the distance between the tips. 
+
+**Step 2**: Create a new distance matrix with an entry representing the new clade created in step 1. 
+
+**Step 3**: Calculate the distance matrix entries for the new clade as the mean distance from each of the tips of the new clade to all other tips in the *original* distance matrix.
+
+**Step 4**: If there is only one distance (below or above the diagonal) in the distance matrix, use it to connect the remaining unconnected clades, and stop. Otherwise repeat step 1.
+
+Let's work through these steps for a simple distance matrix representing the distances between five sequences.
 
 ```python
->>> import ete3
->>> ts = ete3.TreeStyle()
->>> ts.show_leaf_name = True
->>> ts.scale = 500
->>> ts.branch_vertical_margin = 15
+>>> _data = np.array([[ 0.,  4.,  2.,  5.,  6.],
+...                   [ 4.,  0.,  3.,  6.,  5.],
+...                   [ 2.,  3.,  0.,  3.,  4.],
+...                   [ 5.,  6.,  3.,  0.,  1.],
+...                   [ 6.,  5.,  4.,  1.,  0.]])
+>>> _ids = ['s1', 's2', 's3', 's4', 's5']
+>>> master_upgma_dm = skbio.DistanceMatrix(_data, _ids)
+>>> print(master_upgma_dm)
 ```
+
+Iteration 1
+------------
+
+Step 1: The smallest distance in the above matrix is between `s4` and `s5`. So, we'll draw that clade and set each branch length to half of the distance between them.
+
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-iter1.png">
+
+Step 2: Next, we'll create a new, smaller distance matrix where the sequences `s4` and `s5` are now represented by a single clade which we'll call `(s4, s5)`. This notation indicates that the corresponding distances are to both ``s4`` and ``s5``.
+
+```python
+>>> iter1_ids = ['s1', 's2', 's3', '(s4, s5)']
+>>> iter1_dm = [[0.0,   4.0,  2.0, None],
+...             [4.0,   0.0,  3.0, None],
+...             [2.0,   3.0,  0.0, None],
+...             [None, None, None, None]]
+```
+
+Step 3: We'll now fill in the values from the new clade to each of the existing sequences (or clades). The distance will be the mean between each pre-existing clade, and each of the sequences in the new clade. For example, the distance between `s1` and `(s4, s5)` is the mean of the distance between `s1` and `s4` and `s1` and `s5`:
+
+```python
+>>> import numpy as np
+...
+>>> s1_s4s5 = np.mean([master_upgma_dm['s1', 's4'], master_upgma_dm['s1', 's5']])
+>>> print(s1_s4s5)
+```
+
+Similarly, the distance between `s2` and `(s4, s5)` is the mean of the distance between `s2` and `s4` and `s2` and `s5`:
+
+```python
+>>> s2_s4s5 = np.mean([master_upgma_dm['s2', 's4'], master_upgma_dm['s2', 's5']])
+>>> print(s2_s4s5)
+```
+
+And finally, the distance between `s3` and `(s4, s5)` is the mean of the distance between `s3` and `s4` and the distance between `s3` and `s5`:
+
+```python
+>>> s3_s4s5 = np.mean([master_upgma_dm['s3', 's4'], master_upgma_dm['s3', 's5']])
+>>> print(s3_s4s5)
+```
+
+We can fill these values in to our iteration 1 distance matrix. Why do we only need to compute three values to fill in seven cells in this distance matrix?
+
+```python
+>>> iter1_dm = [[0.0, 4.0, 2.0, s1_s4s5],
+...       [4.0, 0.0, 3.0, s2_s4s5],
+...       [2.0, 3.0, 0.0, s3_s4s5],
+...       [s1_s4s5, s2_s4s5, s3_s4s5, 0.0]]
+...
+>>> iter1_dm = DistanceMatrix(iter1_dm, iter1_ids)
+>>> print(iter1_dm)
+```
+
+Step 4: Because there is still more than one value below the diagonal in our new distance matrix, we start a new iteration by going back to Step 1 and repeating this process.
+
+Iteration 2
+------------
+
+Step 1: The smallest distance in the iteration 1 distance matrix is between `s1` and `s3`. So, we'll draw that clade and set each branch length to half of that distance.
+
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-iter2.png">
+
+Step 2: We next create a new, smaller distance matrix where the sequences `s1` and `s3` are now represented by a single clade, `(s1, s3)`.
+
+```python
+>>> iter2_ids = ['(s1, s3)', 's2', '(s4, s5)']
+>>> iter2_dm = [[None, None, None],
+...       [None,  0.0, 5.5],
+...       [None,  5.5, 0.0]]
+```
+
+Step 3: We'll now fill in the values from the new clade to each of the existing sequences (or clades). Notice that the distance between our new clade and ``s2`` is the mean of two values, but the distance between our new clade and the clade defined in iteration 1 is the mean of four values. Why is that?
+
+```python
+>>> s2_s1s3 = np.mean([master_upgma_dm[1][0], master_upgma_dm[1][2]])
+>>> s3s4_s1s3 = np.mean([master_upgma_dm[0][3], master_upgma_dm[0][4], master_upgma_dm[2][3], master_upgma_dm[2][4]])
+```
+
+We can now fill in all of the distances in our iteration 2 distance matrix.
+
+```python
+>>> iter2_dm = [[0.0, s2_s1s3, s3s4_s1s3],
+...             [s2_s1s3, 0.0, 5.5],
+...             [s3s4_s1s3, 5.5, 0.0]]
+...
+>>> iter2_dm = DistanceMatrix(iter2_dm, iter2_ids)
+>>> print(iter2_dm)
+```
+
+Step 4: There is still more than one value below the diagonal, so we start a new iteration by again repeating the process.
+
+Iteration 3
+------------
+
+Step 1: The smallest distance in the above matrix is now between `(s1, s3)` and `s2`. So, we'll draw that clade and set each branch length to half of the distance.
+
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-iter3.png">
+
+Step 2: We'll next create a new distance matrix where the clade `(s1, s3)` and the sequence `s2` are now represented by a single clade, `((s1, s3), s2)`.
+
+```python
+>>> iter3_ids = ['((s1, s3), s2)', '(s4, s5)']
+>>> iter3_dm = [[None, None],
+...             [None,  0.0]]
+```
+
+Step 3: We'll now fill in the values from the new clade to each of the existing sequences (or clades). This is now the mean of six distances. Why?
+
+```python
+>>> s1s2s3_s4s5 = np.mean([master_upgma_dm[0][3], master_upgma_dm[0][4],
+...                        master_upgma_dm[2][3], master_upgma_dm[2][4],
+...                        master_upgma_dm[1][3], master_upgma_dm[1][4]])
+```
+
+We fill this value into our iteration 3 distance matrix.
+
+```python
+>>> iter3_dm = [[0.0, s1s2s3_s4s5],
+...             [s1s2s3_s4s5, 0.0]]
+...
+>>> iter3_dm = DistanceMatrix(iter3_dm, iter3_ids)
+>>> print(iter3_dm)
+```
+
+Step 4: At this stage, there is only one distance below the diagonal in our distance matrix. So, we can use that distance to draw the final branch. This will connect our two deepest clades, `((s1, s3), s2)` and `(s4, s5)`, which will give us our final UPGMA tree.
+
+<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-final.png">
+
+#### Applying UPGMA from SciPy <link src="zS3dSx"/>
+
+[SciPy](http://www.scipy.org/) contains an implementation of UPGMA that we can apply to our existing distance matrices, and we can then visualize the resulting trees with ete3. IAB provides a *wrapper function* that will give this an interface that is convenient to work with. If you'd like to see what the wrapper function is doing, using the ``psource`` IPython magic function as we have in other places in the text. 
+
+Let's compute and visualize UPGMA trees for the two distance matrices that we created above. How do these trees compare to one another? Does one look more or less correct than the other (they may or may not, depending on the random sample of sequences that are being compared). 
+
+One thing to be aware of as you start visualizing trees is that the vertial order (in the default ``TreeStyle`` being used here) doesn't have biological meaning, it's purely a visualization component. You can rotate the branches descending from any node in the tree freely.
 
 ```python
 >>> from iab.algorithms import tree_from_distance_matrix
@@ -284,174 +456,18 @@ As we now start computing phylogenetic trees, we're going to need a way to visua
 >>> ete3.Tree(str(hamming_tree), format=1).render("%%inline", tree_style=ts)
 ```
 
-```python
->>> hamming_tree = tree_from_distance_matrix(hamming_dm, metric='nj')
->>> ete3.Tree(str(hamming_tree), format=1).render("%%inline", tree_style=ts)
-```
+#### Understanding the name *UPGMA* <link src="vQVUAd"/>
 
-**OLD TEXT**
-
-UPGMA is a heirarchical clustering algorithm. It is widely used, though it's application in phylogenetics is usually restricted to building preliminary trees to "guide" the process of multiple sequence alignment, as it makes some assumptions that don't work well for inferring relationships between organsims. We're going to start with it here however for a few reasons. First, the underlying math is very basic, so we don't need to assume anything about your background. Second, there are some other applications of UPGMA that we'll explore later, including grouping samples based on their species compositions. In general, my strategy with teaching this material is to start by giving you a basic introduction into how a process works so you can visualize and do it. From there, we can get more complex.
-
-
-Unweighted Pair-Group Method with Arithmetic mean
-
-Unweighted: all tip-to-tip distances contribute equally
-Pair-group: all branch points lead to exactly two clades
-Arithmetic mean: distances to each clade are the mean of distances to all members of that clade
-
-Steps
------
-
-1. Identify the smallest distance in the matrix and define a clade containing only those members. Draw that clade, and set the *total* branch length to the distance between the tips.
-2. Create a new distance matrix with an entry representing the clade created in step 1.
-3. Calculate the distance matrix entries for the clade as the mean distance from each of the tips of the new clade to all other tips in the distance matrix.
-4. If there is only one distance (below or above the diagonal) in the distance matrix, use it to connect the remaing clades, and stop. Otherwise repeat step 1.
-
-Let's start, working from the above distance matrix.
-
-Iteration 1
-------------
-
-Step 1.1: The smallest distance in the above matrix is `1.00`, between `s4` and `s5`. So, we'll draw that clade and set each branch length to `0.5`.
-
-Step 1.2: Next, we'll create a new, smaller distance matrix where the sequences `s4` and `s5` are now represented by a single clade, `(s4, s5)`.
-
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-iter1.png">
-
-```python
->>> iter1_ids = ['s1', 's2', 's3', '(s4, s5)']
->>> iter1_dm = [[0.0,   4.0,  2.0, None],
-...             [4.0,   0.0,  3.0, None],
-...             [2.0,   3.0,  0.0, None],
-...             [None, None, None, None]]
-```
-
-Step 1.3: We'll now fill in the values from the new clade to each of the existing sequences (or clades). The distance will be the mean between each pre-existing clade, and each of the sequences in the new clade. For example, the distance between `s1` and `(s4, s5)` is the mean of the distance between `s1` and `s4` and `s1` and `s5`:
-
-```python
->>> import numpy as np
-...
->>> np.mean([master_dm[0][3], master_dm[0][4]])
-```
-
-Step 1.3 (continued): Similarly, the distance between `s2` and `(s4, s5)` is the mean of the distance between `s2` and `s4` and `s2` and `s5`:
-
-```python
->>> np.mean([master_dm[1][3], master_dm[1][4]])
-```
-
-Step 1.3 (continued): And finally, the distance between `s3` and `(s4, s5)` is the mean of the distance between `s3` and `s4` and the distance between `s3` and `s5`:
-
-```python
->>> np.mean([master_dm[2][3], master_dm[2][4]])
-```
-
-Step 1.3 (continued): If we fill these values in (note that they will be the same above and below the diagonal) the post-iteration 1 distance matrix looks like the following:
-
-```python
->>> iter1_dm = [[0.0, 4.0, 2.0, 5.5],
-...       [4.0, 0.0, 3.0, 5.5],
-...       [2.0, 3.0, 0.0, 3.5],
-...       [5.5, 5.5, 3.5, 0.0]]
-...
->>> iter1_dm = DistanceMatrix(iter1_dm, iter1_ids)
->>> print(iter1_dm)
-```
-
-Step 1.4: There is still more than one value below the diagonal, so we start a new iteration.
-
-Iteration 2
-------------
-
-Step 2.1: The smallest distance in the above matrix is `2.00`, between `s1` and `s3`. So, we'll draw that clade and set each branch length to `1.0`.
-
-Step 2.2: Next, we'll create a new, smaller distance matrix where the sequences `s1` and `s3` are now represented by a single clade, `(s1, s3)`.
-
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-iter2.png">
-
-```python
->>> iter2_ids = ['(s1, s3)', 's2', '(s4, s5)']
-...
->>> iter2_dm = [[None, None, None],
-...       [None,  0.0, 5.5],
-...       [None,  5.5, 0.0]]
-```
-
-Step 2.3: We'll now fill in the values from the new clade to each of the existing sequences (or clades). The distance will be the mean between each pre-existing clade, and each of the sequences in the new clade. For example, the distance between `s2` and `(s1, s3)` is the mean of the distance between `s2` and `s1` and `s2` and `s3`:
-
-```python
->>> np.mean([master_dm[1][0], master_dm[1][2]])
-```
-
-Step 2.3 (continued): Next, we need to find the distance between `(s1, s3)` and `(s4, s5)`. This is computed as the mean of the distance between `s1` and `s4`, the distance between `s1` and `s5`, the distance between `s3` and `s4`, and the distance between `s3` and `s5`. Note that we are going back to our master distance matrix here for these distances, **not** our iteration 1 distance matrix.
-
-```python
->>> np.mean([master_dm[0][3], master_dm[0][4], master_dm[2][3], master_dm[2][4]])
-```
-
-Step 2.3 (continued): We can now fill in all of the distances in our iteration 2 distance matrix.
-
-```python
->>> iter2_dm = [[0.0, 3.5, 4.5],
-...             [3.5, 0.0, 5.5],
-...             [4.5, 5.5, 0.0]]
-...
->>> iter2_dm = DistanceMatrix(iter2_dm, iter2_ids)
->>> print(iter2_dm)
-```
-
-Step 2.4: There is still more than one value below the diagonal, so we start a new iteration.
-
-Iteration 3
-------------
-
-Step 3.1: The smallest distance in the above matrix is `3.50`, between `(s1, s3)` and `s2`. So, we'll draw that clade and set each branch length to `1.75`.
-
-Step 3.2: Next, we'll create a new, smaller distance matrix where the clade `(s1, s3)` and the sequence `s2` are now represented by a single clade, `((s1, s3), s2)`.
-
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-iter3.png">
-
-```python
->>> iter3_ids = ['((s1, s3), s2)', '(s4, s5)']
-...
->>> iter3_dm = [[None, None],
-...             [None,  0.0]]
-```
-
-Step 3.3: We'll now fill in the values from the new clade to each of the existing sequences (or clades). This is computed as the mean of the distance between `s1` and `s4`, the distance between `s1` and `s5`, the distance between `s3` and `s4`, the distance between `s3` and `s5`, the distance between `s2` and `s4`, and the distance between `s2` and `s5`. Again, note that we are going back to our master distance matrix here for these distances, **not** our iteration 1 or iteration 2 distance matrix.
-
-```python
->>> np.mean([master_dm[0][3], master_dm[0][4], master_dm[2][3], master_dm[2][4], master_dm[1][3], master_dm[1][4]])
-```
-
-Step 3.3 (continued): We can now fill in all of the distances in our iteration 3 distance matrix.
-
-```python
->>> iter3_dm = [[0.0, 4.8],
-...             [4.8, 0.0]]
-...
->>> iter3_dm = DistanceMatrix(iter3_dm, iter3_ids)
->>> print(iter3_dm)
-```
-
-Step 3.4: At this stage, there is only one distance below the diagonal in our distance matrix. So, we can use that distance to draw the final branch in our tree, setting the total branch length to 4.8.
-
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-final.png">
-
-[SciPy](http://www.scipy.org/) contains support for running UPGMA and generating *dendrograms* (or basic tree visualizations). We can apply this to our distance matrix as follows. You can explore other options for hierarchical clustering in SciPy [here](http://docs.scipy.org/doc/scipy/reference/cluster.hierarchy.html) (see the *routines for agglomerative clustering*).
-
-```python
->>> # scipy.cluster.hierarchy.average is an implementation of UPGMA
-... from scipy.cluster.hierarchy import average, dendrogram
->>> lm = average(master_dm.condensed_form())
->>> d = dendrogram(lm, labels=master_dm.ids, orientation='right',
-...                link_color_func=lambda x: 'black')
-```
+As mentioned above, UPGMA has a rather complex sounding name: *Unweighted Pair Group metric with Arithmetic mean*. The *Unweighted* term indicates that all tip-to-tip distances contribute equally to each average that is computed (no weighted averages are being computed). The *Pair Group* term implies that all internal nodes, including the root node, will be strictly bifurcating, or descent to exactly two other nodes (either internal or terminal). The *Arithmetic mean* term implies that distances to each clade are the mean of distances to all members of that clade.
 
 ### Phylogenetic reconstruction with neighbor-joining <link src="JlqeYq"/>
 
 This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 5.2.2 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic. You can also refer to the [scikit-bio implementation of Neighbor Joining](http://scikit-bio.org/docs/latest/generated/skbio.tree.nj.html), which will be used here (the source code is linked from that page).
+
+```python
+>>> hamming_tree = tree_from_distance_matrix(hamming_dm, metric='nj')
+>>> ete3.Tree(str(hamming_tree), format=1).render("%%inline", tree_style=ts)
+```
 
 ### Limitations of distance-based approaches <link src="4hDWma"/>
 
