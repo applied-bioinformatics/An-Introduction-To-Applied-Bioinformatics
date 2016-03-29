@@ -281,6 +281,51 @@ One alignment-based distance metric that we've looked at is Hamming distance. Th
 >>> _ = hamming_dm.plot(cmap='Greens', title='Hamming distances between sequences')
 ```
 
+### Jukes-Cantor correction of observed distances between sequences <link src="xUNwrl"/>
+
+The Hamming distance between aligned sequences, as described above, is simple to calculate, but it is often an underestimate of the actual amount of mutation that has occurred in a sequence. Here's why: imagine that in one generation $g$, position $p$ of sequence $S1$ undergoes a substitution mutation from ``A`` to ``C``. Then, in the next generation $g + 1$, the same position $p$ of sequence $S1$ undergoes a subsitution from ``C`` to ``T``. Because we can only inspect the modern-day sequences, not their ancestors, it looks like position $p$ has had a single subtitution event. Similarly, if in generation $g + 1$ position $p$ changed from ``C`` back to ``A`` (a *back substitution*), we would observe zero substitution mutations at that position even though two had occurred.
+
+To correct for this, the *Jukes-Cantor correction* is typically applied to the Hamming distances between the sequences. Where $p$ is the Hamming distance, the corrected genetic distance is computed as $d = -\frac{3}{4} \ln(1 - \frac{4}{3}p)$. The derivation of this formula is beyond the scope of this text (you can find it in Inferring Phylogeny by Felsenstein), but it is based on the Jukes-Cantor (JC69) nucleotide substitution model. 
+
+The Python implementation of this correction looks like the following. We can apply this to a number of input distance values to understand how it transforms our Hamming distances.
+
+```python
+>>> def jc_correction(p):
+...     return (-3/4) * np.log(1 - (4*p/3))
+```
+
+```python
+>>> import seaborn as sns
+...
+>>> distances = np.arange(0, 0.70, 0.05)
+>>> jc_corrected_distances = list(map(jc_correction, distances))
+...
+>>> ax = sns.pointplot(distances, jc_corrected_distances)
+>>> ax.set_xlabel('Hamming distance')
+>>> ax.set_ylabel('JC-corrected distance')
+>>> ax.set_xlim(0)
+>>> ax.set_ylim(0)
+>>> ax
+```
+
+We can then apply this to a full distance matrix as follows (we'll then print the first row of each).
+
+```python
+>>> def jc_correct_dm(dm):
+...     result = np.zeros(dm.shape)
+...     for i in range(dm.shape[0]):
+...         for j in range(i):
+...             result[i,j] = result[j,i] = jc_correction(dm[i,j])
+...     return skbio.DistanceMatrix(result, ids=dm.ids)
+...
+>>> jc_corrected_hamming_dm = jc_correct_dm(hamming_dm)
+```
+
+```python
+>>> print(hamming_dm[0])
+>>> print(jc_corrected_hamming_dm[0])
+```
+
 ### Phylogenetic reconstruction with UPGMA <link src='73d028'/>
 
 The first algorithm we'll look at for reconstructing phylogenetic trees is called UPGMA, which stands for *Unweighted Pair-Group Method with Arithmetic mean*. While that name sounds complex, it's actually a straightforward algorithm, which is why we're starting with it. After we work through the algorithm, we'll come back to the name as it'll make more sense then.
@@ -289,9 +334,9 @@ UPGMA is a generic hierarchical clustering algorithm. It's not specific to recon
 
 UPGMA starts with a distance matrix, and works through the following steps to create a tree.
 
-**Step 1**: Find the smallest distance in the matrix and define a clade containing only those members. Draw that clade, and set the total length of the branch connecting the tips to the distance between the tips. 
+**Step 1**: Find the smallest distance in the matrix and define a clade containing only those members. Draw that clade, and set the total length of the branch connecting the tips to the distance between the tips. The distance between each tip and the node connecting them should be half of the distance between the tips.
 
-**Step 2**: Create a new distance matrix with an entry representing the new clade created in step 1. 
+**Step 2**: Create a new distance matrix with an entry representing the new clade created in step 1.
 
 **Step 3**: Calculate the distance matrix entries for the new clade as the mean distance from each of the tips of the new clade to all other tips in the *original* distance matrix.
 
@@ -439,9 +484,9 @@ Step 4: At this stage, there is only one distance below the diagonal in our dist
 
 #### Applying UPGMA from SciPy <link src="zS3dSx"/>
 
-[SciPy](http://www.scipy.org/) contains an implementation of UPGMA that we can apply to our existing distance matrices, and we can then visualize the resulting trees with ete3. IAB provides a *wrapper function* that will give this an interface that is convenient to work with. If you'd like to see what the wrapper function is doing, using the ``psource`` IPython magic function as we have in other places in the text. 
+[SciPy](http://www.scipy.org/) contains an implementation of UPGMA that we can apply to our existing distance matrices, and we can then visualize the resulting trees with ete3. IAB provides a *wrapper function* that will give this an interface that is convenient to work with. If you'd like to see what the wrapper function is doing, using the ``psource`` IPython magic function as we have in other places in the text.
 
-Let's compute and visualize UPGMA trees for the two distance matrices that we created above. How do these trees compare to one another? Does one look more or less correct than the other (they may or may not, depending on the random sample of sequences that are being compared). 
+Let's compute and visualize UPGMA trees for the two distance matrices that we created above. How do these trees compare to one another? Does one look more or less correct than the other (they may or may not, depending on the random sample of sequences that are being compared).
 
 One thing to be aware of as you start visualizing trees is that the vertial order (in the default ``TreeStyle`` being used here) doesn't have biological meaning, it's purely a visualization component. You can rotate the branches descending from any node in the tree freely.
 
@@ -452,8 +497,8 @@ One thing to be aware of as you start visualizing trees is that the vertial orde
 ```
 
 ```python
->>> hamming_tree = tree_from_distance_matrix(hamming_dm, metric='upgma')
->>> ete3.Tree(str(hamming_tree), format=1).render("%%inline", tree_style=ts)
+>>> jc_corrected_hamming_tree = tree_from_distance_matrix(jc_correct_dm(hamming_dm), metric='upgma')
+>>> ete3.Tree(str(jc_corrected_hamming_tree), format=1).render("%%inline", tree_style=ts)
 ```
 
 #### Understanding the name *UPGMA* <link src="vQVUAd"/>
@@ -463,6 +508,8 @@ As mentioned above, UPGMA has a rather complex sounding name: *Unweighted Pair G
 ### Phylogenetic reconstruction with neighbor-joining <link src="JlqeYq"/>
 
 This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 5.2.2 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic. You can also refer to the [scikit-bio implementation of Neighbor Joining](http://scikit-bio.org/docs/latest/generated/skbio.tree.nj.html), which will be used here (the source code is linked from that page).
+
+One invalid assumption that is made by UPGMA is inherent in Step 1, where each branch connecting the internal node to a tip is set to half of the length between the tips. This assumes the mutation rates are constant throughout the tree, or in other words that the tree is *ultrametric*. This is not likely to be the case in the real world, as different lineages in the tree might be undergoing different selective pressures, leading to different rates of evolution. Neighboring joining is a distance-based phylogenetic reconstruction approach that does not assume ultrametricity.
 
 ```python
 >>> hamming_tree = tree_from_distance_matrix(hamming_dm, metric='nj')
