@@ -1069,13 +1069,41 @@ def evolve_sequence(sequence, substitution_probability, indel_probability):
 
 def evolve_generation(sequence,
                       substitution_probability,
-                      indel_probability):
+                      indel_probability,
+                      increased_rate_probability,
+                      fold_rate_increase):
     child1 = evolve_sequence(sequence, substitution_probability, indel_probability)
-    child2 = evolve_sequence(sequence, substitution_probability, indel_probability)
+    if random.random() < increased_rate_probability:
+        child2 = evolve_sequence(sequence, fold_rate_increase * substitution_probability, indel_probability)
+    else:
+        child2 = evolve_sequence(sequence, substitution_probability, indel_probability)
     return child1, child2
 
 def evolve_generations(ancestral_sequence, generations, substitution_probability,
-                       indel_probability, verbose=False):
+                       indel_probability, increased_rate_probability=0.0,
+                       fold_rate_increase=5, verbose=False):
+    """
+    ancestral_sequence : skbio.Sequence object
+        The sequence that should be used as the root node in the tree.
+    generations : int
+        The number of generations to simulate. Must be greater than zero.
+    substitution_probability : float
+        The probability at which a substitution mutation should occur.
+    indel_probability : float
+        The probability at which either an insertion or a deletion mutation
+        should occur. One of these will be simulated with even probability,
+        and the length will be randomly chosen between 1 and 9, with shorter
+        lengths being more probable.
+    increased_rate_probability : float, optional
+        The probability at which child2 should experience an increased rate
+        of substitution mutations. Default is that this never occurs.
+    fold_rate_increase : int, optional
+        If increased_rate_probability is greater than zero, the fold increase
+        that substitutions should now occur at.
+    verbose : bool, optional
+        If True, print the sequences that are simulated at each generation.
+
+    """
     # initial some values and perform some basic error checking
     assert generations > 0, "Must simulate one or more generations."
 
@@ -1100,7 +1128,8 @@ def evolve_generations(ancestral_sequence, generations, substitution_probability
         for parent_sequence in previous_generation_sequences:
             # evolve two child sequences - currently the mutation probabilities are
             # constant, but should update that to change with generations
-            r1, r2 = evolve_generation(parent_sequence, substitution_probability, indel_probability)
+            r1, r2 = evolve_generation(parent_sequence, substitution_probability, indel_probability,
+                                       increased_rate_probability, fold_rate_increase)
             r1.metadata['id'] = '%s.1' % (parent_sequence.metadata['id'])
             r2.metadata['id'] = '%s.2' % (parent_sequence.metadata['id'])
             current_generation_sequences.extend([r1, r2])

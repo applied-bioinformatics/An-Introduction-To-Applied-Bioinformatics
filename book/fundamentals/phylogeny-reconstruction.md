@@ -141,7 +141,8 @@ When we call ``evolve_generations``, we'll pass the parameter ``verbose=True``. 
 ```
 
 ```python
->>> sequences = evolve_generations(sequence, 3, 0.1, 0.05, verbose=True)
+>>> sequences = evolve_generations(sequence, generations=3, substitution_probability=0.1, indel_probability=0.05,
+...                                increased_rate_probability=0.1, verbose=True)
 ```
 
 We now have a new variable, sequences, which contains the child sequences from the last generation. Take a minute to look at the ids of the parent and child sequences above, and the ids of a couple of the final generation sequences. These ids are constructed so that each sequence contains the identifiers of its ancestral sequences, and then either ``1`` or ``2``. Notice that all sequence identifiers start with ``0``, the identifier of the last common ancestor (or our starting sequence) of all of the sequences. These identifiers will help us interpret whether the phylogenies that we reconstruct accurately represent the evolutionary relationships between the sequences.
@@ -175,7 +176,8 @@ Let's simulate 10 generations of sequences here, and then select 10 of those seq
 >>> %matplotlib inline
 ...
 >>> import numpy as np
->>> sequences = evolve_generations(sequence, 10, 0.01, 0.005, verbose=False)
+>>> sequences = evolve_generations(sequence, generations=10, substitution_probability=0.01,
+...                                indel_probability=0.005, increased_rate_probability=0.1, verbose=False)
 ```
 
 ```python
@@ -186,7 +188,7 @@ Let's simulate 10 generations of sequences here, and then select 10 of those seq
 
 While simulations are extremely powerful for comparing algorithms, they can also be misleading. This is because when we model evolution we simplify the evolutionary process. For example, in the simulation above, we assume that the rate of substitution mutations doesn't change in different parts of our phylogeny. Imagine in the real-world that the environment changed drastically for some descendants (for example, if a geological event created new thermal vents in a lake they inhabited, resulting in an increase in mean water temperature), but not for others. The descendants who experience the environmental change might have an increased rate of substitutions as their genomes adapt to the new environment. The increased substitution rate may be temporary or permanent.
 
-If we use our simulation code to evaluate phylogeny reconstruction algorithms, it will tell us nothing about which algorithms better handle different evolutionary rates in different branches of the tree. This is one limitation of our simulation that we know about, but because we don't have a perfect understanding of sequence evolution, there are limitations that we don't know about. For this reason, you always want to understand what assumptions a simulation is making, and consider those when determining how confident you are in the results of an evaluation based on simulation. One assumption that our simulation is making is that the evolutionary rate is constant across all branches of the tree. What are some other assumptions that are being made?
+If we use our simulation code to evaluate phylogeny reconstruction algorithms, it will tell us nothing about which algorithms better handle different evolutionary rates in different branches of the tree. This is one limitation of our simulation that we know about, but because we don't have a perfect understanding of sequence evolution, there are limitations that we don't know about. For this reason, you always want to understand what assumptions a simulation is making, and consider those when determining how confident you are in the results of an evaluation based on simulation. One assumption that our simulation is making is that "bursts" of evolution (i.e., where our substitution rate temporarily increases) are restricted to only a single generation. A child is no more or less like to have an increased rate of substitutions if its parent did. This may or may not be an accurate model. What are some other assumptions that are being made? There are many, so take a minute to list a few.
 
 On the opposite end of the spectrum from simulations for algorithm comparison is comparisons based on real data. The trade-off however is that with real data we don't know what the right answer is (in our case, the correct phylogeny) so it's harder to determine which algorithms are doing better or worse. The take-away message here is that neither approach is perfect, and often researchers will use a combination of simulated and real data to evaluate algorithms.
 
@@ -285,7 +287,7 @@ One alignment-based distance metric that we've looked at is Hamming distance. Th
 
 The Hamming distance between aligned sequences, as described above, is simple to calculate, but it is often an underestimate of the actual amount of mutation that has occurred in a sequence. Here's why: imagine that in one generation $g$, position $p$ of sequence $S1$ undergoes a substitution mutation from ``A`` to ``C``. Then, in the next generation $g + 1$, the same position $p$ of sequence $S1$ undergoes a subsitution from ``C`` to ``T``. Because we can only inspect the modern-day sequences, not their ancestors, it looks like position $p$ has had a single subtitution event. Similarly, if in generation $g + 1$ position $p$ changed from ``C`` back to ``A`` (a *back substitution*), we would observe zero substitution mutations at that position even though two had occurred.
 
-To correct for this, the *Jukes-Cantor correction* is typically applied to the Hamming distances between the sequences. Where $p$ is the Hamming distance, the corrected genetic distance is computed as $d = -\frac{3}{4} \ln(1 - \frac{4}{3}p)$. The derivation of this formula is beyond the scope of this text (you can find it in Inferring Phylogeny by Felsenstein), but it is based on the Jukes-Cantor (JC69) nucleotide substitution model. 
+To correct for this, the *Jukes-Cantor correction* is typically applied to the Hamming distances between the sequences. Where $p$ is the Hamming distance, the corrected genetic distance is computed as $d = -\frac{3}{4} \ln(1 - \frac{4}{3}p)$. The derivation of this formula is beyond the scope of this text (you can find it in Inferring Phylogeny by Felsenstein), but it is based on the Jukes-Cantor (JC69) nucleotide substitution model.
 
 The Python implementation of this correction looks like the following. We can apply this to a number of input distance values to understand how it transforms our Hamming distances.
 
@@ -512,8 +514,8 @@ This section is currently a placeholder. You can track progress on this section 
 One invalid assumption that is made by UPGMA is inherent in Step 1, where each branch connecting the internal node to a tip is set to half of the length between the tips. This assumes the mutation rates are constant throughout the tree, or in other words that the tree is *ultrametric*. This is not likely to be the case in the real world, as different lineages in the tree might be undergoing different selective pressures, leading to different rates of evolution. Neighboring joining is a distance-based phylogenetic reconstruction approach that does not assume ultrametricity.
 
 ```python
->>> hamming_tree = tree_from_distance_matrix(hamming_dm, metric='nj')
->>> ete3.Tree(str(hamming_tree), format=1).render("%%inline", tree_style=ts)
+>>> nj_tree = tree_from_distance_matrix(jc_correct_dm(hamming_dm), metric='nj')
+>>> ete3.Tree(str(nj_tree), format=1).render("%%inline", tree_style=ts)
 ```
 
 ### Limitations of distance-based approaches <link src="4hDWma"/>
