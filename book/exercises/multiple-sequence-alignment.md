@@ -246,3 +246,5 @@ Discuss your results here.
 Is the taxonomy of the represenative sequences consistent with phylogenetic tree you generated in question 4? For your 90% and 70% OTUs, list three taxa (e.g., at the phylum, class, or species level) that are monophyletic, if any, and three taxa that are not monophyletic, if any. Discuss two specific reasons why some taxa might appear to not be monophyletic based on your tree.
 
 Discuss your results here.
+
+All the sequences that were compared where momophyletic to such a degree that they were all of the same kingdom. The taxa that are below are momophyletic according to the tree generated in question 4. From the tax_lookup only half of them show any relation beyond kingdomship. This could be becasue there is a gap in the database which is higly likely due to one only have the kingdom known and all the rest unknown. There is also the possibility that it was passed down from the ancestor and the rest of the genome was changed.
