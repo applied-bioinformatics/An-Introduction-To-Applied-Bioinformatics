@@ -105,6 +105,10 @@ Let's inspect this code and then run our simulation beginning with a random sequ
 ```python
 >>> %pylab inline
 ...
+>>> import numpy as np
+>>> import seaborn as sns
+>>> import random
+...
 >>> from IPython.core import page
 >>> page.page = print
 ```
@@ -170,27 +174,34 @@ In our simulation, each sequence is directly derived from exactly one sequence f
     <figcaption><b>Figure 7</b>: Schematic of a simulated evolutionary process. Bases in red indicate mutation since the last common ancestor. The bottom panel illustrates the real-world equivalent of our final product, where we wouldn't know the true phylogeny (indicated by the dashed branches), the sequence of the last common ancestor, or what positions have changed since the last common ancestor.</figcaption>
 </figure>
 
-Let's simulate 10 generations of sequences here, and then select 10 of those sequences at random to work with in the remaining sections of this chapter.
+Let's simulate 10 generations of sequences here, and then randomly select some of those sequences to work with in the remaining sections of this chapter. For the sake of runtime, I'm going to set our ``indel_probability=0.0``. This means that we won't need to align our selected sequences before constructing trees from them (because with only substitution mutations occuring, homologous positions always remain aligned). Multiple sequence alignment is currently a runtime bottleneck in IAB, so this will let us run this notebook much faster. If you'd like to model insertion/deletions, you can increase the ``indel_probability``, say to ``0.005``. If you do that, the sequences will be aligned for you in the next cell, but it may take around 30 minutes to run.
 
 ```python
->>> %matplotlib inline
+>>> from skbio.alignment import global_pairwise_align_nucleotide
+>>> from iab.algorithms import progressive_msa
+>>> from functools import partial
 ...
->>> import numpy as np
->>> sequences = evolve_generations(sequence, generations=10, substitution_probability=0.01,
-...                                indel_probability=0.005, increased_rate_probability=0.1, verbose=False)
-```
-
-```python
->>> sequences = np.random.choice(sequences, 10, replace=False)
+>>> indel_probability = 0.0
+...
+>>> sequences = evolve_generations(sequence, generations=10, substitution_probability=0.03,
+...                                indel_probability=0.0, increased_rate_probability=0.1, verbose=False)
+...
+>>> sequences = random.sample(sequences, 25)
+...
+>>> if indel_probability == 0:
+...     sequences_aligned = sequences
+>>> else:
+...     gpa = partial(global_pairwise_align_nucleotide, penalize_terminal_gaps=True)
+...     sequences_aligned = progressive_msa(sequences, pairwise_aligner=gpa)
 ```
 
 ### A cautionary word about simulations <link src="Wbhke4"/>
 
-While simulations are extremely powerful for comparing algorithms, they can also be misleading. This is because when we model evolution we simplify the evolutionary process. For example, in the simulation above, we assume that the rate of substitution mutations doesn't change in different parts of our phylogeny. Imagine in the real-world that the environment changed drastically for some descendants (for example, if a geological event created new thermal vents in a lake they inhabited, resulting in an increase in mean water temperature), but not for others. The descendants who experience the environmental change might have an increased rate of substitutions as their genomes adapt to the new environment. The increased substitution rate may be temporary or permanent.
+While simulations are extremely powerful for comparing algorithms, they can also be misleading. This is because when we model evolution we simplify the evolutionary process. One assumption that our simulation is making is that "bursts" of evolution (i.e., where our substitution rate temporarily increases) are restricted to only a single generation. A child is no more or less like to have an increased rate of substitutions if its parent did. This may or may not be an accurate model. Imagine in the real-world that the environment changed drastically for some descendants (for example, if a geological event created new thermal vents in a lake they inhabited, resulting in an increase in mean water temperature), but not for others. The lineages who experience the environmental change might have an increased rate of substitutions as their genomes adapt to the new environment. The increased substitution rate may persist for multiple generations, or it may not. This is one limitation of our simulation that we know about, but because we don't have a perfect understanding of sequence evolution, there are limitations that we don't know about.
 
-If we use our simulation code to evaluate phylogeny reconstruction algorithms, it will tell us nothing about which algorithms better handle different evolutionary rates in different branches of the tree. This is one limitation of our simulation that we know about, but because we don't have a perfect understanding of sequence evolution, there are limitations that we don't know about. For this reason, you always want to understand what assumptions a simulation is making, and consider those when determining how confident you are in the results of an evaluation based on simulation. One assumption that our simulation is making is that "bursts" of evolution (i.e., where our substitution rate temporarily increases) are restricted to only a single generation. A child is no more or less like to have an increased rate of substitutions if its parent did. This may or may not be an accurate model. What are some other assumptions that are being made? There are many, so take a minute to list a few.
+When using simulations, it's important to understand what assumptions the simulation makes so you know what it can tell you about and what it can't tell you about. You'll want to consider that when determining how confident you are in the results of an evaluation based on simulation.  What are some other assumptions that are being made by the evolutionary simulation presented here? There are many, so take a minute to list a few.
 
-On the opposite end of the spectrum from simulations for algorithm comparison is comparisons based on real data. The trade-off however is that with real data we don't know what the right answer is (in our case, the correct phylogeny) so it's harder to determine which algorithms are doing better or worse. The take-away message here is that neither approach is perfect, and often researchers will use a combination of simulated and real data to evaluate algorithms.
+On the opposite end of the spectrum from simulations for algorithm comparison is comparisons based on real data. The trade-off is that, while there are no assumptions being made in real data with respect to the composition of the sequences, with real data we don't know what the right answer (in our case, the correct phylogeny) is, so it's harder to determine which algorithms are doing better or worse. The take-away message here is that neither approach is perfect, and often researchers will use a combination of simulated and real data to evaluate algorithms.
 
 ## Visualizing trees with ete3 <link src="WWRxKR"/>
 
@@ -269,15 +280,6 @@ We can use the kmer_distance function with scikit-bio as follows to create an ``
 One alignment-based distance metric that we've looked at is Hamming distance. This would be considered an alignment-based approach because is does consider the order of the characters in the sequence by comparing a character at a position in one sequence only to the character at the corresponding position in the other sequence. We could compute these distances as follows, after first aligning our sequences.
 
 ```python
->>> from skbio.alignment import global_pairwise_align_nucleotide
->>> from iab.algorithms import progressive_msa
->>> from functools import partial
->>> gpa = partial(global_pairwise_align_nucleotide, penalize_terminal_gaps=True)
-...
->>> sequences_aligned = progressive_msa(sequences, pairwise_aligner=gpa)
-```
-
-```python
 >>> from skbio.sequence.distance import hamming
 >>> hamming_dm = DistanceMatrix.from_iterable(sequences_aligned, metric=hamming, key='id')
 >>> _ = hamming_dm.plot(cmap='Greens', title='Hamming distances between sequences')
@@ -297,8 +299,6 @@ The Python implementation of this correction looks like the following. We can ap
 ```
 
 ```python
->>> import seaborn as sns
-...
 >>> distances = np.arange(0, 0.70, 0.05)
 >>> jc_corrected_distances = list(map(jc_correction, distances))
 ...
@@ -326,6 +326,10 @@ We can then apply this to a full distance matrix as follows (we'll then print th
 ```python
 >>> print(hamming_dm[0])
 >>> print(jc_corrected_hamming_dm[0])
+```
+
+```python
+>>> _ = jc_corrected_hamming_dm.plot(cmap='Greens', title='JC-corrected Hamming distances between sequences')
 ```
 
 ### Phylogenetic reconstruction with UPGMA <link src='73d028'/>

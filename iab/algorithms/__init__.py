@@ -1046,7 +1046,9 @@ def evolve_sequence(sequence, substitution_probability, indel_probability):
         if random.random() < substitution_probability:
             # simulate a substitution event by adding a character other than the current
             # character to the result at this position
-            result.append(random.choice([r for r in sequence.nondegenerate_chars if r != current_char]))
+            substituted_base = random.choice([r for r in sequence.nondegenerate_chars if r != current_char])
+            result.append(substituted_base)
+            i += 1
         elif random.random() < indel_probability:
             # simulate either an insertion or a deletion event. the length of the insertion or
             # deletion is determined at random, with shorter lengths being more probable
