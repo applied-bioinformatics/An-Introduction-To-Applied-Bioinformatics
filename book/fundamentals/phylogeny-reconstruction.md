@@ -511,6 +511,8 @@ One thing to be aware of as you start visualizing trees is that the vertial orde
 
 As mentioned above, UPGMA has a rather complex sounding name: *Unweighted Pair Group metric with Arithmetic mean*. The *Unweighted* term indicates that all tip-to-tip distances contribute equally to each average that is computed (no weighted averages are being computed). The *Pair Group* term implies that all internal nodes, including the root node, will be strictly bifurcating, or descent to exactly two other nodes (either internal or terminal). The *Arithmetic mean* term implies that distances to each clade are the mean of distances to all members of that clade.
 
+**NOTE: The text below here gets very rough as these sections are currently being written or re-written.**
+
 ### Phylogenetic reconstruction with neighbor-joining <link src="JlqeYq"/>
 
 This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 5.2.2 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic. You can also refer to the [scikit-bio implementation of Neighbor Joining](http://scikit-bio.org/docs/latest/generated/skbio.tree.nj.html), which will be used here (the source code is linked from that page).
@@ -526,7 +528,9 @@ One invalid assumption that is made by UPGMA is inherent in Step 1, where each b
 
 This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119).
 
-**NOTE: The text below here gets very rough as these sections are currently being written or re-written.**
+## Bootstrap analysis <link src="sbQHSN"/>
+
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 12.4.1 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic.
 
 ## Parsimony-based approaches to phylogenetic reconstruction <link src="7WKikt"/>
 
