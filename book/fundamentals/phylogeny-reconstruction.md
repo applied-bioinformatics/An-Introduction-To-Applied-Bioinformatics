@@ -340,7 +340,7 @@ UPGMA is a generic hierarchical clustering algorithm. It's not specific to recon
 
 UPGMA starts with a distance matrix, and works through the following steps to create a tree.
 
-**Step 1**: Find the smallest distance in the matrix and define a clade containing only those members. Draw that clade, and set the total length of the branch connecting the tips to the distance between the tips. The distance between each tip and the node connecting them should be half of the distance between the tips.
+**Step 1**: Find the smallest non-zero distance in the matrix and define a clade containing only those members. Draw that clade, and set the total length of the branch connecting the tips to the distance between the tips. The distance between each tip and the node connecting them should be half of the distance between the tips.
 
 **Step 2**: Create a new distance matrix with an entry representing the new clade created in step 1.
 
@@ -364,7 +364,7 @@ Let's work through these steps for a simple distance matrix representing the dis
 Iteration 1
 ------------
 
-Step 1: The smallest distance in the above matrix is between `s4` and `s5`. So, we'll draw that clade and set each branch length to half of the distance between them.
+Step 1: The smallest non-zero distance in the above matrix is between `s4` and `s5`. So, we'll draw that clade and set each branch length to half of the distance between them.
 
 <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-iter1.png">
 
@@ -418,7 +418,7 @@ Step 4: Because there is still more than one value below the diagonal in our new
 Iteration 2
 ------------
 
-Step 1: The smallest distance in the iteration 1 distance matrix is between `s1` and `s3`. So, we'll draw that clade and set each branch length to half of that distance.
+Step 1: The smallest non-zero distance in the iteration 1 distance matrix is between `s1` and `s3`. So, we'll draw that clade and set each branch length to half of that distance.
 
 <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-iter2.png">
 
@@ -454,7 +454,7 @@ Step 4: There is still more than one value below the diagonal, so we start a new
 Iteration 3
 ------------
 
-Step 1: The smallest distance in the above matrix is now between `(s1, s3)` and `s2`. So, we'll draw that clade and set each branch length to half of the distance.
+Step 1: The smallest non-zero distance in the above matrix is now between `(s1, s3)` and `s2`. So, we'll draw that clade and set each branch length to half of the distance.
 
 <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/upgma-tree-iter3.png">
 
