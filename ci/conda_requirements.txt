@@ -9,3 +9,4 @@ seaborn
 pandas
 markdown2
 networkx
+setuptools < 20.5.0 
