@@ -168,7 +168,7 @@ Phylogenetic Diversity (PD) is a metric that was developed by Dan Faith in the e
 
 PD is relatively simple to calculate. It is computed simply as the sum of the branch length in a phylogenetic tree that is "covered" or represented in a given sample. Let's look at an example to see how this works.
 
-First, let's define a phylogenetic tree using the newick format (which is described [here](http://evolution.genetics.washington.edu/phylip/newicktree.html), and more formally defined [here](http://evolution.genetics.washington.edu/phylip/newick_doc.html)). We'll then load that up with using [scikit-bio](http://scikit-bio.org)'s [TreeNode](http://scikit-bio.org/generated/skbio.core.tree.TreeNode.html#skbio.core.tree.TreeNode) object.
+First, let's define a phylogenetic tree using the newick format (which is described [here](http://evolution.genetics.washington.edu/phylip/newicktree.html), and more formally defined [here](http://evolution.genetics.washington.edu/phylip/newick_doc.html)). We'll then load that up using [scikit-bio](http://scikit-bio.org)'s [TreeNode](http://scikit-bio.org/generated/skbio.core.tree.TreeNode.html#skbio.core.tree.TreeNode) object.
 
 ```python
 >>> from io import StringIO
@@ -504,7 +504,7 @@ Data:
 
 In the previous section we computed distance matrices that contained the pairwise distances between a few samples. You can look at those distance matrices and get a pretty good feeling for what the patterns are. For example, what are the most similar samples? What are the most dissimilar samples?
 
-What if instead of three samples though, we had more. Here's a screenshot from a distance martix containing data on 105 samples (this is just the first few rows and columns):
+What if instead of three samples though, we had more. Here's a screenshot from a distance matrix containing data on 105 samples (this is just the first few rows and columns):
 
 <img src='https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/applications/images/example_big_dm.png', width=800>
 
@@ -648,7 +648,7 @@ number of permutations         999
 Name: ANOSIM results, dtype: object
 ```
 
-Why do you think the distribution of distances between people has such as larger range than the distribution of distances within people in this particular example?
+Why do you think the distribution of distances between people has a greater range than the distribution of distances within people in this particular example?
 
 Here we used ANOSIM testing whether our with and between category groups differ. This test is specifically designed for distance matrices, and it accounts for the fact that the values are not independent of one another. For example, if one of our samples was very different from all of the others, all of the distances associated with that sample would be large. It's very important to choose the appropriate statistical test to use. One free resource for helping you do that is [*The Guide to Statistical Analysis in Microbial Ecology (GUSTAME)*](http://mb3is.megx.net/gustame). If you're getting started in microbial ecology, I recommend spending some time studying GUSTAME.
 
