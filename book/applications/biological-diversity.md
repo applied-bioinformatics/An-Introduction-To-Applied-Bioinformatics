@@ -968,7 +968,7 @@ What does the following ordination plot tell you about the relationship between 
 >>> _ = lauber_soil_unweighted_unifrac_pc.plot(lauber_soil_sample_md, 'Latitude', cmap='Greens', title="Samples colored by Latitude", axis_labels=('PC1', 'PC2', 'PC3'))
 ```
 
-If the answer to the above question is that there doesn't seem to be much association, you're on the right track. We can qualtify this, for example, by testing for correlation between pH and value on PC 1.
+If the answer to the above question is that there doesn't seem to be much association, you're on the right track. We can qualify this, for example, by testing for correlation between pH and value on PC 1.
 
 ```python
 >>> from scipy.stats import spearmanr
