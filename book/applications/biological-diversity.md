@@ -723,7 +723,7 @@ $D2$ is distance between sample and endpoint 2.
 
 **Step 4.** Find the next largest distance that could be used to define an *uncorrelated axis*. (This step can be labor-intensive to do by hand - usually you would compute all of the axes, along with correlation scores. I'll pick one for the demo, and we'll wrap up by looking at all of the axes.)
 
-Here is what steps 2 and 3 look like in python:
+Here is what steps 2 and 3 look like in Python:
 
 ```python
 >>> def compute_axis_values(dm, endpoint1, endpoint2):
