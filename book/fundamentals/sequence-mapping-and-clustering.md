@@ -178,7 +178,7 @@ There are many other options as well. Let's choose the option 1 here, as it requ
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
-Finally, let's cluster our last sequence, ``s6``. In this case, it falls within the similarity range of ``s1``, but outside of the similarity range of ``s3``. So, because our algortihm requires that a sequence be within the simiarity range of all sequences in an OTU, ``s6`` cannot be a member of ``OTU 1``, so instead it's assigned to a new OTU, ``OTU 4``. Our final mapping of OTUs to sequences would look like:
+Finally, let's cluster our last sequence, ``s6``. In this case, it falls within the similarity range of ``s1``, but outside of the similarity range of ``s3``. So, because our algortihm requires that a sequence be within the similarity range of all sequences in an OTU, ``s6`` cannot be a member of ``OTU 1``, so instead it's assigned to a new OTU, ``OTU 4``. Our final mapping of OTUs to sequences would look like:
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4, s5, s6], 0.70,
