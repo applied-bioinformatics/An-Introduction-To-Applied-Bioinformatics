@@ -490,7 +490,7 @@ One thing you may have noticed is that the score you get back for a pairwise ali
 
 ### Metrics of alignment quality <link src="YdqCls"/>
 
-In the examples above, we compared features like how long the alignment is (relevant for local but not global alignment), the pairwise similarity between the aligned query and reference, and the score. If you've used a system like BLAST, you'll know that there are other values that are often reported about an alignment, like the number of substitutions, or the number of insertion/deletion (or gap) positions. None of these metrics are useful on their own. Let's look at an example to see why.
+In the examples above, we compared features such as how long the alignment is (relevant for local but not global alignment), the pairwise similarity between the aligned query and reference, and the score. If you've used a system like BLAST, you'll know that there are other values that are often reported about an alignment, like the number of substitutions, or the number of insertion/deletion (or gap) positions. None of these metrics are useful on their own. Let's look at an example to see why.
 
 Imagine we're aligning these two sequences:
 
