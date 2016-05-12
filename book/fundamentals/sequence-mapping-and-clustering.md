@@ -35,7 +35,7 @@ In the figures that follow, points (or nodes) represent sequences, and line (or 
 
 Let's define a collection of sequences to work with. These are derived from the [Greengenes](http://greengenes.secondgenome.com/) [13_8](ftp://greengenes.microbio.me/greengenes_release/gg_13_5/) database, and we're pulling them from the [QIIME default reference project](https://github.com/biocore/qiime-default-reference). We can load these as a list of sequences using ``skbio.parse.sequences.parse_fasta``, and count them by taking the length of the list. For the sake of runtime, we'll work with only a small random subset these sequences.
 
-**Our goal here will be to group these sequences into OTUs based on some similarity threshold that we define.** If we set this similarity threshold at 70%, meaning that the sequences within that OTU are 70% identicial (either to each other, or maybe to some representative of that cluster - we'll explore some variants on that definition below), we'd call these *70% OTUs*.
+**Our goal here will be to group these sequences into OTUs based on some similarity threshold that we define.** If we set this similarity threshold at 70%, meaning that the sequences within that OTU are 70% identicial (either to each other, or maybe to some representative of that cluster - we'll explore some variants on that definition below), we would call these *70% OTUs*.
 
 ```python
 >>> from qiime_default_reference import get_reference_sequences
@@ -147,7 +147,7 @@ Our first sequence, ``s1``, will define a new OTU. We'll call that OTU ``OTU 1``
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
-Now imagine that our third sequence, ``s3`` falls within the range of ``s1``. We'd cluster ``s3`` into ``OTU 1`` since it's within the similarity range of all of the sequences in ``OTU 1`` (for now that's just ``s1``). We now have three sequences clustered into two OTUs.
+Now imagine that our third sequence, ``s3`` falls within the range of ``s1``. We would cluster ``s3`` into ``OTU 1`` since it is within the similarity range of all of the sequences in ``OTU 1`` (for now that's just ``s1``). We now have three sequences clustered into two OTUs.
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3], 0.70,
@@ -155,7 +155,7 @@ Now imagine that our third sequence, ``s3`` falls within the range of ``s1``. We
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
-Now let's cluster a fourth sequence, ``s4``. We find that this falls outside the range of ``OTU 1``, and also outside the range of ``OTU 2``. So, we'd create a new OTU, ``OTU 3``, containing ``s4``.
+Now let's cluster a fourth sequence, ``s4``. We find that this falls outside the range of ``OTU 1``, and also outside the range of ``OTU 2``. So, we would create a new OTU, ``OTU 3``, containing ``s4``.
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4], 0.70,
@@ -252,7 +252,7 @@ Our second sequence, ``s2``, still falls outside of the similarity threshold to 
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
-Now imagine that our third sequence, $S3$ falls within the range of $OTU1$. We'd cluster $S3$ into $OTU1$ with $S1$. We now have three sequences clustered into two OTUs. So far, things are looking the same as before, except notice how our OTU definition (grey shading) is now different. Because any sequence within the similarity threshold of *any* of sequence in the OTU will fall into this OTU, the shading now covers the area covered by either of our sequences, rather than the area covered by both of our sequences (in set theory terminology, it is the *union* now, where previously it was the *intersection*).
+Now imagine that our third sequence, $S3$ falls within the range of $OTU1$. We would cluster $S3$ into $OTU1$ with $S1$. We now have three sequences clustered into two OTUs. So far, things are looking the same as before, except notice how our OTU definition (grey shading) is now different. Because any sequence within the similarity threshold of *any* of sequence in the OTU will fall into this OTU, the shading now covers the area covered by either of our sequences, rather than the area covered by both of our sequences (in set theory terminology, it is the *union* now, where previously it was the *intersection*).
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3], 0.70,
@@ -260,7 +260,7 @@ Now imagine that our third sequence, $S3$ falls within the range of $OTU1$. We'd
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
-Now let's cluster a fourth sequence, $S4$. We find that this falls outside the range of $OTU1$, and also outside the range of $OTU2$. So, we'd create a new OTU, $OTU3$, containing $S4$.
+Now let's cluster a fourth sequence, $S4$. We find that this falls outside the range of $OTU1$, and also outside the range of $OTU2$. So, we would create a new OTU, $OTU3$, containing $S4$.
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4], 0.70,
@@ -300,7 +300,7 @@ Finally, let's apply this to our collection of real sequences again.
 
 You'll notice that both the runtime and the number of alignments performed here are different. Most of the runtime is spent aligning, so runtime and number of alignments should be strongly correlated.
 
-There was another affect here though: we have a different number of OTUs. Is this result better or worse? There is not a definitive answer to that question: it really depends on the application, so what we'd ultimately want to know is how does that affect our ability to interpret the data. **Remember: OTU clustering is a necessary evil to deal with the massive amounts of data that we have. We don't necessary care about things like how many OTUs a method gives us, but rather how the clustering process helps or hurts us in answering the biological questions driving the analysis.** We'll explore this concept more in later chapters, but it is an important one that algorithm developers sometimes lose track of.
+There was another affect here though: we have a different number of OTUs. Is this result better or worse? There is not a definitive answer to that question: it really depends on the application, so what we would ultimately want to know is how does that affect our ability to interpret the data. **Remember: OTU clustering is a necessary evil to deal with the massive amounts of data that we have. We don't necessary care about things like how many OTUs a method gives us, but rather how the clustering process helps or hurts us in answering the biological questions driving the analysis.** We'll explore this concept more in later chapters, but it is an important one that algorithm developers sometimes lose track of.
 
 ### Centroid clustering <link src='88add2'/>
 
@@ -327,7 +327,7 @@ Let's implement this and apply the process to our six sequences.
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
-Next, ``s3`` falls within the range of ``OTU 1``. We'd cluster ``s3`` into ``OTU 1`` with ``s1``, and now have three sequences clustered into two OTUs. Again, our sequence to OTU mapping looks the same as before at this stage.
+Next, ``s3`` falls within the range of ``OTU 1``. We would cluster ``s3`` into ``OTU 1`` with ``s1``, and now have three sequences clustered into two OTUs. Again, our sequence to OTU mapping looks the same as before at this stage.
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3], 0.70,
@@ -335,7 +335,7 @@ Next, ``s3`` falls within the range of ``OTU 1``. We'd cluster ``s3`` into ``OTU
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
-Now let's cluster a fourth sequence, $S4$. We find that this falls outside the range of $OTU1$, and (just barely) outside the range of $OTU2$. So, we'd create a new OTU, $OTU3$, containing $S4$.
+Now let's cluster a fourth sequence, $S4$. We find that this falls outside the range of $OTU1$, and (just barely) outside the range of $OTU2$. So, we would create a new OTU, $OTU3$, containing $S4$.
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4], 0.70,
@@ -406,7 +406,7 @@ The outputs that we'll explore are:
  * run time
  * and number of resulting OTUs (or clusters).
 
-For the sake of runtime, I'm only looking at few settings for each of the input parameters. You may want to expand from there, but note that the number of combinations grows quickly since we're going to analyze all combinations of the parameters. For example, for our similarity threshold sweep, if we test two sequence collections, three similarity thresholds, and three clustering methods, we'd run $2 \times 3 \times 3 = 18$ clustering runs. If we add one more similarity threshold, that number would jump to $2 \times 4 \times 3 = 24$ clustering runs. So, these numbers can increase quickly.
+For the sake of runtime, I'm only looking at few settings for each of the input parameters. You may want to expand from there, but note that the number of combinations grows quickly since we're going to analyze all combinations of the parameters. For example, for our similarity threshold sweep, if we test two sequence collections, three similarity thresholds, and three clustering methods, we would run $2 \times 3 \times 3 = 18$ clustering runs. If we add one more similarity threshold, that number would jump to $2 \times 4 \times 3 = 24$ clustering runs. So, these numbers can increase quickly.
 
 ```python
 >>> import pandas as pd
