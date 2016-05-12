@@ -118,7 +118,7 @@ If you're new to Computer Science and programming, these are some books and reso
 
 ### Philosophy of biology and popular science books <link src="bwMyRz"/>
 
-These are some books that I've enjoyed, and which helped get me thinking about biological systems. These are generally written for a more popular audience, so should be accessible to any readers of *An Introduction to Applied Bioinformatics*.
+These are some books that I've enjoyed, that have also helped me think about biological systems. These are generally written for a more popular audience, so should be accessible to any readers of *An Introduction to Applied Bioinformatics*.
 
 * [The Selfish Gene](http://amzn.to/1UkyQ1R) by Richard Dawkins.
 
