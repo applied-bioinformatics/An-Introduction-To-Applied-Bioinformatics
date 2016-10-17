@@ -9,4 +9,5 @@ seaborn
 pandas
 markdown2
 networkx
-setuptools < 20.5.0 
+setuptools < 20.5.0
+PyQt < 5.0.0
