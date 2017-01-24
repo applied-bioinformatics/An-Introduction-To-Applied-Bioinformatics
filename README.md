@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.png?branch=master)](https://travis-ci.org/gregcaporaso/An-Introduction-To-Applied-Bioinformatics)
+[![Build Status](https://travis-ci.org/caporaso-lab/An-Introduction-To-Applied-Bioinformatics.png?branch=master)](https://travis-ci.org/caporaso-lab/An-Introduction-To-Applied-Bioinformatics)
 [![DOI](https://zenodo.org/badge/11339/gregcaporaso/An-Introduction-To-Applied-Bioinformatics.svg)](http://dx.doi.org/10.5281/zenodo.16419)
 [![Join the chat at https://gitter.im/gregcaporaso/An-Introduction-To-Applied-Bioinformatics](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/gregcaporaso/An-Introduction-To-Applied-Bioinformatics?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/gregcaporaso/built-iab)
