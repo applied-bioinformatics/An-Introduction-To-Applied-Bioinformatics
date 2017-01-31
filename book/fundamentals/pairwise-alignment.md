@@ -33,7 +33,7 @@ Imagine you have three sequences - call them ``r1``and ``r2`` (*r* is for *refer
 
 In this case, ``q1`` has a smaller distance to ``r1`` than it does to ``r2``, so ``q1`` is more similar to ``r1`` than ``r2``. But it's not always that simple.
 
-Here we've assumed that only *substitution events* have occurred, meaning one DNA base was substituted for with another. Let's define ``q2``, which is the same as ``q1`` except that a single base has been deleted at the beginning of the sequence, and a single base has been inserted at the end of the sequence.
+Here we've assumed that only *substitution events* have occurred, meaning one DNA base was substituted with another. Let's define ``q2``, which is the same as ``q1`` except that a single base has been deleted at the beginning of the sequence, and a single base has been inserted at the end of the sequence.
 
 ```python
 >>> q2 = DNA("TCCAGGTAAACGGTGACCAGGTACCAGTTGCGTTTGTTGTAGGAGACACGGGGACCCAT")
@@ -446,7 +446,7 @@ Global and local alignment are both used for different applications. We'll next 
 
 ## Smith-Waterman local sequence alignment <link src='c9656e'/>
 
-The algorithm that is most commonly used for performing local alignment was originally published by [Temple F. Smith and Michael S. Waterman in 1981](https://www.ncbi.nlm.nih.gov/pubmed/7265238), and is therefore referred to as Smith-Waterman alignment. In terms of the resulting alignment, the difference between Smith-Waterman and Needleman-Wunsch is that the aligned sequences in Smith-Waterman can be a subsequences of one or both of the unaligned (input) sequences. In Needleman-Wunsch alignment, the aligned sequences will be full-length with respect to the unaligned sequences.
+The algorithm that is most commonly used for performing local alignment was originally published by [Temple F. Smith and Michael S. Waterman in 1981](https://www.ncbi.nlm.nih.gov/pubmed/7265238), and is therefore referred to as Smith-Waterman alignment. In terms of the resulting alignment, the difference between Smith-Waterman and Needleman-Wunsch is that the aligned sequences in Smith-Waterman can be a subsequence of one or both of the unaligned (input) sequences. In Needleman-Wunsch alignment, the aligned sequences will be full-length with respect to the unaligned sequences.
 
 Algorithmically, Smith-Waterman is nearly identical to Needleman-Wunsch, with three small important differences. We'll now work through Smith-Waterman alignment following the same steps that we followed for Needleman-Wunsch, and look at the differences as we go. We'll redefine our two sequences to align here. As you did for Needleman-Wunsch, after working through this example with these sequences, come back here and experiment with different sequences.
 
@@ -797,7 +797,7 @@ One question you might have is whether developing a version of this algorithm wh
 >>> ax
 ```
 
-Notice that the runtimes in the plot are smaller, but shape of the curve is the same. While parallelization can reduce the runtime of an algorithm, it won't change its *computational complexity* (or how its runtime scales as a function of its input size). You can explore the computational complexity of different types of algorithms in the [Big-O cheatsheet](http://bigocheatsheet.com/), though it's a fairly advanced introduction to the topic (and one that's usually covered in the second or third year for Computer Science majors).
+Notice that the runtimes in the plot are smaller, but shape of the curve is the same. While parallelization can reduce the runtime of an algorithm, it won't change its *computational complexity* (or how its runtime scales as a function of its input size). You can explore the computational complexity of different types of algorithms in the [Big-O Cheat Sheet](http://bigocheatsheet.com/), though it's a fairly advanced introduction to the topic (and one that's usually covered in the second or third year for Computer Science majors).
 
 ### Conclusions on the scalability of pairwise sequence alignment with Smith-Waterman <link src="N9htIl"/>
 

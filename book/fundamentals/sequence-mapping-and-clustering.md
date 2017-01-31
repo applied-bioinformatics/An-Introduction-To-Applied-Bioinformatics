@@ -27,15 +27,15 @@ We have learned the key tools we need for both sequence mapping and clustering i
 
 ## De novo clustering of sequences by similarity  <link src='e2c048'/>
 
-The algorithm at the core of *de novo* clustering is sequence alignment. In an ideal world, we would perform a full multiple sequence alignment of all of our sequences, compute their pairwise similarities (or dissimilarities), and use those values to group sequences that are above some *similarity threshold* into *OTU clusters* (just *OTUs* from here). As we discussed in the multiple sequence alignment chapter however, that is infeasible for more than a few tens of sequences due to computational and memory requirements. Even progressive alignment can't typically handle more than a few tens of thousands of sequences (at least with the currently available implementations, that I am aware of), so OTU clustering is generally acheived by picking pairs of sequences to align. You'll notice in this section that many of the heuristics that have been applied for speeding up database searching are similar to the heuristics applied for OTU clustering.
+The algorithm at the core of *de novo* clustering is sequence alignment. In an ideal world, we would perform a full multiple sequence alignment of all of our sequences, compute their pairwise similarities (or dissimilarities), and use those values to group sequences that are above some *similarity threshold* into *OTU clusters* (just *OTUs* from here). As we discussed in the multiple sequence alignment chapter however, that is infeasible for more than a few tens of sequences due to computational and memory requirements. Even progressive alignment can't typically handle more than a few tens of thousands of sequences (at least with the currently available implementations, that I am aware of), so OTU clustering is generally achieved by picking pairs of sequences to align. You'll notice in this section that many of the heuristics that have been applied for speeding up database searching are similar to the heuristics applied for OTU clustering.
 
 We'll work with [SSW](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0082138) for Smith-Waterman pairwise alignment with affine gap scoring here, though in principle any pairwise aligner could be substituted.
 
-In the figures that follow, points (or nodes) represent sequences, and line (or edges) connecting points indicate that a pair of sequences are within a defined percent identity threshold. These illustrations are used to describe OTUs, such that a set of points that are connected either directly or indirecty represent a grouping of sequences into an OTU.
+In the figures that follow, points (or nodes) represent sequences, and line (or edges) connecting points indicate that a pair of sequences are within a defined percent identity threshold. These illustrations are used to describe OTUs, such that a set of points that are connected either directly or indirectly represent a grouping of sequences into an OTU.
 
 Let's define a collection of sequences to work with. These are derived from the [Greengenes](http://greengenes.secondgenome.com/) [13_8](ftp://greengenes.microbio.me/greengenes_release/gg_13_5/) database, and we're pulling them from the [QIIME default reference project](https://github.com/biocore/qiime-default-reference). We can load these as a list of sequences using ``skbio.parse.sequences.parse_fasta``, and count them by taking the length of the list. For the sake of runtime, we'll work with only a small random subset these sequences.
 
-**Our goal here will be to group these sequences into OTUs based on some similarity threshold that we define.** If we set this similarity threshold at 70%, meaning that the sequences within that OTU are 70% identicial (either to each other, or maybe to some representative of that cluster - we'll explore some variants on that definition below), we would call these *70% OTUs*.
+**Our goal here will be to group these sequences into OTUs based on some similarity threshold that we define.** If we set this similarity threshold at 70%, meaning that the sequences within that OTU are 70% identical (either to each other, or maybe to some representative of that cluster - we'll explore some variants on that definition below), we would call these *70% OTUs*.
 
 ```python
 >>> from qiime_default_reference import get_reference_sequences
@@ -178,7 +178,7 @@ There are many other options as well. Let's choose the option 1 here, as it requ
 >>> show_clusters(clusters, plot_labels=True)
 ```
 
-Finally, let's cluster our last sequence, ``s6``. In this case, it falls within the similarity range of ``s1``, but outside of the similarity range of ``s3``. So, because our algortihm requires that a sequence be within the similarity range of all sequences in an OTU, ``s6`` cannot be a member of ``OTU 1``, so instead it's assigned to a new OTU, ``OTU 4``. Our final mapping of OTUs to sequences would look like:
+Finally, let's cluster our last sequence, ``s6``. In this case, it falls within the similarity range of ``s1``, but outside of the similarity range of ``s3``. So, because our algorithm requires that a sequence be within the similarity range of all sequences in an OTU, ``s6`` cannot be a member of ``OTU 1``, so instead it's assigned to a new OTU, ``OTU 4``. Our final mapping of OTUs to sequences would look like:
 
 ```python
 >>> clusters, num_alignments = cluster([s1, s2, s3, s4, s5, s6], 0.70,
@@ -221,7 +221,7 @@ Now let's apply that:
 
 ### Nearest neighbor clustering <link src='ab202d'/>
 
-Let's try a variant on this algorithm. How would things change if **instead of requiring that a sequence be within the similarity treshold of all sequences in an OTU, we only required that it be within the similarity threshold of one sequence in that OTU**? This is referred to as **nearest neighbor** clustering, because cluster membership is defined by the percent similarity to the most similar (or *nearest*) "neighbor" in the cluster.
+Let's try a variant on this algorithm. How would things change if **instead of requiring that a sequence be within the similarity threshold of all sequences in an OTU, we only required that it be within the similarity threshold of one sequence in that OTU**? This is referred to as **nearest neighbor** clustering, because cluster membership is defined by the percent similarity to the most similar (or *nearest*) "neighbor" in the cluster.
 
 Let's implement nearest neighbor clustering and look at the same six toy sequences as above.
 
@@ -482,7 +482,7 @@ Next let's look at run time as a function of the number of sequences to be clust
 ...                data=df[df['Similarity threshold'] == 0.70])
 ```
 
-**Which of these methods do you think will scale best** to continuosuly increasing numbers of sequences (e.g., as is currently the trend in microbiomics)?
+**Which of these methods do you think will scale best** to continuously increasing numbers of sequences (e.g., as is currently the trend in microbiomics)?
 
 Finally, let's look at the number of clusters (or OTUs) that are generated with each method at each similarity threshold.
 
@@ -494,8 +494,8 @@ Finally, let's look at the number of clusters (or OTUs) that are generated with 
 
 ## Reference-based clustering to assist with parallelization <link src='e96c31'/>
 
-Up until this point we have focused our discussion on *de novo* OTU clustering, meaning that sequences are clustered only against each other, with no external reference. This is a very widely applied protocol, and the primary function of popular bioinformatics tools such as [cdhit](http://bioinformatics.oxfordjournals.org/content/28/23/3150.long) and [uclust](http://bioinformatics.oxfordjournals.org/content/26/19/2460.long). Another category of OTU clustering protocols is also popular however: reference-based OTU clustering, where a external reference database of sequences is used to aid in cluster defintion.
+Up until this point we have focused our discussion on *de novo* OTU clustering, meaning that sequences are clustered only against each other, with no external reference. This is a very widely applied protocol, and the primary function of popular bioinformatics tools such as [CD-HIT](http://bioinformatics.oxfordjournals.org/content/28/23/3150.long) and [UCLUST](http://bioinformatics.oxfordjournals.org/content/26/19/2460.long). Another category of OTU clustering protocols is also popular however: reference-based OTU clustering, where a external reference database of sequences is used to aid in cluster definition.
 
-Reference-based clustering is typically a centroid-based approach, where cluster centroids are pre-defined based on sequences in a database. From here, reference-based clustering is performed in one of two ways. In *closed-reference* OTU clustering, the set of centroids is static, and sequenences that don't match a centroid are not clustered. In *open-reference* OTU clustering, the set of centroids can expand: sequences that don't match an existing centroid can become new centroid sequences.
+Reference-based clustering is typically a centroid-based approach, where cluster centroids are pre-defined based on sequences in a database. From here, reference-based clustering is performed in one of two ways. In *closed-reference* OTU clustering, the set of centroids is static, and sequences that don't match a centroid are not clustered. In *open-reference* OTU clustering, the set of centroids can expand: sequences that don't match an existing centroid can become new centroid sequences.
 
-I plan to expand discussion of these topics in IAB (you can track progress on that in [issue #113](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/113). In the meantime, [Rideout et al., (2014)](https://peerj.com/articles/545/) explains these concepts in detail. Please note, OTU picking and OTU clustering are synonomous.
+I plan to expand discussion of these topics in IAB (you can track progress on that in [issue #113](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/113). In the meantime, [Rideout et al., (2014)](https://peerj.com/articles/545/) explains these concepts in detail. Please note, OTU picking and OTU clustering are synonymous.

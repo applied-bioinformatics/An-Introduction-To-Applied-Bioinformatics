@@ -195,7 +195,7 @@ What is the difference between a local and global alignment in terms of what is 
 ## Question 2 <link src="a7b9Xj"/>
 
 
-What is the seqeunce in s2 from position 500 to 505?
+What is the sequence in s2 from position 500 to 505?
 
 ```python
 ...

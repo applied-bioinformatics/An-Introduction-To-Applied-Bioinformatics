@@ -56,7 +56,7 @@ OTU5    0
 Name: A, dtype: int64
 ```
 
-**TODO**: Trees in newick format; sample metadata in tsv format, and loaded into a pandas DataFrame.
+**TODO**: Trees in Newick format; sample metadata in TSV format, and loaded into a pandas DataFrame.
 
 Before we start looking at what we can do with this data once we have it, let's discuss some terminology.
 
@@ -168,7 +168,7 @@ Phylogenetic Diversity (PD) is a metric that was developed by Dan Faith in the e
 
 PD is relatively simple to calculate. It is computed simply as the sum of the branch length in a phylogenetic tree that is "covered" or represented in a given sample. Let's look at an example to see how this works.
 
-First, let's define a phylogenetic tree using the newick format (which is described [here](http://evolution.genetics.washington.edu/phylip/newicktree.html), and more formally defined [here](http://evolution.genetics.washington.edu/phylip/newick_doc.html)). We'll then load that up using [scikit-bio](http://scikit-bio.org)'s [TreeNode](http://scikit-bio.org/generated/skbio.core.tree.TreeNode.html#skbio.core.tree.TreeNode) object.
+First, let's define a phylogenetic tree using the Newick format (which is described [here](http://evolution.genetics.washington.edu/phylip/newicktree.html), and more formally defined [here](http://evolution.genetics.washington.edu/phylip/newick_doc.html)). We'll then load that up using [scikit-bio](http://scikit-bio.org)'s [TreeNode](http://scikit-bio.org/generated/skbio.core.tree.TreeNode.html#skbio.core.tree.TreeNode) object.
 
 ```python
 >>> from io import StringIO
@@ -654,7 +654,7 @@ Here we used ANOSIM testing whether our with and between category groups differ.
 
 #### Hierarchical clustering <link src='09f456'/>
 
-Next, let's look at a hierarchical clustering analysis, similar to that presented in panel G above. Here I'm applying the UPGMA functionality implemented in [scipy](http://www.scipy.org/scipylib/index.html) to generate a tree which we visualize with a dendrogram. However the tips in this tree don't represent sequences or OTUs, like they did when we [covered UPGMA for phylogenetic reconstruction](alias://73d028), but instead they represent samples, and samples with a smaller branch length between them are more similar in composition than samples with a longer branch length between them. (Remember that only horizontal branch length is counted - vertical branch length is just to aid in the organization of the dendrogram.)
+Next, let's look at a hierarchical clustering analysis, similar to that presented in panel G above. Here I'm applying the UPGMA functionality implemented in [SciPy](http://www.scipy.org/scipylib/index.html) to generate a tree which we visualize with a dendrogram. However the tips in this tree don't represent sequences or OTUs, like they did when we [covered UPGMA for phylogenetic reconstruction](alias://73d028), but instead they represent samples, and samples with a smaller branch length between them are more similar in composition than samples with a longer branch length between them. (Remember that only horizontal branch length is counted - vertical branch length is just to aid in the organization of the dendrogram.)
 
 ```python
 >>> from scipy.cluster.hierarchy import average, dendrogram
@@ -869,7 +869,7 @@ As I mentioned above, polar ordination isn't widely used in practice, but the fe
 
 In this section, we're going to make use of three python third-party modules to apply PCoA and visualize the results 3D scatter plots. The data we'll use here is the full unweighted UniFrac distance matrix from a study of soil microbial communities across North and South America (originally published in [Lauber *et al.* (2009)](http://www.ncbi.nlm.nih.gov/pubmed/19502440)). We're going to use [pandas](http://pandas.pydata.org/) to manage the metadata, [scikit-bio](http://scikit-bio.org/) to manage the distance matrix and compute PCoA, and [matplotlib](http://matplotlib.org/) to visualize the results.
 
-First, we'll load sample metadata into a [pandas DateFrame](http://pandas.pydata.org/pandas-docs/dev/generated/pandas.DataFrame.html). These are really useful for loading and working with the type of tabular information that you'd typically store in a spreadsheet or database table. (Note that one thing I'm doing in the following cell is tricking pandas into thinking that it's getting a file as input, even though I have the information represented as tab-separated lines in a multiline string. [python's StringIO](https://docs.python.org/2/library/stringio.html) is very useful for this, and it's especially convenient in your unit tests... which you're writing for all of your code, right?) Here we'll load the tab-separated text, and then print it.
+First, we'll load sample metadata into a [pandas DataFrame](http://pandas.pydata.org/pandas-docs/dev/generated/pandas.DataFrame.html). These are really useful for loading and working with the type of tabular information that you'd typically store in a spreadsheet or database table. (Note that one thing I'm doing in the following cell is tricking pandas into thinking that it's getting a file as input, even though I have the information represented as tab-separated lines in a multiline string. [python's StringIO](https://docs.python.org/2/library/stringio.html) is very useful for this, and it's especially convenient in your unit tests... which you're writing for all of your code, right?) Here we'll load the tab-separated text, and then print it.
 
 ```python
 >>> from iab.data import lauber_soil_sample_md
@@ -1038,7 +1038,7 @@ Imagine you ran three different beta diversity metrics on your BIOM table: unwei
 
 Specifically, what we want to ask when comparing these results is **given a pair of ordination plots, is their shape (in two or three dimensions) the same?** The reason we care is that we want to know, **given a pair of ordination plots, would we derive the same biological conclusions regardless of which plot we look at?**
 
-We can use a [Mantel test](http://scikit-bio.org/docs/latest/generated/generated/skbio.stats.distance.mantel.html) for this, which is way of testing for correlation between distance matrics.
+We can use a [Mantel test](http://scikit-bio.org/docs/latest/generated/generated/skbio.stats.distance.mantel.html) for this, which is a way of testing for correlation between distance matrices.
 
 ```python
 >>> from skbio.stats.distance import mantel

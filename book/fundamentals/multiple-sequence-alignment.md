@@ -2,7 +2,7 @@
 # Generalized dynamic programming for multiple sequence alignment <link src='737114'/>
 
 Until now we worked with alignments between two sequences, but it is likely that you will want to align many sequences at the same time. For example, if you are trying to gain insight on the evolutionary relationships between all of the 16S bacterial genes in a given sample, it would be time consuming and very inefficient to compare them two at a time. It would be more efficient and useful to compare all of the 16S sequences from the bacteria in the same alignment.
-In the pariwise sequence alignment chapter, we went over dynamic programming algorithms. It's possible to generalize Smith-Waterman and Needleman-Wunsch, the dynamic programming algorithms that we explored for pairwise sequence aligment, to identify the optimal alignment of more than two sequences. Remember that our scoring scheme for pairwise alignment with Smith-Waterman looked like the following:
+In the pairwise sequence alignment chapter, we went over dynamic programming algorithms. It's possible to generalize Smith-Waterman and Needleman-Wunsch, the dynamic programming algorithms that we explored for pairwise sequence alignment, to identify the optimal alignment of more than two sequences. Remember that our scoring scheme for pairwise alignment with Smith-Waterman looked like the following:
 
 $$
 \begin{align}
@@ -91,7 +91,7 @@ And for four sequences:
 >>> plt.ylabel('Runtime (s)')
 ```
 
-We clearly have a problem here, and that is that the runtime for multiple sequence alignment using full dynamic programming algorithms grows exponentially with the number of sequences to be aligned. If $n$ is our sequence length, and $s$ is the number of sequences, that means that runtime is proportional to $n^s$. In pairwise alignment, $s$ is always equal to 2, so the problem is more manangeable. However, for the general case of $s$ sequences, we really can't even consider Smith-Waterman or Needleman-Wunsch for more than just a few sequences. The pattern in the plots above should illustrate why.
+We clearly have a problem here, and that is that the runtime for multiple sequence alignment using full dynamic programming algorithms grows exponentially with the number of sequences to be aligned. If $n$ is our sequence length, and $s$ is the number of sequences, that means that runtime is proportional to $n^s$. In pairwise alignment, $s$ is always equal to 2, so the problem is more manageable. However, for the general case of $s$ sequences, we really can't even consider Smith-Waterman or Needleman-Wunsch for more than just a few sequences. The pattern in the plots above should illustrate why.
 
 As we explored with database searching, we need to figure out how to align fewer sequences. This is where *progressive alignment* comes in.
 
@@ -234,13 +234,13 @@ We now have a guide tree, so we can move on to the next step of progressive alig
 
 ### Generalization of Needleman-Wunsch (with affine gap scoring) for progressive multiple sequence alignment <link src='e6484e'/>
 
-Next, we'll address our second burning question: aligning alignments. As illustrated above, there are basically three different types of pairwise alignment we need to support for progressive multiple sequenence alignment with Needleman-Wunsch. These are:
+Next, we'll address our second burning question: aligning alignments. As illustrated above, there are basically three different types of pairwise alignment we need to support for progressive multiple sequence alignment with Needleman-Wunsch. These are:
 
 1. Alignment of a pair of sequences.
 2. Alignment of a sequence and an alignment.
 3. Alignment of a pair of alignments.
 
-Standard Needleman-Wunsch supports the first, and it is very easy to generalize it to support the latter two. The only change that is necessary is in how the alignment of two non-gap characters is scored. Recall that we previously scored an alignment of two characters by looking up the score of subsitution from one to the other in a substitution matrix. To adapt this for aligning a sequence to an alignment, or for aligning an alignment to an alignment, we compute this subsitution as the average score of aligning the pairs of characters.
+Standard Needleman-Wunsch supports the first, and it is very easy to generalize it to support the latter two. The only change that is necessary is in how the alignment of two non-gap characters is scored. Recall that we previously scored an alignment of two characters by looking up the score of substitution from one to the other in a substitution matrix. To adapt this for aligning a sequence to an alignment, or for aligning an alignment to an alignment, we compute this substitution as the average score of aligning the pairs of characters.
 
 For example, if we want to align the alignment column from $aln1$:
 
@@ -256,13 +256,13 @@ T
 G
 ```
 
-we could compute the subsitution score using the matrix $m$ as:
+we could compute the substitution score using the matrix $m$ as:
 
 $$
 s = \frac{m[A][T] + m[A][G] + m[C][T] + m[C][G]}{aln1_{length} \times aln2_{length}}
 $$
 
-The following code adapts our implementation of Needleman-Wunsh to support aligning a sequence to an alignment, or aligning an alignment to an alignment.
+The following code adapts our implementation of Needleman-Wunsch to support aligning a sequence to an alignment, or aligning an alignment to an alignment.
 
 ```python
 >>> from iab.algorithms import format_dynamic_programming_matrix, format_traceback_matrix
@@ -324,7 +324,7 @@ We can now combine all of these steps to take a set of query sequences, build a 
 >>> guide_tree = TreeNode.from_linkage_matrix(guide_lm, guide_dm.ids)
 ```
 
-We can view the guide tree in [newick format](http://scikit-bio.org/docs/latest/generated/skbio.io.newick.html) as follows:
+We can view the guide tree in [Newick format](http://scikit-bio.org/docs/latest/generated/skbio.io.newick.html) as follows:
 
 ```python
 >>> print(guide_tree)
@@ -340,7 +340,7 @@ We can view the guide tree in [newick format](http://scikit-bio.org/docs/latest/
 >>> print(msa)
 ```
 
-We can now build a (hopefully) improved tree from our multiple sequence alignment. First we'll look at our original distance matrix again, and then the distance matrix generted from the progressive multiple sequence alignment.
+We can now build a (hopefully) improved tree from our multiple sequence alignment. First we'll look at our original distance matrix again, and then the distance matrix generated from the progressive multiple sequence alignment.
 
 ```python
 >>> fig = guide_dm.plot(cmap='Greens')
