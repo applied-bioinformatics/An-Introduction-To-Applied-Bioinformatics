@@ -21,7 +21,7 @@ IAB is in early development stage. To see the plans for where the project will g
 
 ## Who's involved?
 
-<div style="float: right; margin-left: 30px;"><a href="http://www.sloan.org"><img title="Logo by @gregcaporaso." style="float: right;margin-left: 30px;" src="http://www.sloan.org/fileadmin/media/images/logos/SloanLogo-primary-black.png" align=right></a></div>
+<div style="float: right; margin-left: 30px;"><a href="http://www.sloan.org"><img title="Sloan Foundation." style="float: right;margin-left: 30px;" src="https://sloan.org/storage/app/media/Logos/Sloan-Logo-primary-blac-web.png" align=right></a></div>
 
 IAB is primarily being developed by [Greg Caporaso](http://caporasolab.us/people/greg-caporaso/) (GitHub/Twitter: [@gregcaporaso](https://github.com/gregcaporaso)) in the [Caporaso Lab](http://www.caporasolab.us) at [Northern Arizona University](http://www.nau.edu). You can find information on the courses I teach on [my teaching website](http://www.caporasolab.us/teaching) and information on my research and lab on [my lab website](http://www.caporasolab.us).
 
