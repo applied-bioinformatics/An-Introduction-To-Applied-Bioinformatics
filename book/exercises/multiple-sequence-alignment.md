@@ -3,7 +3,7 @@
 
 ## Purpose <link src="t1fQKW"/>
 
-In this assignment you'll use multiple sequence alignment to reconstruct the phylogeny of a group of organisms based on their 16S rRNA sequences. This assignment builds on ideas from the previous assingment, in that in the last assignment you were identifying good primers to use for amplifying 16S from diverse organisms, and in this assignment we're using those sequences to group organisms by their relatedness. Because of the very large numbers of sequences that are commonly obtained in a modern DNA-sequencing-based experiment, grouping similiar sequences and then working with representative sequences for each of those groups is common for computational efficiency. We'll be exploring these ideas in more detail through-out the next segments of the class.
+In this assignment you'll use multiple sequence alignment to reconstruct the phylogeny of a group of organisms based on their 16S rRNA sequences. This assignment builds on ideas from the previous assignment, in that in the last assignment you were identifying good primers to use for amplifying 16S from diverse organisms, and in this assignment we're using those sequences to group organisms by their relatedness. Because of the very large numbers of sequences that are commonly obtained in a modern DNA-sequencing-based experiment, grouping similar sequences and then working with representative sequences for each of those groups is common for computational efficiency. We'll be exploring these ideas in more detail through-out the next segments of the class.
 
 From a bioinformatics standpoint, we usually start working with sequence in fasta format, very similar to the sequences in the cell below. See [here](http://www.bioinformatics.nl/tools/crab_fasta.html) for an explanation of the fasta format.
 
@@ -29,7 +29,7 @@ Remember to learn about what a function does you can run:
 
 `help(name_of_function)`
 
-Try this with the funcitons below to see what they do.
+Try this with the functions below to see what they do.
 
 ```python
 >>> %pylab inline
@@ -157,7 +157,7 @@ Display the guide tree for the sequences in the cell below.
 
 ## Question 3 <link src="8xf4kF"/>
 
-What are the differences in the guide tree from *Question 2*, the tree that is generated after 1 iterations of iterative mutliple sequence alignment, and the tree that is generated after 5 iterations of iterative multiple sequence alignment? Display the trees for both 1 and 5 iterations of iterative multiple sequence alignment.
+What are the differences in the guide tree from *Question 2*, the tree that is generated after 1 iterations of iterative multiple sequence alignment, and the tree that is generated after 5 iterations of iterative multiple sequence alignment? Display the trees for both 1 and 5 iterations of iterative multiple sequence alignment.
 
 ```python
 >>> help(iterative_msa_and_tree)
@@ -176,7 +176,7 @@ What are the differences in the guide tree from *Question 2*, the tree that is g
 
 ## Question 4 <link src="sVsOoD"/>
 
-Generate and display a tree based on progressive alignment of the sequences from the second cell (the ones in the ``seqs_16s`` varaible). This step can take about 10 minutes to complete.
+Generate and display a tree based on progressive alignment of the sequences from the second cell (the ones in the ``seqs_16s`` variable). This step can take about 10 minutes to complete.
 
 ```python
 >>> help(progressive_msa_and_tree)
@@ -243,6 +243,6 @@ Discuss your results here.
 
 ## Question 7 <link src="5goFbb"/>
 
-Is the taxonomy of the represenative sequences consistent with phylogenetic tree you generated in question 4? For your 90% and 70% OTUs, list three taxa (e.g., at the phylum, class, or species level) that are monophyletic, if any, and three taxa that are not monophyletic, if any. Discuss two specific reasons why some taxa might appear to not be monophyletic based on your tree.
+Is the taxonomy of the representative sequences consistent with phylogenetic tree you generated in question 4? For your 90% and 70% OTUs, list three taxa (e.g., at the phylum, class, or species level) that are monophyletic, if any, and three taxa that are not monophyletic, if any. Discuss two specific reasons why some taxa might appear to not be monophyletic based on your tree.
 
 Discuss your results here.

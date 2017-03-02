@@ -38,7 +38,7 @@ The *individuals* represented at the tips of our trees don't necessarily have to
 
 <p>
 
-Phylogenetic trees are used for many other diverse applications in bioinformatics, so it's therefore important that a bioinformatican have an understanding of they are built and how they should be interpreted. An additional application that we'll cover in this text is comparing the composition of communities of organisms, but we'll come back to that [later](alias://2bb2cf).
+Phylogenetic trees are used for many other diverse applications in bioinformatics, so it's therefore important that a bioinformatician have an understanding of they are built and how they should be interpreted. An additional application that we'll cover in this text is comparing the composition of communities of organisms, but we'll come back to that [later](alias://2bb2cf).
 
 ## How phylogenies are reconstructed <link src="nluhSw"/>
 
@@ -174,7 +174,7 @@ In our simulation, each sequence is directly derived from exactly one sequence f
     <figcaption><b>Figure 7</b>: Schematic of a simulated evolutionary process. Bases in red indicate mutation since the last common ancestor. The bottom panel illustrates the real-world equivalent of our final product, where we wouldn't know the true phylogeny (indicated by the dashed branches), the sequence of the last common ancestor, or what positions have changed since the last common ancestor.</figcaption>
 </figure>
 
-Let's simulate 10 generations of sequences here, and then randomly select some of those sequences to work with in the remaining sections of this chapter. For the sake of runtime, I'm going to set our ``indel_probability=0.0``. This means that we won't need to align our selected sequences before constructing trees from them (because with only substitution mutations occuring, homologous positions always remain aligned). Multiple sequence alignment is currently a runtime bottleneck in IAB, so this will let us run this notebook much faster. If you'd like to model insertion/deletions, you can increase the ``indel_probability``, say to ``0.005``. If you do that, the sequences will be aligned for you in the next cell, but it may take around 30 minutes to run.
+Let's simulate 10 generations of sequences here, and then randomly select some of those sequences to work with in the remaining sections of this chapter. For the sake of runtime, I'm going to set our ``indel_probability=0.0``. This means that we won't need to align our selected sequences before constructing trees from them (because with only substitution mutations occurring, homologous positions always remain aligned). Multiple sequence alignment is currently a runtime bottleneck in IAB, so this will let us run this notebook much faster. If you'd like to model insertion/deletions, you can increase the ``indel_probability``, say to ``0.005``. If you do that, the sequences will be aligned for you in the next cell, but it may take around 30 minutes to run.
 
 ```python
 >>> from skbio.alignment import global_pairwise_align_nucleotide
@@ -287,7 +287,7 @@ One alignment-based distance metric that we've looked at is Hamming distance. Th
 
 ### Jukes-Cantor correction of observed distances between sequences <link src="xUNwrl"/>
 
-The Hamming distance between aligned sequences, as described above, is simple to calculate, but it is often an underestimate of the actual amount of mutation that has occurred in a sequence. Here's why: imagine that in one generation $g$, position $p$ of sequence $S1$ undergoes a substitution mutation from ``A`` to ``C``. Then, in the next generation $g + 1$, the same position $p$ of sequence $S1$ undergoes a subsitution from ``C`` to ``T``. Because we can only inspect the modern-day sequences, not their ancestors, it looks like position $p$ has had a single subtitution event. Similarly, if in generation $g + 1$ position $p$ changed from ``C`` back to ``A`` (a *back substitution*), we would observe zero substitution mutations at that position even though two had occurred.
+The Hamming distance between aligned sequences, as described above, is simple to calculate, but it is often an underestimate of the actual amount of mutation that has occurred in a sequence. Here's why: imagine that in one generation $g$, position $p$ of sequence $S1$ undergoes a substitution mutation from ``A`` to ``C``. Then, in the next generation $g + 1$, the same position $p$ of sequence $S1$ undergoes a substitution from ``C`` to ``T``. Because we can only inspect the modern-day sequences, not their ancestors, it looks like position $p$ has had a single substitution event. Similarly, if in generation $g + 1$ position $p$ changed from ``C`` back to ``A`` (a *back substitution*), we would observe zero substitution mutations at that position even though two had occurred.
 
 To correct for this, the *Jukes-Cantor correction* is typically applied to the Hamming distances between the sequences. Where $p$ is the Hamming distance, the corrected genetic distance is computed as $d = -\frac{3}{4} \ln(1 - \frac{4}{3}p)$. The derivation of this formula is beyond the scope of this text (you can find it in Inferring Phylogeny by Felsenstein), but it is based on the Jukes-Cantor (JC69) nucleotide substitution model.
 
@@ -494,7 +494,7 @@ Step 4: At this stage, there is only one distance below the diagonal in our dist
 
 Let's compute and visualize UPGMA trees for the two distance matrices that we created above. How do these trees compare to one another? Does one look more or less correct than the other (they may or may not, depending on the random sample of sequences that are being compared).
 
-One thing to be aware of as you start visualizing trees is that the vertial order (in the default ``TreeStyle`` being used here) doesn't have biological meaning, it's purely a visualization component. You can rotate the branches descending from any node in the tree freely.
+One thing to be aware of as you start visualizing trees is that the vertical order (in the default ``TreeStyle`` being used here) doesn't have biological meaning, it's purely a visualization component. You can rotate the branches descending from any node in the tree freely.
 
 ```python
 >>> from iab.algorithms import tree_from_distance_matrix

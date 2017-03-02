@@ -1,7 +1,7 @@
 
 # Studying Microbial Diversity <link src='2bb2cf'/>
 
-Single-cellular organisms, often referred to as “microbes”, represent the vast majority of the diversity of life on Earth. Microbes perform an amazing array of biological functions and rarely live or act alone, but rather exist in complex communities composed of many interacting species. We now know that the traditional approach for studying microbial communities (or microbiomes), which relied on microbial culture (in other words, being able to grow the microbes in the lab), is insufficient because we don’t know the conditions required for the growth of most microbes. Recent advances that have linked microbiomes to processes ranging from global (for example, the cycling of biologically essential nutrients such as carbon and nitrogen) to personal (for example, human disease, including obesity and cancer) have thus relied on “culture independent” techniques. Identification now relies on sequencing fragments of microbial genomes, and using those fragments as “molecular fingerprints” that allow researchers to profile which microbes are present in an environment. Currently, the bottleneck in microbiome analysis is not DNA sequencing, but rather interpreting the large quantities of DNA sequence data that are generated: often on the order of tens to hundreds of gigabytes. This chapter will integrate many of the topics we've covered in previous chapters to introduce how we study communities of microorganisms using their DNA sequences.
+Unicellular organisms, often referred to as “microbes”, represent the vast majority of the diversity of life on Earth. Microbes perform an amazing array of biological functions and rarely live or act alone, but rather exist in complex communities composed of many interacting species. We now know that the traditional approach for studying microbial communities (or microbiomes), which relied on microbial culture (in other words, being able to grow the microbes in the lab), is insufficient because we don’t know the conditions required for the growth of most microbes. Recent advances that have linked microbiomes to processes ranging from global (for example, the cycling of biologically essential nutrients such as carbon and nitrogen) to personal (for example, human disease, including obesity and cancer) have thus relied on “culture independent” techniques. Identification now relies on sequencing fragments of microbial genomes, and using those fragments as “molecular fingerprints” that allow researchers to profile which microbes are present in an environment. Currently, the bottleneck in microbiome analysis is not DNA sequencing, but rather interpreting the large quantities of DNA sequence data that are generated: often on the order of tens to hundreds of gigabytes. This chapter will integrate many of the topics we've covered in previous chapters to introduce how we study communities of microorganisms using their DNA sequences.
 
 ## Getting started: the feature table <link src='23ef6e'/>
 
@@ -56,7 +56,7 @@ OTU5    0
 Name: A, dtype: int64
 ```
 
-**TODO**: Trees in newick format; sample metadata in tsv format, and loaded into a pandas DataFrame.
+**TODO**: Trees in Newick format; sample metadata in TSV format, and loaded into a pandas DataFrame.
 
 Before we start looking at what we can do with this data once we have it, let's discuss some terminology.
 
@@ -164,11 +164,11 @@ E2  0  0  1
 
 ### Phylogenetic Diversity (PD) <link src='c407f8'/>
 
-Phylogenetic Diversity (PD) is a metric that was developed by Dan Faith in the early 1990s (find the original paper [here](http://www.sciencedirect.com/science/article/pii/0006320792912013)). Like many of the measures that are used in microbial community ecology, it wasn't initially designed for studying microbial communities, but rather communities of "macro-organisms" (macrobes?). Some of these metrics, including PD, do translate well to microbial community analysis, while some don't translate as well. (For an illustration of the effect of sequencing error on PD, where it is handled well, versus it's effect on the Chao1 metric, where it is handled less well, see Figure 1 of [Reeder and Knight (2010)](http://www.nature.com/nmeth/journal/v7/n9/full/nmeth0910-668b.html)).
+Phylogenetic Diversity (PD) is a metric that was developed by Dan Faith in the early 1990s (find the original paper [here](http://www.sciencedirect.com/science/article/pii/0006320792912013)). Like many of the measures that are used in microbial community ecology, it wasn't initially designed for studying microbial communities, but rather communities of "macro-organisms" (macrobes?). Some of these metrics, including PD, do translate well to microbial community analysis, while some don't translate as well. (For an illustration of the effect of sequencing error on PD, where it is handled well, versus its effect on the Chao1 metric, where it is handled less well, see Figure 1 of [Reeder and Knight (2010)](http://www.nature.com/nmeth/journal/v7/n9/full/nmeth0910-668b.html)).
 
 PD is relatively simple to calculate. It is computed simply as the sum of the branch length in a phylogenetic tree that is "covered" or represented in a given sample. Let's look at an example to see how this works.
 
-First, let's define a phylogenetic tree using the newick format (which is described [here](http://evolution.genetics.washington.edu/phylip/newicktree.html), and more formally defined [here](http://evolution.genetics.washington.edu/phylip/newick_doc.html)). We'll then load that up using [scikit-bio](http://scikit-bio.org)'s [TreeNode](http://scikit-bio.org/generated/skbio.core.tree.TreeNode.html#skbio.core.tree.TreeNode) object.
+First, let's define a phylogenetic tree using the Newick format (which is described [here](http://evolution.genetics.washington.edu/phylip/newicktree.html), and more formally defined [here](http://evolution.genetics.washington.edu/phylip/newick_doc.html)). We'll then load that up using [scikit-bio](http://scikit-bio.org)'s [TreeNode](http://scikit-bio.org/generated/skbio.core.tree.TreeNode.html#skbio.core.tree.TreeNode) object.
 
 ```python
 >>> from io import StringIO
@@ -654,7 +654,7 @@ Here we used ANOSIM testing whether our with and between category groups differ.
 
 #### Hierarchical clustering <link src='09f456'/>
 
-Next, let's look at a hierarchical clustering analysis, similar to that presented in panel G above. Here I'm applying the UPGMA functionality implemented in [scipy](http://www.scipy.org/scipylib/index.html) to generate a tree which we visualize with a dendrogram. However the tips in this tree don't represent sequences or OTUs, like they did when we [covered UPGMA for phylogenetic reconstruction](alias://73d028), but instead they represent samples, and samples with a smaller branch length between them are more similar in composition than samples with a longer branch length between them. (Remember that only horizontal branch length is counted - vertical branch length is just to aid in the organization of the dendrogram.)
+Next, let's look at a hierarchical clustering analysis, similar to that presented in panel G above. Here I'm applying the UPGMA functionality implemented in [SciPy](http://www.scipy.org/scipylib/index.html) to generate a tree which we visualize with a dendrogram. However the tips in this tree don't represent sequences or OTUs, like they did when we [covered UPGMA for phylogenetic reconstruction](alias://73d028), but instead they represent samples, and samples with a smaller branch length between them are more similar in composition than samples with a longer branch length between them. (Remember that only horizontal branch length is counted - vertical branch length is just to aid in the organization of the dendrogram.)
 
 ```python
 >>> from scipy.cluster.hierarchy import average, dendrogram
@@ -869,7 +869,7 @@ As I mentioned above, polar ordination isn't widely used in practice, but the fe
 
 In this section, we're going to make use of three python third-party modules to apply PCoA and visualize the results 3D scatter plots. The data we'll use here is the full unweighted UniFrac distance matrix from a study of soil microbial communities across North and South America (originally published in [Lauber *et al.* (2009)](http://www.ncbi.nlm.nih.gov/pubmed/19502440)). We're going to use [pandas](http://pandas.pydata.org/) to manage the metadata, [scikit-bio](http://scikit-bio.org/) to manage the distance matrix and compute PCoA, and [matplotlib](http://matplotlib.org/) to visualize the results.
 
-First, we'll load sample metadata into a [pandas DateFrame](http://pandas.pydata.org/pandas-docs/dev/generated/pandas.DataFrame.html). These are really useful for loading and working with the type of tabular information that you'd typically store in a spreadsheet or database table. (Note that one thing I'm doing in the following cell is tricking pandas into thinking that it's getting a file as input, even though I have the information represented as tab-separated lines in a multiline string. [python's StringIO](https://docs.python.org/2/library/stringio.html) is very useful for this, and it's especially convenient in your unit tests... which you're writing for all of your code, right?) Here we'll load the tab-separated text, and then print it.
+First, we'll load sample metadata into a [pandas DataFrame](http://pandas.pydata.org/pandas-docs/dev/generated/pandas.DataFrame.html). These are really useful for loading and working with the type of tabular information that you'd typically store in a spreadsheet or database table. (Note that one thing I'm doing in the following cell is tricking pandas into thinking that it's getting a file as input, even though I have the information represented as tab-separated lines in a multiline string. [python's StringIO](https://docs.python.org/2/library/stringio.html) is very useful for this, and it's especially convenient in your unit tests... which you're writing for all of your code, right?) Here we'll load the tab-separated text, and then print it.
 
 ```python
 >>> from iab.data import lauber_soil_sample_md
@@ -968,7 +968,7 @@ What does the following ordination plot tell you about the relationship between 
 >>> _ = lauber_soil_unweighted_unifrac_pc.plot(lauber_soil_sample_md, 'Latitude', cmap='Greens', title="Samples colored by Latitude", axis_labels=('PC1', 'PC2', 'PC3'))
 ```
 
-If the answer to the above question is that there doesn't seem to be much association, you're on the right track. We can qualtify this, for example, by testing for correlation between pH and value on PC 1.
+If the answer to the above question is that there doesn't seem to be much association, you're on the right track. We can quantify this, for example, by testing for correlation between pH and value on PC 1.
 
 ```python
 >>> from scipy.stats import spearmanr
@@ -1038,7 +1038,7 @@ Imagine you ran three different beta diversity metrics on your BIOM table: unwei
 
 Specifically, what we want to ask when comparing these results is **given a pair of ordination plots, is their shape (in two or three dimensions) the same?** The reason we care is that we want to know, **given a pair of ordination plots, would we derive the same biological conclusions regardless of which plot we look at?**
 
-We can use a [Mantel test](http://scikit-bio.org/docs/latest/generated/generated/skbio.stats.distance.mantel.html) for this, which is way of testing for correlation between distance matrics.
+We can use a [Mantel test](http://scikit-bio.org/docs/latest/generated/generated/skbio.stats.distance.mantel.html) for this, which is a way of testing for correlation between distance matrices.
 
 ```python
 >>> from skbio.stats.distance import mantel
