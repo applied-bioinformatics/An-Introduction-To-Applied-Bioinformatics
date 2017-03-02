@@ -30,36 +30,12 @@ In the *Getting started with [Biology](alias://cf88ac) and [Computer Science](al
 
 There are two ways to read *An Introduction To Applied Bioinformatics*:
 
-* The *recommended* way is to work with it interactively. You have two options here:
-  * Work with the hosted version on [Binder](http://mybinder.org/repo/gregcaporaso/built-iab). This is very easy and will let you work with the latest development version of IAB. This is currently experimental, as Binder is undergoing active development. **Note: On opening a notebook in Binder, you'll need to select the *Kernel* menu item, then *Change kernel*, and then *Python 3*. If you don't do this, you will get errors when you try to execute the notebooks** (this step won't always be required - it should be addressed as part of [Binder issue #20](https://github.com/binder-project/binder/issues/20)).
-  * Install IAB locally. See the [install instructions below](alias://96d24f).
-* The *easiest* way is to view the static notebooks online at  [readIAB.org](http://readIAB.org/). You should:
-  * [start here to view the latest version](http://readIAB.org/book/latest/), or
-  * [start here to view the previous release versions](http://readIAB.org/) (which will won't have all the latest content, but will be more polished and likely less buggy).
+* The *recommended* way is to work with it interactively. You can do this by installing IAB locally. See the [install instructions at readIAB.org](http://readIAB.org).
+* The *easiest* way is to view the static notebooks online at [readIAB.org](http://readIAB.org/).  
+
+In both cases you have the option to read the latest development version (i.e., *master* of the GitHub repository) or the latest release version. The lastest development version will have all of the most recent content, but since it hasn't yet been officially released some aspects may be less polished or buggy. The latest release version won't necessarily have the latest content, but it should be more polished and less buggy. If you're reading IAB on your own, I recommend working with the latest development version. If you're teaching a class that uses IAB, you probably should use the latest release version.
 
 IAB is split into four different sections: *Getting started*, *Fundamentals*, *Applications*, and *Wrapping up*. You should start reading IAB by working through the *Getting started* and *Fundamentals* chapters in order. You should then read the *Applications* chapters and *Wrapping up* in any order, based on your own interest.
-
-## Local installation <link src='96d24f'/>
-
-*This step is not required for readers using Binder.*
-
-If you're going to read *An Introduction to Applied Bioinformatics* interactively (recommended), you'll need to install it. The easiest way to install IAB is using [``conda``](http://conda.pydata.org/docs/intro.html), a free package and environment manager for Python. You'll first need to install Miniconda following the instructions [here](http://conda.pydata.org/docs/install/quick.html#miniconda-quick-install-requirements).
-
-After installing Miniconda, change to the directory where you'd like to store the IAB notebooks (e.g., ``cd $HOME/Documents``). Then, run:
-
-```bash
-conda create --name iab -c http://conda.binstar.org/gregcaporaso python=3.4 iab
-```
-
-This will create a new ``iab`` environment, install IAB and its dependencies in it, and download the IAB notebooks. Once that completes, you should be able to run:
-
-```bash
-source activate iab
-cd $HOME/Documents/IAB-notebooks
-ipython notebook index.ipynb
-```
-
-to get started. If you installed in a directory other than ``$HOME/Documents``, you'll need to adapt the second command to refer to the directory containing ``IAB-notebooks``. Whenever you want to start reading and working with IAB, you'll run these three commands.
 
 ## Using the IPython Notebook <link src='fdf5dd'/>
 
