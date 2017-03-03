@@ -18,5 +18,5 @@ install:
   - pip install . --no-deps
   - biab notebook -i book -o ipynb
 script:
-  # Running through all notebooks takes awhile, so bail if the unit tests fail.
-  - nosetests --with-doctest && python runipynbs.py ipynb
+  - nosetests --with-doctest
+  - python runipynbs.py ipynb
