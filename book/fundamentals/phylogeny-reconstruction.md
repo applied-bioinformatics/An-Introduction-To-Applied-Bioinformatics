@@ -205,7 +205,7 @@ On the opposite end of the spectrum from simulations for algorithm comparison is
 
 ## Visualizing trees with ete3 <link src="WWRxKR"/>
 
-As we now start computing phylogenetic trees, we're going to need a way to visualize them. We'll use the ete3 Python package for this, and in the next cell we'll configure the ``TreeStyle`` which is used to define how the trees we visualize will look. If you'd like to experiment with other views, you can modify the code in this cell according to the [ete3 documentation](http://etetoolkit.org/docs/latest/tutorial/tutorial_drawing.html). If you come up with a nicer style, I'd be interested in seeing that in a pull request. You can post screenshots to [IAB issue #213](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/213) before creating a pull request so I can see what the new style looks like.
+As we now start computing phylogenetic trees, we're going to need a way to visualize them. We'll use the ete3 Python package for this, and in the next cell we'll configure the ``TreeStyle`` which is used to define how the trees we visualize will look. If you'd like to experiment with other views, you can modify the code in this cell according to the [ete3 documentation](http://etetoolkit.org/docs/latest/tutorial/tutorial_drawing.html). If you come up with a nicer style, I'd be interested in seeing that in a pull request. You can post screenshots to [IAB issue #213](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues/213) before creating a pull request so I can see what the new style looks like.
 
 ```python
 >>> import ete3
@@ -515,7 +515,7 @@ As mentioned above, UPGMA has a rather complex sounding name: *Unweighted Pair G
 
 ### Phylogenetic reconstruction with neighbor-joining <link src="JlqeYq"/>
 
-This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 5.2.2 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic. You can also refer to the [scikit-bio implementation of Neighbor Joining](http://scikit-bio.org/docs/latest/generated/skbio.tree.nj.html), which will be used here (the source code is linked from that page).
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 5.2.2 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic. You can also refer to the [scikit-bio implementation of Neighbor Joining](http://scikit-bio.org/docs/latest/generated/skbio.tree.nj.html), which will be used here (the source code is linked from that page).
 
 One invalid assumption that is made by UPGMA is inherent in Step 1, where each branch connecting the internal node to a tip is set to half of the length between the tips. This assumes the mutation rates are constant throughout the tree, or in other words that the tree is *ultrametric*. This is not likely to be the case in the real world, as different lineages in the tree might be undergoing different selective pressures, leading to different rates of evolution. Neighboring joining is a distance-based phylogenetic reconstruction approach that does not assume ultrametricity.
 
@@ -526,29 +526,29 @@ One invalid assumption that is made by UPGMA is inherent in Step 1, where each b
 
 ### Limitations of distance-based approaches <link src="4hDWma"/>
 
-This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119).
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues/119).
 
 ## Bootstrap analysis <link src="sbQHSN"/>
 
-This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 12.4.1 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic.
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 12.4.1 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic.
 
 ## Parsimony-based approaches to phylogenetic reconstruction <link src="7WKikt"/>
 
-This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 8 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic.
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 8 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic.
 
 ### How many possible phylogenies are there for a given collection of sequences? <link src="DguiCU"/>
 
-This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 3 of [Inferring Phylogenies](http://www.amazon.com/Inferring-Phylogenies-Joseph-Felsenstein/dp/0878931775/ref=sr_1_1?s=books&ie=UTF8&qid=1393288952&sr=1-1&keywords=inferring+phylogenies), the definitive text on this topic.
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 3 of [Inferring Phylogenies](http://www.amazon.com/Inferring-Phylogenies-Joseph-Felsenstein/dp/0878931775/ref=sr_1_1?s=books&ie=UTF8&qid=1393288952&sr=1-1&keywords=inferring+phylogenies), the definitive text on this topic.
 
 ## Statistical approaches to phylogenetic reconstruction <link src="VLXTEL"/>
 
 ### Bayesian methods <link src="pTnwaZ"/>
 
-This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 7 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic.
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 7 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic.
 
 ### Maximum likelihood methods <link src="pTnwaZ"/>
 
-This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 6 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic.
+This section is currently a placeholder. You can track progress on this section through [issue #119](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues/119). In the meantime, I recommend Chapter 6 of *[The Phylogenetic Handbook](http://www.amazon.com/gp/product/0521730716/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=0521730716&linkCode=as2&tag=anintrotoappl-20&linkId=YLNAKVFX7BV4W5TW")*, by Lemey, Salemi, and Vandamme for discussion of this topic.
 
 ## Rooted versus unrooted trees <link src="HCGmey"/>
 
