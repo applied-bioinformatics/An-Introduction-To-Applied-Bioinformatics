@@ -9,7 +9,7 @@ From a bioinformatics perspective, studying biological diversity is centered aro
 
 * A table of the frequencies of certain biological features (e.g., species or OTUs) on a per sample basis.
 * *Sample metadata* describing exactly what each of the samples is, as well as any relevant technical information.
-* *Feature metadata* describing each of the features. This can be taxonomic information, for example, but we'll come back to this when we discuss features in more detail (this will be completed as part of [#105](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/105)).
+* *Feature metadata* describing each of the features. This can be taxonomic information, for example, but we'll come back to this when we discuss features in more detail (this will be completed as part of [#105](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues/105)).
 * Optionally, information on the relationships between the biological features, typically in the form of a phylogenetic tree where tips in the tree correspond to OTUs in the table.
 
 None of these are trivial to generate (defining OTUs was described in the [OTU clustering chapter](../algorithms/5-sequence-mapping-and-clustering.ipynb), building trees in the [Phylogenetic reconstruction chapter](../algorithms/3-phylogeny-reconstruction.ipynb), and there is a lot of active work on standardized ways to describe samples in the form of metadata, for example [Yilmaz et al (2011)](http://www.nature.com/nbt/journal/v29/n5/full/nbt.1823.html) and the [isa-tab](http://isa-tools.org/) project. For this discussion we're going to largely ignore the complexities of generating each of these, so we can focus on how we study diversity.
