@@ -12,7 +12,7 @@ import os
 import sys
 
 from runipy.notebook_runner import NotebookRunner, NotebookError
-from IPython.nbformat.current import read
+import nbformat
 
 # Taken and modified from
 # https://github.com/paulgb/runipy/blob/master/runipy/main.py
@@ -52,9 +52,9 @@ def main():
 def run_notebook(nbpath):
     logging.info("Reading notebook '%s'", nbpath)
     with open(nbpath) as nbfile:
-        notebook = read(nbfile, 'json')
+        notebook = nbformat.read(nbfile, as_version=3)
 
-    runner = NotebookRunner(notebook, mpl_inline=True)
+    runner = NotebookRunner(notebook)
 
     try:
         runner.run_notebook()
