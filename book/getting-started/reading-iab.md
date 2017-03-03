@@ -6,15 +6,15 @@
 
 IAB is interactive, being **based on IPython Notebooks** which can be installed on a reader's computer or viewed statically online. As readers are learning a concept, for example, pairwise sequence alignment, they are presented with its scikit-bio implementation directly in the text. scikit-bio code is well annotated (adhering to the [pep8](https://www.python.org/dev/peps/pep-0008/) and [numpydoc](https://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt) conventions), so readers can use it to assist with their understanding of the concept. And, because IAB is presented as an IPython Notebook, readers can execute the code directly in the text. For example, when learning pairwise alignment, users can align sequences provided in IAB (or their own sequences) and modify parameters (or even the algorithm itself) to see how changes affect the resulting alignments.
 
-IAB is **completely open access**, with all software being BSD-licensed, and all text being licensed under Creative Commons Attribution Only (i.e., CC BY-NC-SA 4.0). All development and publication is coordinated under [public revision control on GitHub](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics).
+IAB is **completely open access**, with all software being BSD-licensed, and all text being licensed under Creative Commons Attribution Only (i.e., CC BY-NC-SA 4.0). All development and publication is coordinated under [public revision control on GitHub](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics).
 
 IAB is also an **electronic-only resource**. There are currently no plans to commercialize it or to create a print version. This means that, unlike printed bioinformatics texts which are generally out of date before the ink dries, IAB can be updated as the field changes.
 
 **The life cycle of IAB is more like a software package than a book.** There will be development and release versions of IAB, where the release versions are more polished but won't always contain the latest content, and the development versions will contain all of the latest materials, but won't necessarily be copy-edited and polished.
 
-We are in the process of developing a **project status page** that will detail the plans for IAB. This will include the full table of contents, and what stage you can expect chapters to be at at different times. You can track progress of this on [IAB #97](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/97).
+We are in the process of developing a **project status page** that will detail the plans for IAB. This will include the full table of contents, and what stage you can expect chapters to be at at different times. You can track progress of this on [IAB #97](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues/97).
 
-[My](alias://fedd13) goal for IAB is for it to make bioinformatics as accessible as possible to students from varied backgrounds, and to get more people into this hugely exciting field. I'm very interested in hearing from readers and instructors who are using IAB, so get in touch if you have corrections, suggestions for how to improve the content, or any other thoughts or comments on the text. In the spirit of openness, I'd prefer to be contacted via the [IAB issue tracker](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/). I'll respond to direct e-mail as well, but I'm always backlogged (just ask my students), so e-mail responses are likely to be slower.
+[My](alias://fedd13) goal for IAB is for it to make bioinformatics as accessible as possible to students from varied backgrounds, and to get more people into this hugely exciting field. I'm very interested in hearing from readers and instructors who are using IAB, so get in touch if you have corrections, suggestions for how to improve the content, or any other thoughts or comments on the text. In the spirit of openness, I'd prefer to be contacted via the [IAB issue tracker](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues/). I'll respond to direct e-mail as well, but I'm always backlogged (just ask my students), so e-mail responses are likely to be slower.
 
 I hope you find IAB useful, and that you enjoy reading it!
 
@@ -108,18 +108,18 @@ These are some books that I've enjoyed, that have also helped me think about bio
 
 ## Need help? <link src='da2930'/>
 
-If you're having issues getting *An Introduction to Applied Bioinformatics* running on your computer, or you have corrections or suggestions on the content, you should get in touch through the [IAB issue tracker](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues). This will generally be much faster than e-mailing the author directly, as there are multiple people who monitor the issue tracker. It also helps us manage our technical support load if we can consolidate all requests and responses in one place.
+If you're having issues getting *An Introduction to Applied Bioinformatics* running on your computer, or you have corrections or suggestions on the content, you should get in touch through the [IAB issue tracker](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues). This will generally be much faster than e-mailing the author directly, as there are multiple people who monitor the issue tracker. It also helps us manage our technical support load if we can consolidate all requests and responses in one place.
 
 ## Contributing to IAB <link src='b1c06a'/>
 
-If you're interested in contributing content or features to IAB, you should start by reviewing [CONTRIBUTING.md](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/CONTRIBUTING.md) which provides guidelines on how to get involved.
+If you're interested in contributing content or features to IAB, you should start by reviewing [CONTRIBUTING.md](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/blob/master/CONTRIBUTING.md) which provides guidelines on how to get involved.
 
 ## About the author <link src='fedd13'/>
 
-My name is Greg Caporaso. I'm the primary author of *An Introduction to Applied Bioinformatics*, but there are [other contributors](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/graphs/contributors) and I hope that list will grow.
+My name is Greg Caporaso. I'm the primary author of *An Introduction to Applied Bioinformatics*, but there are [other contributors](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/graphs/contributors) and I hope that list will grow.
 
 <div style="float: left; margin-left: 20px; margin-right: 20px; margin-top: 25px; margin-bottom: 15px; width: 200px">
- <img title="The author in Telluride, CO (April, 2015)." style="float: right;" src="https://raw.github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/getting-started/images/greg-in-telluride.png" height=250/>
+ <img title="The author in Telluride, CO (April, 2015)." style="float: right;" src="https://raw.github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/master/book/getting-started/images/greg-in-telluride.png" height=250/>
 </div>
 
 I have degrees in Computer Science (B.S., University of Colorado, 2001) and Biochemistry (B.A., University of Colorado, 2004; Ph.D., University of Colorado 2009). Following my formal training, I joined the [Rob Knight Laboratory](http://knightlab.ucsd.edu), then at the University of Colorado, for approximately 2 years as a post-doctoral scholar. In 2011, I joined the faculty at [Northern Arizona University (NAU)](www.nau.edu) where I'm an Assistant Professor in the Biological Sciences department. I [teach](http://www.caporasolab.us/teaching/) one course per year in bioinformatics for graduate and undergraduate students of Biology and Computer Science. I also run a [research lab](http://www.caporasolab.us/) in the [Center for Microbial Genetics and Genomics](http://www.mggen.nau.edu/), which is focused on developing bioinformatics software and studying the human microbiome.
@@ -136,4 +136,4 @@ For updates on IAB and various other things, you should [follow me on Twitter](h
 
 *An Introduction to Applied Bioinformatics* is funded in part by the [Alfred P. Sloan Foundation](www.sloan.org). Initial prototyping was funded by [Arizona's Technology and Research Initiative Fund](http://nau.edu/Research/Funding/Technology-Research-Initiative-Fund/). The style of the project was inspired by [Bayesian Methods for Hackers](http://camdavidsonpilon.github.io/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/).
 
-See the repository's [contributors page](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/graphs/contributors) for information on who has contributed to the project.
+See the repository's [contributors page](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/graphs/contributors) for information on who has contributed to the project.

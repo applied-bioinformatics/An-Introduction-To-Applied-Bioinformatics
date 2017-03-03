@@ -6,7 +6,7 @@ You will need a (free) GitHub account to submit a pull request.
 
 ## How IAB is developed
 
-IAB is written in [markdown](http://commonmark.org/). [build-iab](https://github.com/gregcaporaso/build-iab) is then used to convert that markdown to html (for static online viewing) and ipynb (for interactive use). If you're submitting changes to content, you'll be submitting changes to markdown files. These are much more manageable that submitting changes to IPython notebooks, as it's much easier to diff the content.
+IAB is written in [markdown](http://commonmark.org/). [build-iab](https://github.com/caporaso-lab/build-iab) is then used to convert that markdown to html (for static online viewing) and ipynb (for interactive use). If you're submitting changes to content, you'll be submitting changes to markdown files. These are much more manageable that submitting changes to IPython notebooks, as it's much easier to diff the content.
 
 ## Small contributions
 
@@ -16,11 +16,11 @@ Watch a five-minute YouTube video illustrating this process [here](https://www.y
 
 ## Large contributions
 
-If you're interested in making contributions involving code refactoring, new chapters or sections, restructuring of content, etc, you should first comment on existing issues (or create new issues) indicating what you want to work on, and wait for us to discuss the changes with you before you get started. This will ensure that the changes you want to make are in line with the direction of the project, compatible with future plans, and that there is no one else already working on related contributions. This will avoid wasted time if your change involves something that we wouldn't ultimately be merged. If in doubt, bring it up on the [issue tracker](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/issues/) first.
+If you're interested in making contributions involving code refactoring, new chapters or sections, restructuring of content, etc, you should first comment on existing issues (or create new issues) indicating what you want to work on, and wait for us to discuss the changes with you before you get started. This will ensure that the changes you want to make are in line with the direction of the project, compatible with future plans, and that there is no one else already working on related contributions. This will avoid wasted time if your change involves something that we wouldn't ultimately be merged. If in doubt, bring it up on the [issue tracker](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues/) first.
 
 ## Who's contributing?
 
-See the list of [IAB contributors](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/graphs/contributors) to find out who is involved with the project. If you submit a pull request that is merged, your GitHub account will be automatically listed on that page.
+See the list of [IAB contributors](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/graphs/contributors) to find out who is involved with the project. If you submit a pull request that is merged, your GitHub account will be automatically listed on that page.
 
 ## Technical points
 
@@ -30,8 +30,8 @@ If you're interested in building the IAB html and/or IPython Notebooks locally, 
 
 ```
 pip install numpy
-pip install https://github.com/gregcaporaso/build-iab/archive/master.zip
-wget https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/archive/master.zip
+pip install https://github.com/caporaso-lab/build-iab/archive/master.zip
+wget https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/archive/master.zip
 unzip master.zip
 cd An-Introduction-To-Applied-Bioinformatics-master/
 pip install .
@@ -74,6 +74,6 @@ You should always link using these ids, and never statically link to other secti
 
 ## License and license changes
 
-The IAB license is available [here](https://github.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/blob/master/LICENSE). This license may change over time, but the online version of IAB will always be the most current version, and will be available free of charge.
+The IAB license is available [here](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/blob/master/LICENSE). This license may change over time, but the online version of IAB will always be the most current version, and will be available free of charge.
 
 By contributing to IAB, you are agreeing that Greg Caporaso has sole discretion over the license and any future changes to the license. If a paid (e.g., printed) copy of IAB is ever created, contributors are not entitled to payments or royalties of any kind. Your contribution of content represents your agreement with these terms.
