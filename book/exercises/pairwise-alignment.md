@@ -78,7 +78,7 @@ This next function, ``slice_sequence``, will let you let you easily extract segm
 >>>         raise ValueError("Ending position cannot be larger than the length of the sequence.")
 >>>     if start_pos >= end_pos:
 >>>         raise ValueError("The starting position must be less than the ending positions.")
->>>     return ''.join(list(sequence)[start_pos:end_pos+1])
+>>>     return sequence[start_pos:end_pos+1]
 ```
 
 The following cell contains the full-length 16S rRNA sequences of five diverse bacterial organisms. Make sure to run this cell in order to load the sequences into memory.
