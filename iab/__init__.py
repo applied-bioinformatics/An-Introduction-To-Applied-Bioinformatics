@@ -7,4 +7,7 @@
 # http://creativecommons.org/licenses/by-nc-sa/4.0/.
 # -----------------------------------------------------------------------------
 
-__version__ = '0.1.2-dev'
+import pkg_resources
+
+__version__ = pkg_resources.get_distribution(
+                'An-Introduction-To-Applied-Bioinformatics').version
