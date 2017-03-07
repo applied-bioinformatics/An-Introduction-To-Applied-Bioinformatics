@@ -110,6 +110,13 @@ These are some books that I've enjoyed, that have also helped me think about bio
 
 If you're having issues getting *An Introduction to Applied Bioinformatics* running on your computer, or you have corrections or suggestions on the content, you should get in touch through the [IAB issue tracker](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/issues). This will generally be much faster than e-mailing the author directly, as there are multiple people who monitor the issue tracker. It also helps us manage our technical support load if we can consolidate all requests and responses in one place.
 
+If you're getting in touch about an issue that you're having, please include the version of IAB that you're reading. You can get this as follows:
+
+```python
+>>> from iab import __version__ as iab_version
+>>> print(iab_version)
+```
+
 ## Contributing to IAB <link src='b1c06a'/>
 
 If you're interested in contributing content or features to IAB, you should start by reviewing [CONTRIBUTING.md](https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/blob/master/CONTRIBUTING.md) which provides guidelines on how to get involved.
