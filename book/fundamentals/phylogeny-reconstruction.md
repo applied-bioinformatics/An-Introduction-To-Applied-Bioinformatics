@@ -490,7 +490,7 @@ Step 4: At this stage, there is only one distance below the diagonal in our dist
 
 #### Applying UPGMA from SciPy <link src="zS3dSx"/>
 
-[SciPy](http://www.scipy.org/) contains an implementation of UPGMA that we can apply to our existing distance matrices, and we can then visualize the resulting trees with ete3. IAB provides a *wrapper function* that will give this an interface that is convenient to work with. If you'd like to see what the wrapper function is doing, using the ``psource`` IPython magic function as we have in other places in the text.
+[SciPy](http://www.scipy.org/) contains an implementation of UPGMA that we can apply to our existing distance matrices, and then visualize the resulting trees with ete3. IAB provides a *wrapper function* that will give this an interface that is convenient to work with. If you'd like to see what the wrapper function is doing, using the ``psource`` IPython magic function as we have in other places in the text.
 
 Let's compute and visualize UPGMA trees for the two distance matrices that we created above. How do these trees compare to one another? Does one look more or less correct than the other (they may or may not, depending on the random sample of sequences that are being compared).
 
