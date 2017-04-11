@@ -5,7 +5,7 @@
 
 In this assignment you'll use multiple sequence alignment to reconstruct the phylogeny of a group of organisms based on their 16S rRNA sequences. This assignment builds on ideas from the previous assignment, in that in the last assignment you were identifying good primers to use for amplifying 16S from diverse organisms, and in this assignment we're using those sequences to group organisms by their relatedness. Because of the very large numbers of sequences that are commonly obtained in a modern DNA-sequencing-based experiment, grouping similar sequences and then working with representative sequences for each of those groups is common for computational efficiency. We'll be exploring these ideas in more detail through-out the next segments of the class.
 
-From a bioinformatics standpoint, we usually start working with sequence in fasta format, very similar to the sequences in the cell below. See [here](http://www.bioinformatics.nl/tools/crab_fasta.html) for an explanation of the fasta format.
+From a bioinformatics standpoint, we usually start working with sequences in fasta format, very similar to the sequences in the cell below. See [here](http://www.bioinformatics.nl/tools/crab_fasta.html) for an explanation of the fasta format.
 
 At this point, you should be feeling fairly comfortable interacting with the IPython Notebook. This assignment will give you additional practice while you explore the ideas mentioned above.
 
