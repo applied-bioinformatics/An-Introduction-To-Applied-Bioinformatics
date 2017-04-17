@@ -39,7 +39,7 @@ F(i-1, j, k) - 2d\\
 \end{align}
 $$
 
-However the complexity of this algorithm is much worse than for pairwise alignment. For pairwise alignment, remember that if aligning two sequences of lengths $m$ and $n$, the runtime of the algorithm will be proportional to $m \times n$. If $n$ is longer than or as long as $m$, we simplify the statement to say that the runtime of the algorithm will be be proportional to $n^2$. This curve has a pretty scary trajectory: runtime for pairwise alignment with dynamic programming is said to scale quadratically.
+The complexity of this algorithm is much worse than for pairwise alignment. For pairwise alignment, remember that if aligning two sequences of lengths $m$ and $n$, the runtime of the algorithm will be proportional to $m \times n$. If $n$ is longer than or as long as $m$, we simplify the statement to say that the runtime of the algorithm will be be proportional to $n^2$. This curve has a pretty scary trajectory: runtime for pairwise alignment with dynamic programming is said to scale quadratically.
 
 ```python
 >>> %pylab inline
