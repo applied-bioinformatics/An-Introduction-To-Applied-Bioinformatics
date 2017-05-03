@@ -199,6 +199,8 @@ What is the difference between a local and global alignment in terms of what is 
 
 What is the sequence in s2 from position 500 to 505?
 
+**Hint:** the first base in a sequence is position 1; the first item in a Python list is index 0.
+
 ```python
 ...
 ```
