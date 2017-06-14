@@ -92,7 +92,7 @@ In the next section we'll work through our first bioinformatics algorithm, in th
 
 ## A simple procedure for aligning a pair of sequences <link src='86c6b7'/>
 
-Lets define two sequences, ``seq1`` and ``seq2``, and develop an approach for aligning them.
+Let's define two sequences, ``seq1`` and ``seq2``, and develop an approach for aligning them.
 
 ```python
 >>> seq1 = DNA("ACCGGTGGAACCGGTAACACCCAC")
