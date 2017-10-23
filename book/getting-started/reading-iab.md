@@ -84,7 +84,7 @@ If you're new to biology, these are some books and resources that will help you 
 
 If you're new to Computer Science and programming, these are some books and resources that will help you get started.
 
-* [Software Carpentry](www.software-carpentry.org) *Online resources for learning scientific computing skills, and regular in-person workshops all over the world. Taking a Software Carpentry workshop **will** pay off for biology students interested in a career in research.*
+* [Software Carpentry](http://www.software-carpentry.org) *Online resources for learning scientific computing skills, and regular in-person workshops all over the world. Taking a Software Carpentry workshop **will** pay off for biology students interested in a career in research.*
 
 * [Practical Computing for Biologists](http://amzn.to/1Ukx5S6) by Steven Haddock and Casey Dunn. *A great introduction to many computational skills that are required of modern biologists. I *highly* recommend this book to all Biology undergraduate and graduate students.*
 
