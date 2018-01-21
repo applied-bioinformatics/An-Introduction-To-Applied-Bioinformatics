@@ -39,7 +39,7 @@ IAB is split into four different sections: *Getting started*, *Fundamentals*, *A
 
 ## Using the IPython Notebook <link src='fdf5dd'/>
 
-IAB is built using the IPython Notebook, an interactive HTML-based computing environment. The main source for information about the IPython Notebook is the [IPython Notebook website](http://ipython.org/notebook). You can find information there on how to use the IPython Notebook, and also on how to set up and run and IPython Notebook server (for example, if you'd like to make one available to your students).
+IAB is built using the IPython Notebook, an interactive HTML-based computing environment. The main source for information about the IPython Notebook is the [IPython Notebook website](http://ipython.org/notebook). You can find information there on how to use the IPython Notebook as well as setting up and running an IPython Notebook server (for example, if you'd like to make one available to your students).
 
 Most of the code that is used in IAB comes from [scikit-bio](http://scikit-bio.org) package, or other python scientific computing tools. You can access these in the same way that you would in a python script. For example:
 
