@@ -3,7 +3,7 @@ numpy
 scipy
 matplotlib
 nose
-scikit-bio
+scikit-bio < 0.5.0
 jupyter
 seaborn
 pandas
