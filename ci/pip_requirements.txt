@@ -1,6 +1,0 @@
-runipy
-ipymd
-https://github.com/caporaso-lab/build-iab/archive/master.zip
-qiime-default-reference <0.2.0
-tabulate
-ete3
