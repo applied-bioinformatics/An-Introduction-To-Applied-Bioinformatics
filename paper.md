@@ -17,6 +17,9 @@ authors:
   affiliation: "1, 2"
 - name: Willow Mercurio
   affiliation: 1
+- name: Matthew R Dillon
+  orcid: 0000-0002-7713-1952
+  affiliation: 1
 - name: J Gregory Caporaso
   orcid: 0000-0002-8865-1670
   affiliation: "1, 2"
