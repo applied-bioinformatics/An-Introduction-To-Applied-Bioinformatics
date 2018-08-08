@@ -16,7 +16,7 @@ before_install:
 install:
   - conda env create -n iab -f environment.yml
   - source activate iab
-  - pip install . runipy ipymd https://github.com/caporaso-lab/build-iab/archive/master.zip
+  - pip install runipy https://github.com/caporaso-lab/build-iab/archive/master.zip
   - biab notebook -i book -o ipynb
 script:
   - nosetests --with-doctest
