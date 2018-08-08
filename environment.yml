@@ -1,0 +1,11 @@
+channels:
+  - etetoolkit
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.5
+  - scikit-bio=0.4.2
+  - ete3
+  - ete_toolchain
+  - pip:
+    - https://github.com/caporaso-lab/An-Introduction-To-Applied-Bioinformatics/archive/master.zip
