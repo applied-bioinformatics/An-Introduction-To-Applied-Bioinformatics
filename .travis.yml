@@ -14,7 +14,7 @@ before_install:
   - ./miniconda.sh -b
   - export PATH=/home/travis/miniconda3/bin:$PATH
 install:
-  - conda env create --yes -n iab -f environment.yml
+  - conda env create -n iab -f environment.yml
   - source activate iab
   - pip install . runipy ipymd https://github.com/caporaso-lab/build-iab/archive/master.zip
   - biab notebook -i book -o ipynb
