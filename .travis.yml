@@ -14,9 +14,9 @@ before_install:
   - ./miniconda.sh -b
   - export PATH=/home/travis/miniconda3/bin:$PATH
 install:
-  - conda create --yes -n iab -c etetoolkit -c conda-forge python=3.5 ete3 scikit-bio=0.4.2 numpy scipy pandas
+  - conda env create -n iab -f environment.yml
   - source activate iab
-  - pip install . runipy ipymd https://github.com/caporaso-lab/build-iab/archive/master.zip
+  - pip install runipy https://github.com/caporaso-lab/build-iab/archive/master.zip
   - biab notebook -i book -o ipynb
 script:
   - nosetests --with-doctest
