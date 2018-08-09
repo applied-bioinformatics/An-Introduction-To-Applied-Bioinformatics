@@ -16,8 +16,8 @@ before_install:
 install:
   - conda env create -n iab -f environment.yml
   - source activate iab
-  - pip install runipy https://github.com/caporaso-lab/build-iab/archive/master.zip
+  - pip install https://github.com/caporaso-lab/build-iab/archive/master.zip
   - biab notebook -i book -o ipynb
 script:
   - nosetests --with-doctest
-  - python runipynbs.py ipynb
+  - jupyter nbconvert *ipynb */*ipynb --execute --ExecutePreprocessor.timeout=-1
