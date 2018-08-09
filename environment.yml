@@ -4,7 +4,7 @@ channels:
   - defaults
 dependencies:
   - python=3.5
-  - scikit-bio=0.4.2
+  - scikit-bio >= 0.4.1, < 0.5.0
   - ete3
   - ete_toolchain
   - pip:
