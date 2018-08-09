@@ -20,4 +20,5 @@ install:
   - biab notebook -i book -o ipynb
 script:
   - nosetests --with-doctest
+  - cd ipynb
   - jupyter nbconvert *ipynb */*ipynb --execute --ExecutePreprocessor.timeout=-1
