@@ -75,7 +75,7 @@ Scanning through these two sequences, we can see that they are largely identical
 
 ## What is a sequence alignment? <link src='e63a4f'/>
 
-Let's take a minute to think about sequence evolution and what a biological sequence alignment actually is. Over the course of biological evolution, a DNA sequence changes, most frequently due to random errors in replication (or the copying of a DNA sequence). These replications errors are referred to as **mutations**. Some types of mutation events that can occur are:
+Let's take a minute to think about sequence evolution and what a biological sequence alignment actually is. Over the course of biological evolution, a DNA sequence changes, most frequently due to random errors in replication (or the copying of a DNA sequence). These replication errors are referred to as **mutations**. Some types of mutation events that can occur are:
 
 * **substitutions**, where one base (or amino acid, in protein sequences) is replaced with another;
 * **insertions**, where one or more contiguous bases are inserted into a sequence;
