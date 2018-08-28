@@ -22,9 +22,14 @@ Imagine you have three sequences - call them ``r1``and ``r2`` (*r* is for *refer
 >>> r1 = DNA("ACCCAGGTTAACGGTGACCAGGTACCAGAAGGGTACCAGGTAGGACACACGGGGATTAA")
 >>> r2 = DNA("ACCGAGGTTAACGGTGACCAGGTACCAGAAGGGTACCAGGTAGGAGACACGGCGATTAA")
 >>> q1 = DNA("TTCCAGGTAAACGGTGACCAGGTACCAGTTGCGTTTGTTGTAGGAGACACGGGGACCCA")
-...
+```
+Here we just stored 3 sequences as variables. Now we're going to computer the hamming distance on them using the function `hamming()`. Don't forget we can look at what any function does by using `%psource`. Let's see what the `hamming()` function looks like (don't worry if some parts of it aren't entirely clear just yet):
+
+```python
 >>> %psource hamming
 ```
+
+Let's find out if our query ("q1") is closer to reference 1 or reference 2 based on the hamming distance:
 
 ```python
 >>> print(hamming(r1, q1))
