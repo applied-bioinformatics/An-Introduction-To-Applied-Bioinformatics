@@ -42,6 +42,10 @@ Here we've assumed that only *substitution events* have occurred, meaning one DN
 
 ```python
 >>> q2 = DNA("TCCAGGTAAACGGTGACCAGGTACCAGTTGCGTTTGTTGTAGGAGACACGGGGACCCAT")
+
+print(q1)
+print(q2)
+
 >>> print(hamming(r1, q2))
 ```
 
@@ -51,6 +55,10 @@ What we'd really want to do is have a way to indicate that a deletion seems to h
 
 ```python
 >>> q3 = DNA("-TCCAGGTAAACGGTGACCAGGTACCAGTTGCGTTTGTTGTAGGAGACACGGGGACCCA")
+
+print(q1)
+print(q3)
+
 >>> print(hamming(r1, q3))
 ```
 
