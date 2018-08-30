@@ -14,6 +14,24 @@ Whose genome is the above sequence encoded in? What is its function? Take a minu
 
 In the context of database searching, a query sequence and a reference sequence that we hypothesize to be homologous can be identical to one another, or they can differ as a result of mutation events. When sequences differ, we're often then interested in how much they differ, or their pairwise similarity, which can help us identify the most closely related of several homologs in the reference database. There is an important distinction in the terms *homology* and *similarity*: homology is a discrete variable, and similarity is a continuous variable. A pair of biological sequences either *are* or *are not* derived from a common ancestor, but they can be more or less similar to each other. Saying that two sequences are 80% homologous doesn't make sense. What people generally mean when they say this is that two sequences are 80% similar, and as a result they are hypothesizing homology between the sequences.
 
+> Here we are going to import all functions used in this chapter. If you want to return somewhere in the middle later, be sure to run this block of code.
+
+```python
+>>> from skbio.alignment import local_pairwise_align_ssw
+>>> from IPython.core import page
+>>> import qiime_default_reference as qdr
+>>> import skbio
+>>> import random
+>>> from iab.algorithms import local_alignment_search, heuristic_local_alignment_search_random, heuristic_local_alignment_search_kmers, heuristic_local_alignment_search_gc, shuffle_sequence, generate_random_score_distribution, fraction_better_or_equivalent_alignments
+>>> import time
+>>> import pandas as pd
+>>> import itertools
+>>> import seaborn as sns
+>>> import IPython.display
+>>> import collections
+>>> import functools
+```
+
 ## Defining the problem <link src="P7kHdy"/>
 
 As mentioned above, if we want to perform a homology search we'll have one or more *query sequences*, and for each we want to know which sequence(s) in a reference database they are most similar to.
@@ -21,7 +39,6 @@ As mentioned above, if we want to perform a homology search we'll have one or mo
 Sequence homology searching can be implemented in a few ways. In this chapter, we'll use the local alignment function that we worked with in [the Pairwise Alignment chapter](alias://a76822), ``local_pairwise_align_ssw``, run it many times to search one *query* sequence against many *reference* sequences, and investigate the highest scoring alignment(s) to identify the best database match. Remember that you can always get help with a function by passing it as an argument to ``help``:
 
 ```python
->>> from skbio.alignment import local_pairwise_align_ssw
 >>> help(local_pairwise_align_ssw)
 ```
 
@@ -38,14 +55,10 @@ First, let's load Greengenes into a list of ``skbio.DNA`` sequence objects, and 
 ```python
 >>> %pylab inline
 ...
->>> from IPython.core import page
 >>> page.page = print
 ```
 
 ```python
->>> import qiime_default_reference as qdr
->>> import skbio
-...
 >>> # Load the taxonomic data
 ... reference_taxonomy = {}
 >>> for e in open(qdr.get_reference_taxonomy()):
@@ -76,8 +89,6 @@ Next, we'll just inspect a couple of the sequences we loaded. Notice how the spe
 For the sake of runtime, we're going to work through this chapter using a random sample of sequences from this database. Here we'll use Python's [random module](https://docs.python.org/3/library/random.html) to select sequences at random.
 
 ```python
->>> import random
-...
 >>> reference_db = random.sample(reference_db, k=5000)
 >>> print("%s sequences are present in the subsampled database." % len(reference_db))
 ```
@@ -122,8 +133,6 @@ Let's define a homology search function that aligns each provided query sequence
 Spend a minute looking at this function to understand what it's doing.
 
 ```python
->>> from iab.algorithms import local_alignment_search
-...
 >>> %psource local_alignment_search
 ```
 
@@ -132,8 +141,6 @@ Now let's perform some database searches. You can run the remaining code cells i
 This next cell, which is the one that actually performs the database searches, will take a little bit of time to run (maybe up to a minute or two). There is some code in this cell that will track the runtime. As it's running, think about how many query sequences we're searching against how many reference sequences, and refer back to the number of sequences in the full reference database. Does this strategy seem scalable to millions or sequences, which as mentioned above might be our ultimate goal? When you know the per-sequence runtime of this search, estimate how long it would take to do this in seconds for one million sequences. Convert the time in seconds to a unit that will be more meaningful to you.
 
 ```python
->>> import time
-...
 >>> start_time = time.time()
 >>> current_queries = random.sample(queries, k=4)
 >>> results = local_alignment_search(current_queries, reference_db)
@@ -173,9 +180,6 @@ In the examples above, it's taking on the order of 5-15 seconds to search a sing
 As we discussed in the previous chapter, the run time of pairwise alignment scales quadratically with sequence length. Database searching, at least in the example we're exploring in this chapter, is a bit of a different problem however. Our sequence lengths aren't changing, but rather it takes a long time because we're performing a computationally expensive step, pairwise alignment, many times. Our database is fixed in that the number of sequences in it doesn't change and the sequences themselves don't change. Our query sequences are all exactly the same length in this example (remember that we set that above, when we sliced a single region from reference database sequences to create our query sequences). Let's explore how the runtime of this database search scales under these constraints.
 
 ```python
->>> import pandas as pd
->>> import itertools
-...
 >>> def tabulate_local_alignment_search_runtime(queries, reference_db, n_query_sequences,
 ...                                             n_reference_sequences, search_function):
 ...     data = []
@@ -223,7 +227,6 @@ This table shows that we've tried a few variations on number of query sequences 
 This table clearly shows that there is an increase in runtime with an increasing number of query sequences, which we'd of course expect. What we care about is how runtime is increasing as a function of number of query sequences. Let's plot runtime versus the number of query sequences to help us understand that relationship.
 
 ```python
->>> import seaborn as sns
 >>> ax = sns.regplot(x="Number of query seqs", y="Runtime (s)", data=local_alignment_search_runtimes)
 >>> ax.set_xlim(0)
 >>> ax.set_ylim(0)
@@ -243,14 +246,12 @@ In practice, for a production scale sequence database search application like BL
 As mentioned above, it just takes too long to search individual query sequences against a large database. This problem also isn't going away anytime soon. While computers are getting faster (or cheaper), the size of our sequences collections are getting bigger because sequencing is getting cheaper. In fact, many people think that obtaining DNA sequences is getting cheaper faster than computers are getting cheaper. As our number of query sequences increases because we are able to obtain more for the same amount of money, or the size of our reference databases increases (because we're continuously obtaining more sequence data) this will increasing become a problem. Figures 1 and 2, respectively, illustrate that these are both real-world issues. Notice that the axes in these boths are on a log scale in both cases.
 
 ```python
->>> import IPython.display
 >>> IPython.display.IFrame(width="600", height="394", src="https://docs.google.com/spreadsheets/d/1vUkUuZsRlLW5U05rXXUn8B2sDYwShkClRMGa8Wiu6bc/pubchart?oid=1844125885&amp;format=interactive")
 ```
 
 Figure 1: Genome sequencing costs.
 
 ```python
->>> import IPython.display
 >>> IPython.display.IFrame(width="763", height="371", src="https://docs.google.com/spreadsheets/d/1vUkUuZsRlLW5U05rXXUn8B2sDYwShkClRMGa8Wiu6bc/pubchart?oid=2103353397&amp;format=interactive")
 ```
 
@@ -270,7 +271,6 @@ Our first heuristic will be a [straw man](https://en.wikipedia.org/wiki/Straw_ma
 Here's the source code for this. You can see that we're just wrapping our ``local_alignment_search`` function in a function that samples down to $p\%$ of the reference sequences.
 
 ```python
->>> from iab.algorithms import heuristic_local_alignment_search_random
 >>> %psource heuristic_local_alignment_search_random
 ```
 
@@ -302,8 +302,6 @@ What we need now is a way to know how often we get the "right answer", and how l
 Here's what this would look like:
 
 ```python
->>> import collections
-...
 >>> def evaluate_search(queries, reference_db, reference_taxonomy, search_function, taxonomy_levels, n=5, aligner=local_pairwise_align_ssw):
 ...     start_time = time.time()
 ...     search_results = search_function(current_queries, reference_db, n=n, aligner=aligner)
@@ -350,8 +348,6 @@ First let's see how this works for our full database search algorithm. What's th
 Next let's see how this compare to our random heuristic search algorithm. Try running this a few times, as you might get different answers due to different random selections of the database.
 
 ```python
->>> import functools
-...
 >>> heuristic_local_alignment_search_random_10 = functools.partial(heuristic_local_alignment_search_random, p=0.10)
 ...
 >>> runtime, fraction_correct, data = evaluate_search(current_queries, reference_db, reference_taxonomy,
@@ -386,8 +382,6 @@ One metric of sequence composition that we can compute quickly (because remember
 ```
 
 ```python
->>> from iab.algorithms import heuristic_local_alignment_search_gc
-...
 >>> %psource heuristic_local_alignment_search_gc
 ```
 
@@ -424,8 +418,6 @@ In our next heuristic, we'll only align our query to the reference sequences wit
 Here's the source code:
 
 ```python
->>> from iab.algorithms import heuristic_local_alignment_search_kmers
-...
 >>> %psource heuristic_local_alignment_search_kmers
 ```
 
@@ -437,7 +429,7 @@ Let's apply this and see how it does. How does the runtime and fraction of corre
 
 ```python
 >>> heuristic_local_alignment_search_kmers_50 = \
->>>  functools.partial(heuristic_local_alignment_search_kmers, k=k, database_subset_size=database_subset_size)
+>>> functools.partial(heuristic_local_alignment_search_kmers, k=k, database_subset_size=database_subset_size)
 ...
 >>> runtime, fraction_correct, data = evaluate_search(current_queries, reference_db, reference_taxonomy,
 ...                                                   heuristic_local_alignment_search_kmers_50,
@@ -534,7 +526,6 @@ In this section, we are going to learn about how to interpret alignment scores b
 First, we'll define a function that can generate random sequences for us. This will take a scikit-bio sequence object (either ``skbio.DNA``, ``skbio.RNA``, or ``skbio.Protein``) and a length, and it will randomly generate a sequence of that type and length for us.
 
 ```python
->>> import random
 >>> def random_sequence(moltype, length):
 ...     result = []
 ...     alphabet = list(moltype.nondegenerate_chars)
@@ -556,7 +547,6 @@ We can now run this a few times to generate some random sequences:
 Next, we need a function that will shuffle the characters in a sequence, and give us a new sequence back. We'll use this to generate a sequence that is similar (in length and composition) to our input sequence, but which we know is not homologous. We'll use Pythons `random.shuffle` function, which randomly re-orders the order of the elements in a sequence, but keeps the composition and length of the sequence the same.
 
 ```python
->>> from iab.algorithms import shuffle_sequence
 >>> %psource shuffle_sequence
 ```
 
@@ -582,7 +572,6 @@ Let's generate a random query sequence and align it against itself to see what t
 Next let's generate 99 random variants of that sequence with ``shuffle_sequence`` and compute the pairwise alignment for each of those variants against the query sequence. We'll then look at the distribution of those scores.
 
 ```python
->>> from iab.algorithms import generate_random_score_distribution
 >>> %psource generate_random_score_distribution
 ```
 
@@ -594,8 +583,6 @@ Next let's generate 99 random variants of that sequence with ``shuffle_sequence`
 How does the actual score of aligning the sequence to itself compare to the score of aligning it to many similar but non-homologous sequences? Let's plot these to get a better idea.
 
 ```python
->>> import seaborn as sns
-...
 >>> def plot_score_distribution(actual_score, random_scores):
 ...     ax = sns.distplot(random_scores, kde=False, label="Random scores", color="b")
 ...     ax.plot([actual_score, actual_score], ax.get_ylim(), '--', label="Actual score")
@@ -618,7 +605,6 @@ To determine if our alignment is statistically significant, we need to define $\
 Here's what all of this looks like:
 
 ```python
->>> from iab.algorithms import fraction_better_or_equivalent_alignments
 >>> %psource fraction_better_or_equivalent_alignments
 ```
 
