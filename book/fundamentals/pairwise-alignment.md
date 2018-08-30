@@ -694,8 +694,6 @@ To explore runtime, let's use the IPython [magic function](http://ipython.org/ip
 First, let's *benchmark* the runtime of the scikit-bio ``local_pairwise_align_nucleotide`` function. This specifically performs nucleotide alignment, and is implemented in Python.
 
 ```python
->>> from skbio.alignment import local_pairwise_align_nucleotide
-...
 >>> seq1 = DNA("GGTCTTCGCTAGGCTTTCATCGGGTTCGGCATCTACTCTGAGTTACTACG")
 >>> seq2 = DNA("GGTCTTCAGGCTTTCATCGGGAACGGCATCTCTGAGTTACTACC")
 ...
@@ -705,8 +703,6 @@ First, let's *benchmark* the runtime of the scikit-bio ``local_pairwise_align_nu
 From interpreting these results, it looks like this is taking a few seconds to compute the alignment. When executing this, you may see a red warning box pop up. Read that warning message (a good practice, in general!). This is telling us that there is a faster implementation of Smith-Waterman alignment available in scikit-bio, so let's benchmark that one for comparison. We'll use the same two sequences for a direct comparison, of course.
 
 ```python
->>> from skbio.alignment import local_pairwise_align_ssw
-...
 >>> %timeit local_pairwise_align_ssw(seq1, seq2)
 ```
 
@@ -733,8 +729,6 @@ Next, let's apply this to pairs of sequences where we vary the length. We don't 
 Let's first define a function to generate a random sequence of a specific length and type of biological sequence. Take a minute to understand that code, as we'll do this a few times throughout the text.
 
 ```python
->>> import numpy as np
-...
 >>> def random_sequence(moltype, length):
 ...     result = []
 ...     # Our "alphabet" here will consist of the standard characters in a
@@ -757,8 +751,6 @@ Now let's apply that function a few times. Execute this cell a few times to conf
 Now we'll define a loop where we align random pairs of sequences of increasing length, and compile the time it took to align the sequences. Here we want programmatic access to the runtimes, so we're going to use [Python's ``timeit`` module](https://docs.python.org/3/library/timeit.html) (which the ``%timeit`` magic function is based on).
 
 ```python
->>> import timeit
-...
 >>> times = []
 >>> seq_lengths = range(5000,110000,20000)
 ...
@@ -775,8 +767,8 @@ Now we'll define a loop where we align random pairs of sequences of increasing l
 
 If we look at the run times, we can see that they are increasing with increasing sequence lengths:
 
+
 ```python
->>> import pandas as pd
 >>> runtimes = pd.DataFrame(data=np.asarray([seq_lengths, times]).T, columns=["Sequence length", "Runtime (s)"] )
 >>> runtimes
 ```
@@ -790,7 +782,6 @@ That's probably to be expected, but what we care about now is *how* the runtimes
 Ultimately, we'd like to get an idea of how useful alignment would be in practice if our sequences were much longer, and specifically if sequence length might ultimately make sequence alignment too slow. Plotting these runtimes can help us to figure this out.
 
 ```python
->>> import seaborn as sns
 >>> ax = sns.regplot(x="Sequence length", y="Runtime (s)", data=runtimes, fit_reg=False)
 >>> ax.set_xlim(0)
 >>> ax.set_ylim(0)
