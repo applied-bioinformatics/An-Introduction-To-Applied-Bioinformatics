@@ -3,7 +3,7 @@
 
 One of the most fundamental problems in bioinformatics is determining how "similar" a pair of biological sequences are. There are many applications for this, including inferring the function or source organism of an unknown gene sequence, developing hypotheses about the relatedness of organisms, or grouping sequences from closely related organisms. On the surface this seems like a pretty straight-forward problem, not one that would have been at the center of decades of research and the subject of [one of the most cited papers](http://scholar.google.com/citations?view_op=view_citation&hl=en&user=VRccPlQAAAAJ&citation_for_view=VRccPlQAAAAJ:u-x6o8ySG0sC) in modern biology. In this chapter we'll explore why determining sequence similarity is harder than it might initially seem, and learn about *pairwise sequence alignment*, the standard approach for determining sequence similarity.
 
-> Here we are loading the tools we are going to use into our current environment. If you return to a section in this chapter later, be sure to run this block of code again.
+> Here we are importing the functions we are going to use into our current working environment. If you return to a section in this chapter later, be sure to run this block of code again.
 
 ```python
 >>> %pylab inline
@@ -12,6 +12,16 @@ One of the most fundamental problems in bioinformatics is determining how "simil
 >>> import numpy as np
 >>> from IPython.core.display import HTML
 >>> from IPython.core import page
+>>> from scipy.spatial.distance import hamming
+>>> from skbio import DNA, Protein
+>>> from iab.algorithms import show_F, show_T, blosum50, show_substitution_matrix, format_dynamic_programming_matrix, format_traceback_matrix
+>>> from skbio.alignment._pairwise import _compute_score_and_traceback_matrices, _traceback, _init_matrices_sw
+>>> from skbio.sequence import Protein
+>>> from skbio.alignment import TabularMSA, global_pairwise_align, local_pairwise_align, local_pairwise_align_nucleotide, local_pairwise_align_ssw
+>>> import timeit
+>>> import pandas as pd
+>>> import seaborn as sns
+
 >>> page.page = print
 ```
 
@@ -19,12 +29,13 @@ Imagine you have three sequences - call them ``r1``and ``r2`` (*r* is for *refer
 
 
 ```python
->>> from scipy.spatial.distance import hamming
->>> from skbio import DNA
-...
 >>> r1 = DNA("ACCCAGGTTAACGGTGACCAGGTACCAGAAGGGTACCAGGTAGGACACACGGGGATTAA")
 >>> r2 = DNA("ACCGAGGTTAACGGTGACCAGGTACCAGAAGGGTACCAGGTAGGAGACACGGCGATTAA")
 >>> q1 = DNA("TTCCAGGTAAACGGTGACCAGGTACCAGTTGCGTTTGTTGTAGGAGACACGGGGACCCA")
+...
+>>> print(r1)
+>>> print(r2)
+>>> print(q1)
 ```
 Here we just stored 3 sequences as variables. Now we're going to compute the hamming distance between them using the function `hamming()`. Don't forget we can look at what any function does by using `%psource`. Let's see what the `hamming()` function looks like (don't worry if some parts of it aren't entirely clear just yet):
 
@@ -117,7 +128,7 @@ Let's define two sequences, ``seq1`` and ``seq2``, and develop an approach for a
 
 I'm going to use a function in the following cells called ``show_F`` to display a table that we're going to use to develop our alignment. Once a function has been imported, you can view the source code for that function. This will be useful as we begin to explore some of the algorithms that are in use throughout these notebooks. You should spend time reading the source code examples in this book until you're sure that you understand what's happening, especially if your goal is to develop bioinformatics software. Reading other people's code is a good way to improve your own.
 
-Here's how you'd import a function and then view its source code:
+We did this at the top, but more explicitly now, here's how you'd import a function and then view its source code:
 
 ```python
 >>> from iab.algorithms import show_F
@@ -238,7 +249,6 @@ Because the sodium-potassium pump is a membrane-bound protein, it has regions th
 To score matches and mismatches differently based on which pair of amino acid residues are being aligned, our alignment algorithm is redefined to incorporate a **substitution matrix**, which defines the score associated with substitution of one amino acid for another. A widely used substitution matrix is referred to as BLOSUM 50. Let's take a look at this matrix:
 
 ```python
->>> from iab.algorithms import blosum50, show_substitution_matrix
 >>> aas = list(blosum50.keys())
 >>> aas.sort()
 >>> data = []
@@ -280,9 +290,11 @@ Needleman-Wunsch alignment is similar to the approach that we explored above. We
 We'll define two protein sequences to work with in this section. After working through this section, come back to this cell and change these protein sequences to explore how it changes the process. Make some small changes and some large changes to the protein sequences. The sequences that we're starting with are the same that are used in Chapter 2 of [Biological Sequence Analysis](http://amzn.to/1IYUEz2).
 
 ```python
->>> from skbio import Protein
 >>> seq1 = Protein("HEAGAWGHEE")
 >>> seq2 = Protein("PAWHEAE")
+...
+>>> print(seq1)
+>>> print(seq2)
 ```
 
 #### Step 1: Create blank matrices. <link src="hVbAxT"/>
@@ -307,8 +319,6 @@ Prior to initialization, $F$ and $T$ would look like the following.
 ```
 
 ```python
->>> from iab.algorithms import show_T
-...
 >>> T = np.full(shape=(num_rows, num_cols), fill_value=" ", dtype=np.str)
 >>> HTML(show_T(seq1, seq2, T))
 ```
@@ -373,18 +383,12 @@ Notice the situation that you encounter when computing the value for $F(2, 1)$. 
 The function in the next cell generates the dynamic programming and traceback matrices for us. You should review this code to understand exactly how it's working.
 
 ```python
->>> from iab.algorithms import format_dynamic_programming_matrix, format_traceback_matrix
->>> from skbio.alignment._pairwise import _compute_score_and_traceback_matrices
-...
 >>> %psource _compute_score_and_traceback_matrices
 ```
 
 You can now apply this function to `seq1` and `seq2` to compute the dynamic programming and traceback matrices.
 
 ```python
->>> from skbio.sequence import Protein
->>> from skbio.alignment import TabularMSA
-...
 >>> seq1 = TabularMSA([seq1])
 >>> seq2 = TabularMSA([seq2])
 ...
@@ -414,7 +418,6 @@ The score in the cell that you started in (the bottom-right in this case) is the
 Work through this process on paper, and then review the function in the next cell to see how this looks in Python.
 
 ```python
->>> from skbio.alignment._pairwise import _traceback
 >>> %psource _traceback
 ```
 
@@ -437,7 +440,6 @@ Think for a minute about how you'd define this function. What are the required i
 Here's the scikit-bio implementation of Needleman-Wunsch alignment. How is its API different from the interface you sketched out above?
 
 ```python
->>> from skbio.alignment import global_pairwise_align
 >>> %psource global_pairwise_align
 ```
 
@@ -467,9 +469,11 @@ The algorithm that is most commonly used for performing local alignment was orig
 Algorithmically, Smith-Waterman is nearly identical to Needleman-Wunsch, with three small important differences. We'll now work through Smith-Waterman alignment following the same steps that we followed for Needleman-Wunsch, and look at the differences as we go. We'll redefine our two sequences to align here. As you did for Needleman-Wunsch, after working through this example with these sequences, come back here and experiment with different sequences.
 
 ```python
->>> from skbio import Protein
 >>> seq1 = Protein("HEAGAWGHEE")
 >>> seq2 = Protein("PAWHEAE")
+...
+>>> print(seq1)
+>>> print(seq2)
 ```
 
 ### Step 1: Create blank matrices. <link src="Ew2bdO"/>
@@ -484,8 +488,6 @@ $F$ and $T$ are created in the same way for Smith-Waterman as for Needleman-Wuns
 ```
 
 ```python
->>> from iab.algorithms import show_T
-...
 >>> T = np.full(shape=(num_rows, num_cols), fill_value=" ", dtype=np.str)
 >>> HTML(show_T(seq1, seq2, T))
 ```
@@ -545,7 +547,6 @@ Go back to the final $F$ matrix that you computed with Needleman-Wunsch earlier 
 We'll use the same function that we used above to compute the full $F$ and $T$ matrices. To indicate that we now want to compute this using Smith-Waterman, we pass some additional parameters.
 
 ```python
->>> from skbio.alignment._pairwise import _init_matrices_sw
 >>> seq1 = TabularMSA([seq1])
 >>> seq2 = TabularMSA([seq2])
 ...
@@ -585,8 +586,6 @@ There is one small difference in the traceback step between Smith-Waterman and N
 Again, we can define a *convenience function*, which will allow us to provide the required input and just get our aligned sequences back.
 
 ```python
->>> from skbio.alignment import local_pairwise_align
-...
 >>> %psource local_pairwise_align
 ```
 
@@ -663,6 +662,9 @@ Here I define `seq1` to be slightly different than what I have above. Notice how
 ```python
 >>> seq1 = TabularMSA([Protein("HEAGAWGFHEE")])
 >>> seq2 = TabularMSA([Protein("PAWHEAE")])
+...
+>>> print(seq1)
+>>> print(seq2)
 ```
 
 ```python
