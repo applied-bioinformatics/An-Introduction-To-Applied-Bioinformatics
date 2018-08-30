@@ -243,7 +243,7 @@ In practice, for a production-scale sequence database search application like BL
 
 ## Heuristic algorithms <link src="mUArdw"/>
 
-As mentioned above, it just takes too long to search individual query sequences against a large database. This problem also isn't going away anytime soon. While computers are getting faster (or cheaper), the size of our sequences collections are getting bigger because sequencing is getting cheaper. In fact, many people think that obtaining DNA sequences is getting cheaper faster than computers are getting cheaper. As our number of query sequences increases because we are able to obtain more for the same amount of money, or the size of our reference databases increases (because we're continuously obtaining more sequence data) this will increasing become a problem. Figures 1 and 2, respectively, illustrate that these are both real-world issues. Notice that the axes in these boths are on a log scale in both cases.
+As mentioned above, it just takes too long to search individual query sequences against a large database. This problem also isn't going away anytime soon. While computers are getting faster (or cheaper), the sizes of our sequence collections are getting bigger because sequencing is getting cheaper. In fact, many people think that obtaining DNA sequences is getting cheaper faster than computers are getting cheaper. As our number of query sequences increases because we are able to obtain more for the same amount of money, or the size of our reference databases increases (because we're continuously obtaining more sequence data) this will increasing become a bigger problem. Figures 1 and 2, respectively, illustrate that these are both real-world issues. Notice that the axes are on a log scale in both cases.
 
 ```python
 >>> IPython.display.IFrame(width="600", height="394", src="https://docs.google.com/spreadsheets/d/1vUkUuZsRlLW5U05rXXUn8B2sDYwShkClRMGa8Wiu6bc/pubchart?oid=1844125885&amp;format=interactive")
@@ -257,7 +257,7 @@ Figure 1: Genome sequencing costs.
 
 Figure 2: Size of GenBank.
 
-One way that we can deal with this problem is by recognizing that most of the alignments that are performed in a database search are unlikely to be very good alignments. An algorithm developer could therefore improve runtime by defining a heuristic (or a rule) that is applied to determine which reference sequences are likely to result in good alignments, and only aligning the query against those. For it to be useful, making the decision to align or not (i.e., applying the heuristic) must be *much faster* than actually performing the pairwise alignment. The heuristic also needs to make *good* choices about which reference sequences to align the query against. If the algorithm chooses to not align against a specific query, that query is ruled out as a possible result of the database search. A good heuristic for sequence homology searching therefore makes it very unlikely to exclude the best alignment(s). When thinking about heuristic algorithms in general, there are some important considerations:
+One way that we can deal with this problem is by recognizing that most of the alignments that are performed in a database search are unlikely to be very good alignments. An algorithm developer could therefore improve runtime by defining a heuristic (or a rule) that is applied to determine which reference sequences are likely to result in good alignments, and only aligning the query against those. For it to be useful, making the decision to align or not (i.e., applying the heuristic) must be *much faster* than actually performing the pairwise alignment. The heuristic also needs to make *good* choices about which reference sequences to align the query against. If the algorithm chooses to not align against a specific reference, that reference is ruled out as a possible result of the database search. A good heuristic for sequence homology searching would therefore be very unlikely to exclude the best alignment(s). When thinking about heuristic algorithms in general, there are some important considerations:
 
 1. How often does the heuristic algorithm fail to get the right answer (in our case, does it make good choices about which reference sequences to align against)?
 2. How much faster is the heuristic than the "complete" approach, and is that reduction in runtime enough to justify not being guaranteed to get the best answer?
@@ -345,7 +345,7 @@ First let's see how this works for our full database search algorithm. What's th
 ...     print()
 ```
 
-Next let's see how this compare to our random heuristic search algorithm. Try running this a few times, as you might get different answers due to different random selections of the database.
+Next let's see how this compares to our random heuristic search algorithm. Try running this a few times, as you might get different answers due to different random selections of the database.
 
 ```python
 >>> heuristic_local_alignment_search_random_10 = functools.partial(heuristic_local_alignment_search_random, p=0.10)
@@ -385,7 +385,7 @@ One metric of sequence composition that we can compute quickly (because remember
 >>> %psource heuristic_local_alignment_search_gc
 ```
 
-If we run our queries again, how often do we get the right answer? How much did we reduce runtime? Do you think this is a better or worse heuristic?
+If we run our queries again, how often do we get the right answer? How much did we reduce runtime? Do you think this is a better or worse heuristic than what we implemented above?
 
 ```python
 >>> heuristic_local_alignment_search_gc_2 = functools.partial(heuristic_local_alignment_search_gc, database_subset_size=database_subset_size)
@@ -407,13 +407,13 @@ Try increasing and decreasing the number of sequences we'll align by increasing 
 
 #### kmer content <link src="QblTRV"/>
 
-Another metric of sequence composition is *kmer composition*. A kmer is simply a word (or list of adjacent characters) in a sequence of length k. Here are the kmer frequencies in a short DNA sequence. The ``overlap=True`` parameter here means that our kmers can overlap one another.
+Another metric of sequence composition is *kmer composition*. A kmer is simply a word (or list of adjacent characters) of length *k*, in a sequence. Here are the kmer frequencies in a short DNA sequence. The ``overlap=True`` parameter here means that our kmers can overlap one another.
 
 ```python
 >>> skbio.DNA('ACCGTGACCAGTTACCAGTTTGACCAA').kmer_frequencies(k=5, overlap=True)
 ```
 
-In our next heuristic, we'll only align our query to the reference sequences with the largest fraction of the kmers that are observed in the query sequence are also present in the reference sequence. This makes a lot of sense to use as an alignment heuristic: we're only aligning sequences when it looks like they'll have multiple length-``k`` stretches of nucleotides that are not interrupted by substitutions or insertion/deletion mutations.
+In our next heuristic, we'll only align our query to the reference sequences with the largest fraction of the kmers that are observed in the query sequence. This makes a lot of sense to use as an alignment heuristic: we're only aligning sequences when it looks like they'll have multiple length-``k`` stretches of nucleotides that are not interrupted by substitutions or insertion/deletion mutations.
 
 Here's the source code:
 
@@ -447,7 +447,7 @@ Let's apply this and see how it does. How does the runtime and fraction of corre
 
 #### Further optimizing composition-based approaches by pre-computing reference database information <link src="HQmZgF"/>
 
-One important feature of composition-based approaches is that, because the reference database doesn't change very often, we can pre-compute features of the reference sequences and re-use this. This can help us to vastly decrease the runtime of our heuristic searches. For example, the computation of all of the reference database kmer frequencies is a lot of work. If we can compute that outside of our database search, we can avoid doing that step for every database search, and therefore remove that computationally expensive (i.e., slow) step of the process.
+One important feature of composition-based approaches is that, because the reference database doesn't change very often, we can pre-compute features of the reference sequences and re-use them. This can help us to vastly decrease the runtime of our heuristic searches. For example, the computation of all of the reference database kmer frequencies is a lot of work. If we can compute that outside of our database search, we can avoid doing that step for every database search, and therefore remove that computationally expensive (i.e., slow) step of the process.
 
 Here we'll compute all of the reference database kmer frequencies. Notice that this step takes about a minute to complete. This is a minute of compute time that we can save on every database search!
 
@@ -478,7 +478,7 @@ We'll now pass our pre-computed kmer frequencies into our search function. How d
 
 ## Determining the statistical significance of a pairwise alignment <link src='87c92f'/>
 
-One thing you may have noticed is that the score you get back for a pairwise alignment is hard to interpret. It's dependent on the query and reference sequence lengths (and possibly their composition, depending on your substitution matrix). So an important question is how good a given pairwise alignment is. Here we'll learn about a statistical approach for answering that.
+One thing you may have noticed is that the score you get back for a pairwise alignment is hard to interpret. It's dependent on the query and reference sequence lengths (and possibly their composition, depending on your substitution matrix). So an important question is how to determine *how good* a given pairwise alignment is. Here we'll learn about a statistical approach for answering that.
 
 ### Metrics of alignment quality <link src="YdqCls"/>
 
@@ -517,11 +517,11 @@ There are a couple of ways that we could be wrong when we do sequence homology s
 
 If incurring a false positive about 5% of the time is acceptable (i.e., you're ok with calling a pair of sequences homologous when they actually are not about one in twenty times) then you'd set your $\alpha$ to 0.05. Setting $\alpha$ to a value this high likely means that the method will err on the side of false positives, and only infrequently will it say that a pair of sequences are not homologous when they actually are (i.e., achieve a false negative). If $\alpha$ were set to be very low on the other hand (say, $1 \times 10^{-50}$), then you will err on the side of false negatives. Only infrequently will you say that a pair of non-homologous sequences are homologous, but you might call many pairs of homologous sequences non-homologous. You should think of $\alpha$ as a dial. If you turn the dial toward higher values, you'll increase your false positive rate and decrease your false negative rate. If you turn the dial toward lower values, you'll decrease your false positive rate and increase your false negative rate.
 
-There is not a hard-and-fast rule for whether false positives or false negatives are better, which makes choosing $\alpha$ hard. It's application specific, so you need to understand the biological question your answering when making this decision, and the ramifications of false positives versus false negatives. In general, when might you prefer to have false positives? When might you prefer to have false negatives?
+There is not a hard-and-fast rule for whether false positives or false negatives are better, which makes choosing $\alpha$ hard. It's application specific, so you need to understand the biological question you're asking when making this decision, and the ramifications of false positives versus false negatives. In general, when might you prefer to have false positives? When might you prefer to have false negatives?
 
 ### Interpreting alignment scores in context <link src="a0nqBH"/>
 
-In this section, we are going to learn about how to interpret alignment scores by empirically determining if a pairwise alignment that we obtain is better than we would expect if the pair of sequences were working with were definitely not homologous. For a given pair of sequences that we want to align, we're first going to align them and compute the score of the alignment. We're then going to align many pairs of sequences that are similar to the query and reference, but that we know are not homologous. We'll do this by shuffling or randomizing the order of the bases in the query sequences, and performing another pairwise alignment.
+In this section, we are going to learn about how to interpret alignment scores by empirically determining if a pairwise alignment that we obtain is better than we would expect if the pair of sequences we're working with are definitely not homologous. For a given pair of sequences that we want to align, we're first going to align them and compute the score of the alignment. We're then going to align many pairs of sequences that are similar to the query and reference, but that we know are not homologous. We'll do this by shuffling or randomizing the order of the bases in the query sequences, and performing another pairwise alignment.
 
 First, we'll define a function that can generate random sequences for us. This will take a scikit-bio sequence object (either ``skbio.DNA``, ``skbio.RNA``, or ``skbio.Protein``) and a length, and it will randomly generate a sequence of that type and length for us.
 
@@ -666,17 +666,12 @@ Let's define a function to do this, and then compute a sequence that is 95% iden
 
 ```python
 >>> sequence1_95 = partially_randomize_sequence(0.95, sequence1)
-```
-
-```python
+...
 >>> sequence1
-```
-
-```python
 >>> sequence1_95
 ```
 
-Notice how these sequences are almost identical, but have some differences. Let's apply our approach to determine it would identify these sequences as being homologous bases on $\alpha = 0.05$.
+Notice how these sequences are almost identical, but have some differences. Let's apply our approach to determine it would identify these sequences as being homologous at $\alpha = 0.05$.
 
 ```python
 >>> print("Fraction of alignment scores at least as good as the alignment score: %r" %
@@ -689,13 +684,8 @@ Now let's simulate much more distantly related sequences by introducing substitu
 
 ```python
 >>> sequence1_25 = partially_randomize_sequence(0.25, sequence1)
-```
-
-```python
+...
 >>> sequence1
-```
-
-```python
 >>> sequence1_25
 ```
 
@@ -736,4 +726,4 @@ Lets run a simulation to gain some more insight into the limit of detection of t
 
 What does this simulation tell us about our limit of detection for homology (i.e., how similar must a pair of sequences be for us to reliably be able to identify homology between them)? Is this higher or lower than you expected?
 
-With respect to our simulation, I took a few shortcuts here to keep the runtime low. What are some things that could be improve to make this simulation more robust, if we weren't as concerned about runtime?
+With respect to our simulation, I took a few shortcuts here to keep the runtime low. What are some things that could be improved to make this simulation more robust, if we weren't as concerned about runtime?
