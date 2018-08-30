@@ -4,7 +4,7 @@
 In this chapter we'll talk about using pairwise alignment to search databases of biological sequences with the goal of identifying sequence homology. We [previously defined homology](alias://e63a4f) between a pair of sequences to mean that those sequences are derived from a common ancestral sequence. Homology searching is an essential part of making inferences about where a biological sequence came from, and/or what it does. In most cases, if you have an unannotated biological sequence, such as the following protein sequence, it's very hard (really, impossible) to know what it is without more information.
 
 ```
-> mystery-sequence1
+>mystery-sequence1
 PQITLWQRPLVTIRIGGQLKEALLDTGADDTVLEEMNLPGKWKPKMIGGIGGFIKVRQYDQIPVEIAHKAIGTVLVGPTPVNIIGRNLLTQIGATLNF
 ```
 
@@ -14,14 +14,31 @@ Whose genome is the above sequence encoded in? What is its function? Take a minu
 
 In the context of database searching, a query sequence and a reference sequence that we hypothesize to be homologous can be identical to one another, or they can differ as a result of mutation events. When sequences differ, we're often then interested in how much they differ, or their pairwise similarity, which can help us identify the most closely related of several homologs in the reference database. There is an important distinction in the terms *homology* and *similarity*: homology is a discrete variable, and similarity is a continuous variable. A pair of biological sequences either *are* or *are not* derived from a common ancestor, but they can be more or less similar to each other. Saying that two sequences are 80% homologous doesn't make sense. What people generally mean when they say this is that two sequences are 80% similar, and as a result they are hypothesizing homology between the sequences.
 
+> Here we are going to import all functions used in this chapter. If you want to return somewhere in the middle later, be sure to run this block of code.
+
+```python
+>>> from skbio.alignment import local_pairwise_align_ssw
+>>> from IPython.core import page
+>>> import qiime_default_reference as qdr
+>>> import skbio
+>>> import random
+>>> from iab.algorithms import local_alignment_search, heuristic_local_alignment_search_random, heuristic_local_alignment_search_kmers, heuristic_local_alignment_search_gc, shuffle_sequence, generate_random_score_distribution, fraction_better_or_equivalent_alignments
+>>> import time
+>>> import pandas as pd
+>>> import itertools
+>>> import seaborn as sns
+>>> import IPython.display
+>>> import collections
+>>> import functools
+```
+
 ## Defining the problem <link src="P7kHdy"/>
 
-As mentioned above, if we want to perform a homology search we'll have one or more *query sequences*, and for each we want to know which sequence(s) in a reference database it is most similar to.
+As mentioned above, if we want to perform a homology search we'll have one or more *query sequences*, and for each we want to know which sequence(s) in a reference database they are most similar to.
 
 Sequence homology searching can be implemented in a few ways. In this chapter, we'll use the local alignment function that we worked with in [the Pairwise Alignment chapter](alias://a76822), ``local_pairwise_align_ssw``, run it many times to search one *query* sequence against many *reference* sequences, and investigate the highest scoring alignment(s) to identify the best database match. Remember that you can always get help with a function by passing it as an argument to ``help``:
 
 ```python
->>> from skbio.alignment import local_pairwise_align_ssw
 >>> help(local_pairwise_align_ssw)
 ```
 
@@ -38,14 +55,10 @@ First, let's load Greengenes into a list of ``skbio.DNA`` sequence objects, and 
 ```python
 >>> %pylab inline
 ...
->>> from IPython.core import page
 >>> page.page = print
 ```
 
 ```python
->>> import qiime_default_reference as qdr
->>> import skbio
-...
 >>> # Load the taxonomic data
 ... reference_taxonomy = {}
 >>> for e in open(qdr.get_reference_taxonomy()):
@@ -76,8 +89,6 @@ Next, we'll just inspect a couple of the sequences we loaded. Notice how the spe
 For the sake of runtime, we're going to work through this chapter using a random sample of sequences from this database. Here we'll use Python's [random module](https://docs.python.org/3/library/random.html) to select sequences at random.
 
 ```python
->>> import random
-...
 >>> reference_db = random.sample(reference_db, k=5000)
 >>> print("%s sequences are present in the subsampled database." % len(reference_db))
 ```
@@ -106,34 +117,30 @@ Let's inspect a couple of the query sequences that we'll work with.
 
 ## Defining the problem <link src="SZ9u3S"/>
 
-The problem that we are going to address here is as follows. We now have a query sequence ($q_i$) which is not taxonomically annotated (meaning we don't know the taxonomy of the organism whose genome it is found in), and a reference database ($R$) of taxonomically annotated sequences ($r_1, r_2, r_3, ... r_n$). We want to infer a taxonomic annotation for $q_i$. We'll do this by identifying the most closely evolutionary related sequences in $R$ and associating their taxonomy with $q_i$. Because we actually do know the taxonomy of $q_i$ (to the extent that we trust the annotations in $R$), we can evaluate how well this approach works.
+The problem that we are going to address here is as follows. We now have a query sequence ($q_i$) which is not taxonomically annotated (meaning we don't know the taxonomy of the organism whose genome it is found in), and a reference database ($R$) of taxonomically annotated sequences ($r_1, r_2, r_3, ... r_n$). We want to infer a taxonomic annotation for $q_i$. We'll do this by identifying the most closely related sequences in $R$ and associating their taxonomy with $q_i$. Because we actually do know the taxonomy of $q_i$ (to the extent that we trust the annotations in $R$), we can evaluate how well this approach works.
 
 There are a few realistic features of the situation that we've set up here that I want you to be aware of.
 
 1. All of the query and reference sequences are homologous. In this case, they are all sequences of the 16S rRNA gene from archaea and bacteria. This may or may not be the case in real-world applications. Sometimes you'll work with gene-specific databases such as Greengenes, and sometimes you'll work with non-specific databases such as the NCBI nucleotide database (nr). Regardless, the search process is similar.
-2. The evolutionary distance between each query sequence and its most closely related sequences in $R$ will vary widely. Sometimes $q$ will be an exact match to a reference sequence $r_i$, and sometimes we may have as little as $50\%$ similarity.
+2. The distance between each query sequence and its most closely related sequences in $R$ will vary widely. Sometimes $q$ will be an exact match to a reference sequence $r_i$, and sometimes we may have as little as $50\%$ similarity.
 
-As we work through the next sections, imagine that we're exploring scaling this system up, so that instead of search just one or a few query sequences against the reference database, we ultimately want to apply this to search millions of sequences against the database. This would be the real-world problem we faced if we had collected 16S rRNA sequences from the environment (which would of course be unannotated) using high-throughput DNA sequencing.
+As we work through the next sections, imagine that we're exploring scaling this system up, so that instead of searching just one or a few query sequences against the reference database, we ultimately want to apply this to search millions of sequences against the database. This would be the real-world problem we faced if we had collected 16S rRNA sequences from the environment (which would of course be unannotated) using high-throughput DNA sequencing.
 
 ## A complete homology search function <link src="0C9FCS"/>
 
-Let's define a homology search function that aligns each provided query sequences $q_i$ with each of our reference database sequences ($r_1, r_2, r_3, ... r_n$). This function will take as input one or more query sequences, and the reference database. We'll call the top scoring alignments for each $q_i$ the *best hits*, and we'll specifically request some number (`n`) of best hits for each $q_i$. The output of this function will be a summary of the `n` best hits for each query sequence, including some technical information about the alignment and the taxonomy associated with the corresponding reference sequence. We'll then review the taxonomy annotations for our best hits, and from those make an inference about the taxonomy annotation for $q$.
+Let's define a homology search function that aligns each provided query sequence $q_i$ with each of our reference database sequences ($r_1, r_2, r_3, ... r_n$). This function will take as input one or more query sequences, and the reference database. We'll call the top scoring alignments for each $q_i$ the *best hits*, and we'll specifically request some number (`n`) of best hits for each $q_i$. The output of this function will be a summary of the `n` best hits for each query sequence, including some technical information about the alignment and the taxonomy associated with the corresponding reference sequence. We'll then review the taxonomy annotations for our best hits, and from those make an inference about the taxonomy annotation for $q_i$.
 
 Spend a minute looking at this function to understand what it's doing.
 
 ```python
->>> from iab.algorithms import local_alignment_search
-...
 >>> %psource local_alignment_search
 ```
 
 Now let's perform some database searches. You can run the remaining code cells in this section a few times to experiment with searching different query sequences against the same reference database.
 
-This next cell, which is the one that actually performs the database searches, will take a little bit of time to run (maybe up to a minute or two). There is some code in this cell that will track the runtime. As it's running, think about how many query sequences we're searching against how many reference sequences, and refer back to the number of sequences in the full reference database. Does this strategy seem scalable to millions or sequences, which as mentioned above might be our ultimate goal? When you know the per-sequence runtime of this search, estimate how long it would take to do this in seconds for one million sequences. Convert the time in seconds to a unit that will be more meaningful to you.
+This next cell, which is the one that actually performs the database searches, will take a little bit of time to run (maybe up to a minute or two). There is some code in this cell that will track the runtime. As it's running, think about how many query sequences we're searching against how many reference sequences, and refer back to the number of sequences in the full reference database. Does this strategy seem scalable to millions of sequences, which as mentioned above might be our ultimate goal? When you know the per-sequence runtime of this search, estimate how long it would take to do this in seconds for one million sequences. Convert the time in seconds to a unit that will be more meaningful to you.
 
 ```python
->>> import time
-...
 >>> start_time = time.time()
 >>> current_queries = random.sample(queries, k=4)
 >>> results = local_alignment_search(current_queries, reference_db)
@@ -173,9 +180,6 @@ In the examples above, it's taking on the order of 5-15 seconds to search a sing
 As we discussed in the previous chapter, the run time of pairwise alignment scales quadratically with sequence length. Database searching, at least in the example we're exploring in this chapter, is a bit of a different problem however. Our sequence lengths aren't changing, but rather it takes a long time because we're performing a computationally expensive step, pairwise alignment, many times. Our database is fixed in that the number of sequences in it doesn't change and the sequences themselves don't change. Our query sequences are all exactly the same length in this example (remember that we set that above, when we sliced a single region from reference database sequences to create our query sequences). Let's explore how the runtime of this database search scales under these constraints.
 
 ```python
->>> import pandas as pd
->>> import itertools
-...
 >>> def tabulate_local_alignment_search_runtime(queries, reference_db, n_query_sequences,
 ...                                             n_reference_sequences, search_function):
 ...     data = []
@@ -218,12 +222,11 @@ As we discussed in the previous chapter, the run time of pairwise alignment scal
 >>> local_alignment_search_runtimes
 ```
 
-This table shows that we've tried a few variations on number of query sequences but kept the number of reference sequences constant. The is no variance in the query sequence length, and there is a relatively small amount of variance in reference sequence length (they're all of the same order of magnitude). There is also relatively little variance in runtime for fixed numbers of query and reference sequences.
+This table shows that we've tried a few variations on number of query sequences but kept the number of reference sequences constant. There is no variance in the query sequence length, and there is a relatively small amount of variance in reference sequence length (they're all of the same order of magnitude). There is also relatively little variance in runtime for fixed numbers of query and reference sequences.
 
 This table clearly shows that there is an increase in runtime with an increasing number of query sequences, which we'd of course expect. What we care about is how runtime is increasing as a function of number of query sequences. Let's plot runtime versus the number of query sequences to help us understand that relationship.
 
 ```python
->>> import seaborn as sns
 >>> ax = sns.regplot(x="Number of query seqs", y="Runtime (s)", data=local_alignment_search_runtimes)
 >>> ax.set_xlim(0)
 >>> ax.set_ylim(0)
@@ -236,27 +239,25 @@ The first seems obvious, and even silly at first: perform fewer alignments. This
 
 Another approach to reducing the runtime of this process would be to create a faster implementation of the algorithm (though at some point that won't be possible anymore), use a faster computer, or run the process in parallel on multiple processors. All of these would be ways to reduce the runtime of the search by some factor $f$, where $new\ runtime \approx \frac{runtime}{f}$.
 
-In practice, for a production scale sequence database search application like BLAST, we'd combine these approaches. In the next section we'll explore ways to reduce the runtime of database searching for a fixed number of query sequences and a fixed number of reference sequences by reducing the number of pairwise alignments that the search function will perform.
+In practice, for a production-scale sequence database search application like BLAST, we'd combine these approaches. In the next section we'll explore ways to reduce the runtime of database-searching for a fixed number of query sequences and a fixed number of reference sequences by reducing the number of pairwise alignments that the search function will perform.
 
 ## Heuristic algorithms <link src="mUArdw"/>
 
-As mentioned above, it just takes too long to search individual query sequences against a large database. This problem also isn't going away anytime soon. While computers are getting faster (or cheaper), the size of our sequences collections are getting bigger because sequencing is getting cheaper. In fact, many people think that obtaining DNA sequences is getting cheaper faster than computers are getting cheaper. As our number of query sequences increases because we are able to obtain more for the same amount of money, or the size of our reference databases increases (because we're continuously obtaining more sequence data) this will increasing become a problem. Figures 1 and 2, respectively, illustrate that these are both real-world issues. Notice that the axes in these boths are on a log scale in both cases.
+As mentioned above, it just takes too long to search individual query sequences against a large database. This problem also isn't going away anytime soon. While computers are getting faster (or cheaper), the sizes of our sequence collections are getting bigger because sequencing is getting cheaper. In fact, many people think that obtaining DNA sequences is getting cheaper faster than computers are getting cheaper. As our number of query sequences increases because we are able to obtain more for the same amount of money, or the size of our reference databases increases (because we're continuously obtaining more sequence data) this will increasing become a bigger problem. Figures 1 and 2, respectively, illustrate that these are both real-world issues. Notice that the axes are on a log scale in both cases.
 
 ```python
->>> import IPython.display
 >>> IPython.display.IFrame(width="600", height="394", src="https://docs.google.com/spreadsheets/d/1vUkUuZsRlLW5U05rXXUn8B2sDYwShkClRMGa8Wiu6bc/pubchart?oid=1844125885&amp;format=interactive")
 ```
 
 Figure 1: Genome sequencing costs.
 
 ```python
->>> import IPython.display
 >>> IPython.display.IFrame(width="763", height="371", src="https://docs.google.com/spreadsheets/d/1vUkUuZsRlLW5U05rXXUn8B2sDYwShkClRMGa8Wiu6bc/pubchart?oid=2103353397&amp;format=interactive")
 ```
 
 Figure 2: Size of GenBank.
 
-One way that we can deal with this problem is by recognizing that most of the alignments that are performed in a database search are unlikely to be very good alignments. An algorithm developer could therefore improve runtime by defining a heuristic (or a rule) that is applied to determine which reference sequences are likely to result in good alignments, and only aligning the query against those. For it to be useful, making the decision to align or not (i.e., applying the heuristic) must be *much faster* than actually performing the pairwise alignment. The heuristic also needs to make *good* choices about which reference sequences to align the query against. If the algorithm chooses to not align against a specific query, that query is ruled out as a possible result of the database search. A good heuristic for sequence homology searching therefore makes it very unlikely to exclude the best alignment(s). When thinking about heuristic algorithms in general, there are some important considerations:
+One way that we can deal with this problem is by recognizing that most of the alignments that are performed in a database search are unlikely to be very good alignments. An algorithm developer could therefore improve runtime by defining a heuristic (or a rule) that is applied to determine which reference sequences are likely to result in good alignments, and only aligning the query against those. For it to be useful, making the decision to align or not (i.e., applying the heuristic) must be *much faster* than actually performing the pairwise alignment. The heuristic also needs to make *good* choices about which reference sequences to align the query against. If the algorithm chooses to not align against a specific reference, that reference is ruled out as a possible result of the database search. A good heuristic for sequence homology searching would therefore be very unlikely to exclude the best alignment(s). When thinking about heuristic algorithms in general, there are some important considerations:
 
 1. How often does the heuristic algorithm fail to get the right answer (in our case, does it make good choices about which reference sequences to align against)?
 2. How much faster is the heuristic than the "complete" approach, and is that reduction in runtime enough to justify not being guaranteed to get the best answer?
@@ -270,7 +271,6 @@ Our first heuristic will be a [straw man](https://en.wikipedia.org/wiki/Straw_ma
 Here's the source code for this. You can see that we're just wrapping our ``local_alignment_search`` function in a function that samples down to $p\%$ of the reference sequences.
 
 ```python
->>> from iab.algorithms import heuristic_local_alignment_search_random
 >>> %psource heuristic_local_alignment_search_random
 ```
 
@@ -302,8 +302,6 @@ What we need now is a way to know how often we get the "right answer", and how l
 Here's what this would look like:
 
 ```python
->>> import collections
-...
 >>> def evaluate_search(queries, reference_db, reference_taxonomy, search_function, taxonomy_levels, n=5, aligner=local_pairwise_align_ssw):
 ...     start_time = time.time()
 ...     search_results = search_function(current_queries, reference_db, n=n, aligner=aligner)
@@ -347,11 +345,9 @@ First let's see how this works for our full database search algorithm. What's th
 ...     print()
 ```
 
-Next let's see how this compare to our random heuristic search algorithm. Try running this a few times, as you might get different answers due to different random selections of the database.
+Next let's see how this compares to our random heuristic search algorithm. Try running this a few times, as you might get different answers due to different random selections of the database.
 
 ```python
->>> import functools
-...
 >>> heuristic_local_alignment_search_random_10 = functools.partial(heuristic_local_alignment_search_random, p=0.10)
 ...
 >>> runtime, fraction_correct, data = evaluate_search(current_queries, reference_db, reference_taxonomy,
@@ -386,12 +382,10 @@ One metric of sequence composition that we can compute quickly (because remember
 ```
 
 ```python
->>> from iab.algorithms import heuristic_local_alignment_search_gc
-...
 >>> %psource heuristic_local_alignment_search_gc
 ```
 
-If we run our queries again, how often do we get the right answer? How much did we reduce runtime? Do you think this is a better or worse heuristic?
+If we run our queries again, how often do we get the right answer? How much did we reduce runtime? Do you think this is a better or worse heuristic than what we implemented above?
 
 ```python
 >>> heuristic_local_alignment_search_gc_2 = functools.partial(heuristic_local_alignment_search_gc, database_subset_size=database_subset_size)
@@ -413,19 +407,17 @@ Try increasing and decreasing the number of sequences we'll align by increasing 
 
 #### kmer content <link src="QblTRV"/>
 
-Another metric of sequence composition is *kmer composition*. A kmer is simply a word (or list of adjacent characters) in a sequence of length k. Here are the kmer frequencies in a short DNA sequence. The ``overlap=True`` parameter here means that our kmers can overlap one another.
+Another metric of sequence composition is *kmer composition*. A kmer is simply a word (or list of adjacent characters) of length *k*, in a sequence. Here are the kmer frequencies in a short DNA sequence. The ``overlap=True`` parameter here means that our kmers can overlap one another.
 
 ```python
 >>> skbio.DNA('ACCGTGACCAGTTACCAGTTTGACCAA').kmer_frequencies(k=5, overlap=True)
 ```
 
-In our next heuristic, we'll only align our query to the reference sequences with the largest fraction of the kmers that are observed in the query sequence are also present in the reference sequence. This makes a lot of sense to use as an alignment heuristic: we're only aligning sequences when it looks like they'll have multiple length-``k`` stretches of nucleotides that are not interrupted by substitutions or insertion/deletion mutations.
+In our next heuristic, we'll only align our query to the reference sequences with the largest fraction of the kmers that are observed in the query sequence. This makes a lot of sense to use as an alignment heuristic: we're only aligning sequences when it looks like they'll have multiple length-``k`` stretches of nucleotides that are not interrupted by substitutions or insertion/deletion mutations.
 
 Here's the source code:
 
 ```python
->>> from iab.algorithms import heuristic_local_alignment_search_kmers
-...
 >>> %psource heuristic_local_alignment_search_kmers
 ```
 
@@ -437,7 +429,7 @@ Let's apply this and see how it does. How does the runtime and fraction of corre
 
 ```python
 >>> heuristic_local_alignment_search_kmers_50 = \
->>>  functools.partial(heuristic_local_alignment_search_kmers, k=k, database_subset_size=database_subset_size)
+>>> functools.partial(heuristic_local_alignment_search_kmers, k=k, database_subset_size=database_subset_size)
 ...
 >>> runtime, fraction_correct, data = evaluate_search(current_queries, reference_db, reference_taxonomy,
 ...                                                   heuristic_local_alignment_search_kmers_50,
@@ -455,7 +447,7 @@ Let's apply this and see how it does. How does the runtime and fraction of corre
 
 #### Further optimizing composition-based approaches by pre-computing reference database information <link src="HQmZgF"/>
 
-One important feature of composition-based approaches is that, because the reference database doesn't change very often, we can pre-compute features of the reference sequences and re-use this. This can help us to vastly decrease the runtime of our heuristic searches. For example, the computation of all of the reference database kmer frequencies is a lot of work. If we can compute that outside of our database search, we can avoid doing that step for every database search, and therefore remove that computationally expensive (i.e., slow) step of the process.
+One important feature of composition-based approaches is that, because the reference database doesn't change very often, we can pre-compute features of the reference sequences and re-use them. This can help us to vastly decrease the runtime of our heuristic searches. For example, the computation of all of the reference database kmer frequencies is a lot of work. If we can compute that outside of our database search, we can avoid doing that step for every database search, and therefore remove that computationally expensive (i.e., slow) step of the process.
 
 Here we'll compute all of the reference database kmer frequencies. Notice that this step takes about a minute to complete. This is a minute of compute time that we can save on every database search!
 
@@ -486,7 +478,7 @@ We'll now pass our pre-computed kmer frequencies into our search function. How d
 
 ## Determining the statistical significance of a pairwise alignment <link src='87c92f'/>
 
-One thing you may have noticed is that the score you get back for a pairwise alignment is hard to interpret. It's dependent on the query and reference sequence lengths (and possibly their composition, depending on your substitution matrix). So an important question is how good a given pairwise alignment is. Here we'll learn about a statistical approach for answering that.
+One thing you may have noticed is that the score you get back for a pairwise alignment is hard to interpret. It's dependent on the query and reference sequence lengths (and possibly their composition, depending on your substitution matrix). So an important question is how to determine *how good* a given pairwise alignment is. Here we'll learn about a statistical approach for answering that.
 
 ### Metrics of alignment quality <link src="YdqCls"/>
 
@@ -525,16 +517,15 @@ There are a couple of ways that we could be wrong when we do sequence homology s
 
 If incurring a false positive about 5% of the time is acceptable (i.e., you're ok with calling a pair of sequences homologous when they actually are not about one in twenty times) then you'd set your $\alpha$ to 0.05. Setting $\alpha$ to a value this high likely means that the method will err on the side of false positives, and only infrequently will it say that a pair of sequences are not homologous when they actually are (i.e., achieve a false negative). If $\alpha$ were set to be very low on the other hand (say, $1 \times 10^{-50}$), then you will err on the side of false negatives. Only infrequently will you say that a pair of non-homologous sequences are homologous, but you might call many pairs of homologous sequences non-homologous. You should think of $\alpha$ as a dial. If you turn the dial toward higher values, you'll increase your false positive rate and decrease your false negative rate. If you turn the dial toward lower values, you'll decrease your false positive rate and increase your false negative rate.
 
-There is not a hard-and-fast rule for whether false positives or false negatives are better, which makes choosing $\alpha$ hard. It's application specific, so you need to understand the biological question your answering when making this decision, and the ramifications of false positives versus false negatives. In general, when might you prefer to have false positives? When might you prefer to have false negatives?
+There is not a hard-and-fast rule for whether false positives or false negatives are better, which makes choosing $\alpha$ hard. It's application specific, so you need to understand the biological question you're asking when making this decision, and the ramifications of false positives versus false negatives. In general, when might you prefer to have false positives? When might you prefer to have false negatives?
 
 ### Interpreting alignment scores in context <link src="a0nqBH"/>
 
-In this section, we are going to learn about how to interpret alignment scores by empirically determining if a pairwise alignment that we obtain is better than we would expect if the pair of sequences were working with were definitely not homologous. For a given pair of sequences that we want to align, we're first going to align them and compute the score of the alignment. We're then going to align many pairs of sequences that are similar to the query and reference, but that we know are not homologous. We'll do this by shuffling or randomizing the order of the bases in the query sequences, and performing another pairwise alignment.
+In this section, we are going to learn about how to interpret alignment scores by empirically determining if a pairwise alignment that we obtain is better than we would expect if the pair of sequences we're working with are definitely not homologous. For a given pair of sequences that we want to align, we're first going to align them and compute the score of the alignment. We're then going to align many pairs of sequences that are similar to the query and reference, but that we know are not homologous. We'll do this by shuffling or randomizing the order of the bases in the query sequences, and performing another pairwise alignment.
 
 First, we'll define a function that can generate random sequences for us. This will take a scikit-bio sequence object (either ``skbio.DNA``, ``skbio.RNA``, or ``skbio.Protein``) and a length, and it will randomly generate a sequence of that type and length for us.
 
 ```python
->>> import random
 >>> def random_sequence(moltype, length):
 ...     result = []
 ...     alphabet = list(moltype.nondegenerate_chars)
@@ -556,7 +547,6 @@ We can now run this a few times to generate some random sequences:
 Next, we need a function that will shuffle the characters in a sequence, and give us a new sequence back. We'll use this to generate a sequence that is similar (in length and composition) to our input sequence, but which we know is not homologous. We'll use Pythons `random.shuffle` function, which randomly re-orders the order of the elements in a sequence, but keeps the composition and length of the sequence the same.
 
 ```python
->>> from iab.algorithms import shuffle_sequence
 >>> %psource shuffle_sequence
 ```
 
@@ -582,7 +572,6 @@ Let's generate a random query sequence and align it against itself to see what t
 Next let's generate 99 random variants of that sequence with ``shuffle_sequence`` and compute the pairwise alignment for each of those variants against the query sequence. We'll then look at the distribution of those scores.
 
 ```python
->>> from iab.algorithms import generate_random_score_distribution
 >>> %psource generate_random_score_distribution
 ```
 
@@ -594,8 +583,6 @@ Next let's generate 99 random variants of that sequence with ``shuffle_sequence`
 How does the actual score of aligning the sequence to itself compare to the score of aligning it to many similar but non-homologous sequences? Let's plot these to get a better idea.
 
 ```python
->>> import seaborn as sns
-...
 >>> def plot_score_distribution(actual_score, random_scores):
 ...     ax = sns.distplot(random_scores, kde=False, label="Random scores", color="b")
 ...     ax.plot([actual_score, actual_score], ax.get_ylim(), '--', label="Actual score")
@@ -618,7 +605,6 @@ To determine if our alignment is statistically significant, we need to define $\
 Here's what all of this looks like:
 
 ```python
->>> from iab.algorithms import fraction_better_or_equivalent_alignments
 >>> %psource fraction_better_or_equivalent_alignments
 ```
 
@@ -680,17 +666,12 @@ Let's define a function to do this, and then compute a sequence that is 95% iden
 
 ```python
 >>> sequence1_95 = partially_randomize_sequence(0.95, sequence1)
-```
-
-```python
+...
 >>> sequence1
-```
-
-```python
 >>> sequence1_95
 ```
 
-Notice how these sequences are almost identical, but have some differences. Let's apply our approach to determine it would identify these sequences as being homologous bases on $\alpha = 0.05$.
+Notice how these sequences are almost identical, but have some differences. Let's apply our approach to determine it would identify these sequences as being homologous at $\alpha = 0.05$.
 
 ```python
 >>> print("Fraction of alignment scores at least as good as the alignment score: %r" %
@@ -703,13 +684,8 @@ Now let's simulate much more distantly related sequences by introducing substitu
 
 ```python
 >>> sequence1_25 = partially_randomize_sequence(0.25, sequence1)
-```
-
-```python
+...
 >>> sequence1
-```
-
-```python
 >>> sequence1_25
 ```
 
@@ -750,4 +726,4 @@ Lets run a simulation to gain some more insight into the limit of detection of t
 
 What does this simulation tell us about our limit of detection for homology (i.e., how similar must a pair of sequences be for us to reliably be able to identify homology between them)? Is this higher or lower than you expected?
 
-With respect to our simulation, I took a few shortcuts here to keep the runtime low. What are some things that could be improve to make this simulation more robust, if we weren't as concerned about runtime?
+With respect to our simulation, I took a few shortcuts here to keep the runtime low. What are some things that could be improved to make this simulation more robust, if we weren't as concerned about runtime?
