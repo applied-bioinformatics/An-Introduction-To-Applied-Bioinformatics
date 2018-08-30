@@ -8,7 +8,7 @@ One of the most fundamental problems in bioinformatics is determining how "simil
 ```python
 >>> %pylab inline
 >>> from __future__ import division, print_function
-...
+
 >>> import numpy as np
 >>> from IPython.core.display import HTML
 >>> from IPython.core import page
