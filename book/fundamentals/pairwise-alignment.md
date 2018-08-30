@@ -748,7 +748,7 @@ Now let's apply that function a few times. Execute this cell a few times to conf
 >>> print(random_sequence(DNA, 50))
 ```
 
-Now we'll define a loop where we align random pairs of sequences of increasing length, and compile the time it took to align the sequences. Here we want programmatic access to the runtimes, so we're going to use [Python's ``timeit`` module](https://docs.python.org/3/library/timeit.html) (which the ``%timeit`` magic function is based on).
+Now we'll define a loop where we align random pairs of sequences of increasing length, and compile the time it took to align the sequences. Here we want programmatic access to the runtimes, so we're going to use [Python's ``timeit`` module](https://docs.python.org/3/library/timeit.html) (which the ``%timeit`` magic function is based on). The computer's doing a lot of work here, even though these are relatively small sequences, so this may take over a minute or so.
 
 ```python
 >>> times = []
@@ -763,6 +763,8 @@ Now we'll define a loop where we align random pairs of sequences of increasing l
 ...
 >>> for seq_length in seq_lengths:
 ...     times.append(min(timeit.Timer(get_time_function(seq_length)).repeat(repeat=3, number=3)))
+...
+>>> print("Done!")
 ```
 
 If we look at the run times, we can see that they are increasing with increasing sequence lengths:
