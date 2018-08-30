@@ -124,11 +124,11 @@ There are a few realistic features of the situation that we've set up here that 
 1. All of the query and reference sequences are homologous. In this case, they are all sequences of the 16S rRNA gene from archaea and bacteria. This may or may not be the case in real-world applications. Sometimes you'll work with gene-specific databases such as Greengenes, and sometimes you'll work with non-specific databases such as the NCBI nucleotide database (nr). Regardless, the search process is similar.
 2. The distance between each query sequence and its most closely related sequences in $R$ will vary widely. Sometimes $q$ will be an exact match to a reference sequence $r_i$, and sometimes we may have as little as $50\%$ similarity.
 
-As we work through the next sections, imagine that we're exploring scaling this system up, so that instead of search just one or a few query sequences against the reference database, we ultimately want to apply this to search millions of sequences against the database. This would be the real-world problem we faced if we had collected 16S rRNA sequences from the environment (which would of course be unannotated) using high-throughput DNA sequencing.
+As we work through the next sections, imagine that we're exploring scaling this system up, so that instead of searching just one or a few query sequences against the reference database, we ultimately want to apply this to search millions of sequences against the database. This would be the real-world problem we faced if we had collected 16S rRNA sequences from the environment (which would of course be unannotated) using high-throughput DNA sequencing.
 
 ## A complete homology search function <link src="0C9FCS"/>
 
-Let's define a homology search function that aligns each provided query sequences $q_i$ with each of our reference database sequences ($r_1, r_2, r_3, ... r_n$). This function will take as input one or more query sequences, and the reference database. We'll call the top scoring alignments for each $q_i$ the *best hits*, and we'll specifically request some number (`n`) of best hits for each $q_i$. The output of this function will be a summary of the `n` best hits for each query sequence, including some technical information about the alignment and the taxonomy associated with the corresponding reference sequence. We'll then review the taxonomy annotations for our best hits, and from those make an inference about the taxonomy annotation for $q$.
+Let's define a homology search function that aligns each provided query sequence $q_i$ with each of our reference database sequences ($r_1, r_2, r_3, ... r_n$). This function will take as input one or more query sequences, and the reference database. We'll call the top scoring alignments for each $q_i$ the *best hits*, and we'll specifically request some number (`n`) of best hits for each $q_i$. The output of this function will be a summary of the `n` best hits for each query sequence, including some technical information about the alignment and the taxonomy associated with the corresponding reference sequence. We'll then review the taxonomy annotations for our best hits, and from those make an inference about the taxonomy annotation for $q_i$.
 
 Spend a minute looking at this function to understand what it's doing.
 
@@ -138,7 +138,7 @@ Spend a minute looking at this function to understand what it's doing.
 
 Now let's perform some database searches. You can run the remaining code cells in this section a few times to experiment with searching different query sequences against the same reference database.
 
-This next cell, which is the one that actually performs the database searches, will take a little bit of time to run (maybe up to a minute or two). There is some code in this cell that will track the runtime. As it's running, think about how many query sequences we're searching against how many reference sequences, and refer back to the number of sequences in the full reference database. Does this strategy seem scalable to millions or sequences, which as mentioned above might be our ultimate goal? When you know the per-sequence runtime of this search, estimate how long it would take to do this in seconds for one million sequences. Convert the time in seconds to a unit that will be more meaningful to you.
+This next cell, which is the one that actually performs the database searches, will take a little bit of time to run (maybe up to a minute or two). There is some code in this cell that will track the runtime. As it's running, think about how many query sequences we're searching against how many reference sequences, and refer back to the number of sequences in the full reference database. Does this strategy seem scalable to millions of sequences, which as mentioned above might be our ultimate goal? When you know the per-sequence runtime of this search, estimate how long it would take to do this in seconds for one million sequences. Convert the time in seconds to a unit that will be more meaningful to you.
 
 ```python
 >>> start_time = time.time()
@@ -222,7 +222,7 @@ As we discussed in the previous chapter, the run time of pairwise alignment scal
 >>> local_alignment_search_runtimes
 ```
 
-This table shows that we've tried a few variations on number of query sequences but kept the number of reference sequences constant. The is no variance in the query sequence length, and there is a relatively small amount of variance in reference sequence length (they're all of the same order of magnitude). There is also relatively little variance in runtime for fixed numbers of query and reference sequences.
+This table shows that we've tried a few variations on number of query sequences but kept the number of reference sequences constant. There is no variance in the query sequence length, and there is a relatively small amount of variance in reference sequence length (they're all of the same order of magnitude). There is also relatively little variance in runtime for fixed numbers of query and reference sequences.
 
 This table clearly shows that there is an increase in runtime with an increasing number of query sequences, which we'd of course expect. What we care about is how runtime is increasing as a function of number of query sequences. Let's plot runtime versus the number of query sequences to help us understand that relationship.
 
@@ -239,7 +239,7 @@ The first seems obvious, and even silly at first: perform fewer alignments. This
 
 Another approach to reducing the runtime of this process would be to create a faster implementation of the algorithm (though at some point that won't be possible anymore), use a faster computer, or run the process in parallel on multiple processors. All of these would be ways to reduce the runtime of the search by some factor $f$, where $new\ runtime \approx \frac{runtime}{f}$.
 
-In practice, for a production scale sequence database search application like BLAST, we'd combine these approaches. In the next section we'll explore ways to reduce the runtime of database searching for a fixed number of query sequences and a fixed number of reference sequences by reducing the number of pairwise alignments that the search function will perform.
+In practice, for a production-scale sequence database search application like BLAST, we'd combine these approaches. In the next section we'll explore ways to reduce the runtime of database-searching for a fixed number of query sequences and a fixed number of reference sequences by reducing the number of pairwise alignments that the search function will perform.
 
 ## Heuristic algorithms <link src="mUArdw"/>
 
