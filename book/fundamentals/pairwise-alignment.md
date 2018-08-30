@@ -3,7 +3,7 @@
 
 One of the most fundamental problems in bioinformatics is determining how "similar" a pair of biological sequences are. There are many applications for this, including inferring the function or source organism of an unknown gene sequence, developing hypotheses about the relatedness of organisms, or grouping sequences from closely related organisms. On the surface this seems like a pretty straight-forward problem, not one that would have been at the center of decades of research and the subject of [one of the most cited papers](http://scholar.google.com/citations?view_op=view_citation&hl=en&user=VRccPlQAAAAJ&citation_for_view=VRccPlQAAAAJ:u-x6o8ySG0sC) in modern biology. In this chapter we'll explore why determining sequence similarity is harder than it might initially seem, and learn about *pairwise sequence alignment*, the standard approach for determining sequence similarity.
 
-Imagine you have three sequences - call them ``r1``and ``r2`` (*r* is for *reference*) and ``q1`` (*q* is for *query*) - and you want to know whether ``q1`` is more similar to ``r1`` or ``r2``. On the surface, it seems like you could just count the number of positions where they differ (i.e., compute the [Hamming distance](http://en.wikipedia.org/wiki/Hamming_distance) between them) to figure this out. Here's what this would look like.
+> Here we are loading the tools we are going to use into our current environment. If you return to a section in this chapter later, be sure to run this block of code again.
 
 ```python
 >>> %pylab inline
@@ -14,6 +14,9 @@ Imagine you have three sequences - call them ``r1``and ``r2`` (*r* is for *refer
 >>> from IPython.core import page
 >>> page.page = print
 ```
+
+Imagine you have three sequences - call them ``r1``and ``r2`` (*r* is for *reference*) and ``q1`` (*q* is for *query*) - and you want to know whether ``q1`` is more similar to ``r1`` or ``r2``. On the surface, it seems like you could just count the number of positions where they differ (i.e., compute the [Hamming distance](http://en.wikipedia.org/wiki/Hamming_distance) between them) to figure this out. Here's what this would look like.
+
 
 ```python
 >>> from scipy.spatial.distance import hamming
@@ -140,7 +143,7 @@ We'll create this matrix and initialize it with all zeros as follows:
 
 ### Step 2: Add values to the cells in the matrix. <link src="fDXYPE"/>
 
-Next we'll add initial values to the cells so that if the characters at the corresponding row and column are the same, the value of the cell is changed from zero to one. We can then review the resulting matrix. For clarity, we'll have ``show_table`` hide the zero values.
+Next we'll add initial values to the cells so that if the characters at the corresponding row and column are the same, the value of the cell is changed from zero to one. We can then review the resulting matrix. For clarity, we'll have ``show_F`` hide the zero values.
 
 ```python
 >>> for row_number, row_character in enumerate(seq2):
