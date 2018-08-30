@@ -3,7 +3,7 @@
 
 One of the most fundamental problems in bioinformatics is determining how "similar" a pair of biological sequences are. There are many applications for this, including inferring the function or source organism of an unknown gene sequence, developing hypotheses about the relatedness of organisms, or grouping sequences from closely related organisms. On the surface this seems like a pretty straight-forward problem, not one that would have been at the center of decades of research and the subject of [one of the most cited papers](http://scholar.google.com/citations?view_op=view_citation&hl=en&user=VRccPlQAAAAJ&citation_for_view=VRccPlQAAAAJ:u-x6o8ySG0sC) in modern biology. In this chapter we'll explore why determining sequence similarity is harder than it might initially seem, and learn about *pairwise sequence alignment*, the standard approach for determining sequence similarity.
 
-Imagine you have three sequences - call them ``r1``and ``r2`` (*r* is for *reference*) and ``q1`` (*q* is for *query*) - and you want to know whether ``q1`` is more similar to ``r1`` or ``r2``. On the surface, it seems like you could just count the number of positions where they differ (i.e., compute the [Hamming distance](http://en.wikipedia.org/wiki/Hamming_distance) between them) to figure this out. Here's what this would look like.
+> Here we are importing the functions we are going to use into our current working environment. If you return to a section in this chapter later, be sure to run this block of code again.
 
 ```python
 >>> %pylab inline
@@ -12,19 +12,38 @@ Imagine you have three sequences - call them ``r1``and ``r2`` (*r* is for *refer
 >>> import numpy as np
 >>> from IPython.core.display import HTML
 >>> from IPython.core import page
+>>> from scipy.spatial.distance import hamming
+>>> from skbio import DNA, Protein
+>>> from iab.algorithms import show_F, show_T, blosum50, show_substitution_matrix, format_dynamic_programming_matrix, format_traceback_matrix
+>>> from skbio.alignment._pairwise import _compute_score_and_traceback_matrices, _traceback, _init_matrices_sw
+>>> from skbio.sequence import Protein
+>>> from skbio.alignment import TabularMSA, global_pairwise_align, local_pairwise_align, local_pairwise_align_nucleotide, local_pairwise_align_ssw
+>>> import timeit
+>>> import pandas as pd
+>>> import seaborn as sns
+...
 >>> page.page = print
 ```
 
+Imagine you have three sequences - call them ``r1``and ``r2`` (*r* is for *reference*) and ``q1`` (*q* is for *query*) - and you want to know whether ``q1`` is more similar to ``r1`` or ``r2``. On the surface, it seems like you could just count the number of positions where they differ (i.e., compute the [Hamming distance](http://en.wikipedia.org/wiki/Hamming_distance) between them) to figure this out. Here's what this would look like.
+
+
 ```python
->>> from scipy.spatial.distance import hamming
->>> from skbio import DNA
-...
 >>> r1 = DNA("ACCCAGGTTAACGGTGACCAGGTACCAGAAGGGTACCAGGTAGGACACACGGGGATTAA")
 >>> r2 = DNA("ACCGAGGTTAACGGTGACCAGGTACCAGAAGGGTACCAGGTAGGAGACACGGCGATTAA")
 >>> q1 = DNA("TTCCAGGTAAACGGTGACCAGGTACCAGTTGCGTTTGTTGTAGGAGACACGGGGACCCA")
 ...
+>>> print(r1)
+>>> print(r2)
+>>> print(q1)
+```
+Here we just stored 3 sequences as variables. Now we're going to compute the hamming distance between them using the function `hamming()`. Don't forget we can look at what any function does by using `%psource`. Let's see what the `hamming()` function looks like (don't worry if some parts of it aren't entirely clear just yet):
+
+```python
 >>> %psource hamming
 ```
+
+Let's find out if our query ("q1") is closer to reference 1 or reference 2 based on the hamming distance:
 
 ```python
 >>> print(hamming(r1, q1))
@@ -37,6 +56,10 @@ Here we've assumed that only *substitution events* have occurred, meaning one DN
 
 ```python
 >>> q2 = DNA("TCCAGGTAAACGGTGACCAGGTACCAGTTGCGTTTGTTGTAGGAGACACGGGGACCCAT")
+...
+print(q1)
+print(q2)
+...
 >>> print(hamming(r1, q2))
 ```
 
@@ -46,6 +69,10 @@ What we'd really want to do is have a way to indicate that a deletion seems to h
 
 ```python
 >>> q3 = DNA("-TCCAGGTAAACGGTGACCAGGTACCAGTTGCGTTTGTTGTAGGAGACACGGGGACCCA")
+...
+print(q1)
+print(q3)
+...
 >>> print(hamming(r1, q3))
 ```
 
@@ -62,7 +89,7 @@ Scanning through these two sequences, we can see that they are largely identical
 
 ## What is a sequence alignment? <link src='e63a4f'/>
 
-Let's take a minute to think about sequence evolution and what a biological sequence alignment actually is. Over the course of biological evolution, a DNA sequence changes, most frequently due to random errors in replication (or the copying of a DNA sequence). These replications errors are referred to as **mutations**. Some types of mutation events that can occur are:
+Let's take a minute to think about sequence evolution and what a biological sequence alignment actually is. Over the course of biological evolution, a DNA sequence changes, most frequently due to random errors in replication (or the copying of a DNA sequence). These replication errors are referred to as **mutations**. Some types of mutation events that can occur are:
 
 * **substitutions**, where one base (or amino acid, in protein sequences) is replaced with another;
 * **insertions**, where one or more contiguous bases are inserted into a sequence;
@@ -80,13 +107,13 @@ Figure 1 illustrates how one ancestral DNA sequence (Figure 1a), over time, migh
 
 **The goal of pairwise sequence alignment is, given two sequences, to generate a hypothesis about which sequence positions derived from a common ancestral sequence position.** In practice, we develop this hypothesis by aligning the sequences to one another inserting gaps as necessary, in a way that maximizes their similarity. This is a **maximum parsimony** approach (an application of [Occam's razor](https://en.wikipedia.org/wiki/Occam%27s_razor)), where we assume that the simplest explanation (the one involving the fewest or least extreme mutation events) is the most likely.
 
-In nearly all cases, the only sequences we have to work with are the modern (derived) sequences, as illustrated in Figure 1c. The ancestral sequence is not something we have access to (for example, because the organism whose genome it was present in went extinct 100 million years ago).
+In nearly all cases, the only sequences we have to work with are the modern (derived) sequences, as illustrated in Figure 1c. The ancestral sequence is not something we have access to (for example, because the organism whose genome it was present in went extinct 100 million years ago – and even if not extinct, it would no longer be the same).
 
 Figure 1d-f illustrates three possible alignments of these two sequences. Just as the notes you made about which types of mutation events may have happened at which positions represents your *hypothesis* about the evolutionary events that took place, a sequence alignment that you might get from a computer program such as BLAST is also only a hypothesis. Which do you think is the most likely alignment of these sequences (note that there may not be a single best answer)?
 
 You can think of an alignment as a table (Figure 1g), where the rows are sequences and the columns are positions in those sequences. When you have two or more aligned sequences, there will, by definition, always be the same number of columns in each row. Each column in your alignment represents a hypothesis about the evolutionary events that occurred at that position since the last ancestor of the aligned sequences (the sequence in Figure 1a in our example). The specific hypotheses represented by each column in the Figure 1d alignment are explicitly annotated in Figure 1g.
 
-One thing that's worth pointing out at this point is that because we don't know what the ancestral sequence was, when we encounter a gap in a pairwise alignment, we generally won't know whether a deletion occurred in one sequence, or an insertion occurred in the other. For that reason, you will often see the term **indel** used to refer to these either an insertion or deletion events.
+One thing that's worth pointing out at this point is that because we don't know what the ancestral sequence was, when we encounter a gap in a pairwise alignment, we generally won't know whether a deletion occurred in one sequence, or an insertion occurred in the other. For that reason, you will often see the term **indel** used to refer to these insertion or deletion events.
 
 In the next section we'll work through our first bioinformatics algorithm, in this case a very simple (and also simplistic) method for aligning a pair of sequences. As you work through this exercise, think about why it might be too simple given what you know about biological sequences.
 
@@ -99,9 +126,9 @@ Let's define two sequences, ``seq1`` and ``seq2``, and develop an approach for a
 >>> seq2 = DNA("ACCGGTAACCGGTTAACACCCAC")
 ```
 
-I'm going to use a function in the following cells called ``show_table`` to display a table that we're going to use to develop our alignment. Once a function has been imported, you can view the source code for that function. This will be useful as we begin to explore some of the algorithms that are in use throughout these notebooks. You should spend time reading the source code examples in this book until you're sure that you understand what's happening, especially if your goal is to develop bioinformatics software. Reading other people's code is a good way to improve your own.
+I'm going to use a function in the following cells called ``show_F`` to display a table that we're going to use to develop our alignment. Once a function has been imported, you can view the source code for that function. This will be useful as we begin to explore some of the algorithms that are in use throughout these notebooks. You should spend time reading the source code examples in this book until you're sure that you understand what's happening, especially if your goal is to develop bioinformatics software. Reading other people's code is a good way to improve your own.
 
-Here's how you'd import a function and then view its source code:
+We did this at the top, but more explicitly now, here's how you'd import a function and then view its source code:
 
 ```python
 >>> from iab.algorithms import show_F
@@ -127,7 +154,7 @@ We'll create this matrix and initialize it with all zeros as follows:
 
 ### Step 2: Add values to the cells in the matrix. <link src="fDXYPE"/>
 
-Next we'll add initial values to the cells so that if the characters at the corresponding row and column are the same, the value of the cell is changed from zero to one. We can then review the resulting matrix. For clarity, we'll have ``show_table`` hide the zero values.
+Next we'll add initial values to the cells so that if the characters at the corresponding row and column are the same, the value of the cell is changed from zero to one. We can then review the resulting matrix. For clarity, we'll have ``show_F`` hide the zero values.
 
 ```python
 >>> for row_number, row_character in enumerate(seq2):
@@ -222,7 +249,6 @@ Because the sodium-potassium pump is a membrane-bound protein, it has regions th
 To score matches and mismatches differently based on which pair of amino acid residues are being aligned, our alignment algorithm is redefined to incorporate a **substitution matrix**, which defines the score associated with substitution of one amino acid for another. A widely used substitution matrix is referred to as BLOSUM 50. Let's take a look at this matrix:
 
 ```python
->>> from iab.algorithms import blosum50, show_substitution_matrix
 >>> aas = list(blosum50.keys())
 >>> aas.sort()
 >>> data = []
@@ -264,9 +290,11 @@ Needleman-Wunsch alignment is similar to the approach that we explored above. We
 We'll define two protein sequences to work with in this section. After working through this section, come back to this cell and change these protein sequences to explore how it changes the process. Make some small changes and some large changes to the protein sequences. The sequences that we're starting with are the same that are used in Chapter 2 of [Biological Sequence Analysis](http://amzn.to/1IYUEz2).
 
 ```python
->>> from skbio import Protein
 >>> seq1 = Protein("HEAGAWGHEE")
 >>> seq2 = Protein("PAWHEAE")
+...
+>>> print(seq1)
+>>> print(seq2)
 ```
 
 #### Step 1: Create blank matrices. <link src="hVbAxT"/>
@@ -291,8 +319,6 @@ Prior to initialization, $F$ and $T$ would look like the following.
 ```
 
 ```python
->>> from iab.algorithms import show_T
-...
 >>> T = np.full(shape=(num_rows, num_cols), fill_value=" ", dtype=np.str)
 >>> HTML(show_T(seq1, seq2, T))
 ```
@@ -357,18 +383,12 @@ Notice the situation that you encounter when computing the value for $F(2, 1)$. 
 The function in the next cell generates the dynamic programming and traceback matrices for us. You should review this code to understand exactly how it's working.
 
 ```python
->>> from iab.algorithms import format_dynamic_programming_matrix, format_traceback_matrix
->>> from skbio.alignment._pairwise import _compute_score_and_traceback_matrices
-...
 >>> %psource _compute_score_and_traceback_matrices
 ```
 
 You can now apply this function to `seq1` and `seq2` to compute the dynamic programming and traceback matrices.
 
 ```python
->>> from skbio.sequence import Protein
->>> from skbio.alignment import TabularMSA
-...
 >>> seq1 = TabularMSA([seq1])
 >>> seq2 = TabularMSA([seq2])
 ...
@@ -398,7 +418,6 @@ The score in the cell that you started in (the bottom-right in this case) is the
 Work through this process on paper, and then review the function in the next cell to see how this looks in Python.
 
 ```python
->>> from skbio.alignment._pairwise import _traceback
 >>> %psource _traceback
 ```
 
@@ -421,7 +440,6 @@ Think for a minute about how you'd define this function. What are the required i
 Here's the scikit-bio implementation of Needleman-Wunsch alignment. How is its API different from the interface you sketched out above?
 
 ```python
->>> from skbio.alignment import global_pairwise_align
 >>> %psource global_pairwise_align
 ```
 
@@ -451,9 +469,11 @@ The algorithm that is most commonly used for performing local alignment was orig
 Algorithmically, Smith-Waterman is nearly identical to Needleman-Wunsch, with three small important differences. We'll now work through Smith-Waterman alignment following the same steps that we followed for Needleman-Wunsch, and look at the differences as we go. We'll redefine our two sequences to align here. As you did for Needleman-Wunsch, after working through this example with these sequences, come back here and experiment with different sequences.
 
 ```python
->>> from skbio import Protein
 >>> seq1 = Protein("HEAGAWGHEE")
 >>> seq2 = Protein("PAWHEAE")
+...
+>>> print(seq1)
+>>> print(seq2)
 ```
 
 ### Step 1: Create blank matrices. <link src="Ew2bdO"/>
@@ -468,8 +488,6 @@ $F$ and $T$ are created in the same way for Smith-Waterman as for Needleman-Wuns
 ```
 
 ```python
->>> from iab.algorithms import show_T
-...
 >>> T = np.full(shape=(num_rows, num_cols), fill_value=" ", dtype=np.str)
 >>> HTML(show_T(seq1, seq2, T))
 ```
@@ -529,7 +547,6 @@ Go back to the final $F$ matrix that you computed with Needleman-Wunsch earlier 
 We'll use the same function that we used above to compute the full $F$ and $T$ matrices. To indicate that we now want to compute this using Smith-Waterman, we pass some additional parameters.
 
 ```python
->>> from skbio.alignment._pairwise import _init_matrices_sw
 >>> seq1 = TabularMSA([seq1])
 >>> seq2 = TabularMSA([seq2])
 ...
@@ -569,8 +586,6 @@ There is one small difference in the traceback step between Smith-Waterman and N
 Again, we can define a *convenience function*, which will allow us to provide the required input and just get our aligned sequences back.
 
 ```python
->>> from skbio.alignment import local_pairwise_align
-...
 >>> %psource local_pairwise_align
 ```
 
@@ -647,6 +662,9 @@ Here I define `seq1` to be slightly different than what I have above. Notice how
 ```python
 >>> seq1 = TabularMSA([Protein("HEAGAWGFHEE")])
 >>> seq2 = TabularMSA([Protein("PAWHEAE")])
+...
+>>> print(seq1)
+>>> print(seq2)
 ```
 
 ```python
@@ -676,8 +694,6 @@ To explore runtime, let's use the IPython [magic function](http://ipython.org/ip
 First, let's *benchmark* the runtime of the scikit-bio ``local_pairwise_align_nucleotide`` function. This specifically performs nucleotide alignment, and is implemented in Python.
 
 ```python
->>> from skbio.alignment import local_pairwise_align_nucleotide
-...
 >>> seq1 = DNA("GGTCTTCGCTAGGCTTTCATCGGGTTCGGCATCTACTCTGAGTTACTACG")
 >>> seq2 = DNA("GGTCTTCAGGCTTTCATCGGGAACGGCATCTCTGAGTTACTACC")
 ...
@@ -687,8 +703,6 @@ First, let's *benchmark* the runtime of the scikit-bio ``local_pairwise_align_nu
 From interpreting these results, it looks like this is taking a few seconds to compute the alignment. When executing this, you may see a red warning box pop up. Read that warning message (a good practice, in general!). This is telling us that there is a faster implementation of Smith-Waterman alignment available in scikit-bio, so let's benchmark that one for comparison. We'll use the same two sequences for a direct comparison, of course.
 
 ```python
->>> from skbio.alignment import local_pairwise_align_ssw
-...
 >>> %timeit local_pairwise_align_ssw(seq1, seq2)
 ```
 
@@ -715,8 +729,6 @@ Next, let's apply this to pairs of sequences where we vary the length. We don't 
 Let's first define a function to generate a random sequence of a specific length and type of biological sequence. Take a minute to understand that code, as we'll do this a few times throughout the text.
 
 ```python
->>> import numpy as np
-...
 >>> def random_sequence(moltype, length):
 ...     result = []
 ...     # Our "alphabet" here will consist of the standard characters in a
@@ -736,11 +748,9 @@ Now let's apply that function a few times. Execute this cell a few times to conf
 >>> print(random_sequence(DNA, 50))
 ```
 
-Now we'll define a loop where we align random pairs of sequences of increasing length, and compile the time it took to align the sequences. Here we want programmatic access to the runtimes, so we're going to use [Python's ``timeit`` module](https://docs.python.org/3/library/timeit.html) (which the ``%timeit`` magic function is based on).
+Now we'll define a loop where we align random pairs of sequences of increasing length, and compile the time it took to align the sequences. Here we want programmatic access to the runtimes, so we're going to use [Python's ``timeit`` module](https://docs.python.org/3/library/timeit.html) (which the ``%timeit`` magic function is based on). The computer's doing a lot of work here, even though these are relatively small sequences, so this may take over a minute or so.
 
 ```python
->>> import timeit
-...
 >>> times = []
 >>> seq_lengths = range(5000,110000,20000)
 ...
@@ -753,12 +763,14 @@ Now we'll define a loop where we align random pairs of sequences of increasing l
 ...
 >>> for seq_length in seq_lengths:
 ...     times.append(min(timeit.Timer(get_time_function(seq_length)).repeat(repeat=3, number=3)))
+...
+>>> print("Done!")
 ```
 
 If we look at the run times, we can see that they are increasing with increasing sequence lengths:
 
+
 ```python
->>> import pandas as pd
 >>> runtimes = pd.DataFrame(data=np.asarray([seq_lengths, times]).T, columns=["Sequence length", "Runtime (s)"] )
 >>> runtimes
 ```
@@ -772,7 +784,6 @@ That's probably to be expected, but what we care about now is *how* the runtimes
 Ultimately, we'd like to get an idea of how useful alignment would be in practice if our sequences were much longer, and specifically if sequence length might ultimately make sequence alignment too slow. Plotting these runtimes can help us to figure this out.
 
 ```python
->>> import seaborn as sns
 >>> ax = sns.regplot(x="Sequence length", y="Runtime (s)", data=runtimes, fit_reg=False)
 >>> ax.set_xlim(0)
 >>> ax.set_ylim(0)
@@ -781,7 +792,7 @@ Ultimately, we'd like to get an idea of how useful alignment would be in practic
 
 This looks to be a [quadratic relationship](http://en.wikipedia.org/wiki/Quadratic_time): the increase in runtime is proportional to the square of sequence length. If you think back to the computation of $F$ and $T$, this makes sense. If our sequences are each five bases long, our matrices will have five rows and five columns, so $5 \times 5 = 25$ cells that need to be filled in by performing some numeric computations. If we double our sequences lengths to ten, our matrices will have ten rows and ten columns, so $10 \times 10 = 100$ cells that need to be filled in. Because each of the numeric computations take roughly the same amount of time (you can take that on faith, or prove it to yourself using ``timeit``), when we double our sequence length we have four times as many cells to compute.
 
-When runtime scales quadratically, that can be a practical limitation for algorithm. We'd much prefer to see a linear relationship (i.e., if we double our sequence length, our runtime doubles). But this is an inherent issue with pairwise alignment, so it's one that we need to deal with.
+When runtime scales quadratically, that can be a practical limitation for an algorithm. We'd much prefer to see a linear relationship (i.e., if we double our sequence length, our runtime doubles). But this is an inherent issue with pairwise alignment, so it's one that we need to deal with.
 
 One question you might have is whether developing a version of this algorithm which can run in parallel on multiple processors would be an effective way to make it scale to larger data sets. In the next cell, we look and how the plot would change if we could run the alignment process over four processors.
 
