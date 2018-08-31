@@ -8,3 +8,12 @@ A hypothesis about which bases or amino acids in two biological sequences are de
 ACC---GTAC
 CCCATCGTAG
 ```
+
+## kmer (noun) <link src="C7hMX5"/>
+
+A kmer is simply a word (or list of adjacent characters) in a sequence of length k. For example, the overlapping kmers in the sequence ``ACCGTGACCAGTTACCAGTTTGACCAA`` are as follows:
+
+```python
+>>> import skbio
+>>> skbio.DNA('ACCGTGACCAGTTACCAGTTTGACCAA').kmer_frequencies(k=5, overlap=True)
+```

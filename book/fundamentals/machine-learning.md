@@ -1,10 +1,26 @@
 # Machine learning in bioinformatics <link src="7SFnTr"/>
 
-## Supervised v unsupervised classification
+## Supervised v unsupervised classification <link src="b05Cya"/>
 
-## Training data, test data, and cross validation
+## Training data, test data, and cross validation <link src="QIewra"/>
 
-## Naive Bayes classifiers
+## scikit-learn <link src="ifjF4O"/>
+
+In this chapter we'll implement several machine learning classifiers so we can gain an in-depth understanding of how they work. In practice though, there are many mature machine learning libraries that you'd want to use. [scikit-learn](http://scikit-learn.org/) is a popular and well-documented Python library for machine learning which many bioinformatics researchers and software developers use in their work.
+
+## Defining the problem <link src="2R6CTy"/>
+
+We'll explore machine learning classifiers in the context of a familiar topic: taxonomic classification of 16S rRNA sequences. We previously explored this problem in [Sequence Homology Searching](alias://d22e6b), so it is likely worth spending a few minutes skimming that chapter if it's not fresh in your mind.
+
+Briefly, the problem that we are going to address here is as follows. We have a query sequence ($q_i$) which is not taxonomically annotated (meaning we don't know the taxonomy of the organism whose genome it is found in), and a reference database ($R$) of taxonomically annotated sequences ($r_1, r_2, r_3, ... r_n$). We want to infer a taxonomic annotation for $q_i$. We'll again work with the [Greengenes](http://greengenes.secondgenome.com/) database, which we'll access using [QIIME default reference project](https://github.com/biocore/qiime-default-reference). Greengenes is a database of 16S rRNA gene sequences. (This should all sound very familiar - if not, I again suggest that you review [Sequence Homology Searching](alias://d22e6b).)
+
+This time, instead of using sequence alignment to identify the most likely taxonomic origin of a sequence, we'll train classifiers (i.e., build kmer-based models) of the 16S sequences of taxa in our reference database. We'll then run our query sequences through those models to identify the most likely taxonomic origin of each query sequence. Since we know the taxonomic origin of our query sequences in this case, we can test our classifiers by seeing how often they return the known taxonomy assignment. If our training and testing approaches are well-designed, the performance on our tests will inform us of how accurate we can expect our classifier to be on data where the actual taxonomic origin is unknown.
+
+Let's jump in...
+
+## Naive Bayes classifiers <link src="H8vYPu"/>
+
+The first classifier we'll explore is the popular and relatively simple Naive Bayes classifier. This classifier uses Bayes Theorem to determine the most likely label for an unknown input based on a probabilistic model is has constructed from training data. (_The preceding text needs work._) The model that is constructed is based on user-defined features of the sequences. The most commonly used features for sequence classification tasks such as this is overlapping [kmers](alias://C7hMX5).
 
 ```python
 >>> %pylab inline
@@ -194,6 +210,6 @@
 >>> summary
 ```
 
-## Random Forest classifiers
+## Random Forest classifiers <link src="N7CyaN"/>
 
-## Neural networks and "deep learning"
+## Neural networks and "deep learning" <link src="DgnnyS"/>
