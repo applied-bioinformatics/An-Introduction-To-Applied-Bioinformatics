@@ -118,7 +118,7 @@ Let's define two sequences, ``seq1`` and ``seq2``, and develop an approach for a
 
 I'm going to use a function in the following cells called ``show_F`` to display a table that we're going to use to develop our alignment. Once a function has been imported, you can view the source code for that function. This will be useful as we begin to explore some of the algorithms that are in use throughout these notebooks. You should spend time reading the source code examples in this book until you're sure that you understand what's happening, especially if your goal is to develop bioinformatics software. Reading other people's code is a good way to improve your own.
 
-Let's import the function ``show_f`` and then view its source code:
+Let's import the function ``show_F`` and then view its source code:
 
 ```python
 >>> from iab.algorithms import show_F
