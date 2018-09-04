@@ -361,7 +361,7 @@ We can now build a (hopefully) improved tree from our multiple sequence alignmen
 >>> fig = msa_dm.plot(cmap='Greens')
 ```
 
-The UPGMA tree that result from the initial (not-aligned) sequences is very different from the UPGMA tree that results from the multiple sequence alignment. First we'll look at the guide tree, and then the tree resulting from the progressive multiple sequence alignment.
+The UPGMA tree that result from the initial (not-aligned) sequences is very different from the UPGMA tree that results from the multiple sequence alignment. First we'll look at the intial guide tree, and then the tree resulting from the progressive multiple sequence alignment.
 
 ```python
 >>> d = dendrogram(guide_lm, labels=guide_dm.ids, orientation='right',
