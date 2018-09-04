@@ -162,7 +162,7 @@ And here are the kmers of size 3 without allowing overlap:
 
 We'll go with overlapping for this example, as the more words we have, the better our guide tree should be.
 
-If we then have two sequences, we can compute the word counts for each and define a distance between the sequences as the fraction of total words that are unique to either sequence.
+So now when we have two sequences, we can compute the word counts for each and define a distance between them as the fraction of total words that are unique to either sequence.
 
 ```python
 >>> from iab.algorithms import kmer_distance
@@ -176,7 +176,7 @@ We can then use this as a distance function...
 >>> s2 = DNA("ATCGGTACCGGTAGAAGT")
 >>> s3 = DNA("GGTACCAAATAGAA")
 ...
->>> print(s1.distance(s2, kmer_distance)) # distance between s1 and s2 based on the fraction of unique kmers of total kmers
+>>> print(s1.distance(s2, kmer_distance)) # distance between s1 and s2 based on the fraction of total kmers that are unique between them
 >>> print(s1.distance(s3, kmer_distance)) # distance between s1 and s3
 ```
 
@@ -229,7 +229,7 @@ We can next use some functionality from SciPy to cluster the sequences with UPGM
 >>> guide_tree = to_tree(guide_lm)
 ```
 
-Which in integrated into our ``guide_tree_from_sequences`` function as applied here:
+Which is integrated into our ``guide_tree_from_sequences`` function as applied here:
 
 ```python
 >>> from iab.algorithms import guide_tree_from_sequences
