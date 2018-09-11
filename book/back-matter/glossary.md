@@ -17,3 +17,5 @@ A kmer is simply a word (or list of adjacent characters) in a sequence of length
 >>> import skbio
 >>> skbio.DNA('ACCGTGACCAGTTACCAGTTTGACCAA').kmer_frequencies(k=5, overlap=True)
 ```
+
+It is common for bioinformaticians to substitute the value of `k` for the letter _k_ in the word _kmer_. For example, you might here someone say "we identified all seven-mers in our sequence", to mean they identified all kmers of length seven.
