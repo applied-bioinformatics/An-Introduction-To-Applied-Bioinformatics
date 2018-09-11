@@ -109,6 +109,8 @@ This information can be convenient to store in a pandas ``Series`` object:
 ...     return '; '.join(taxon[:level])
 ```
 
+## TODO: filter reference to drop sequences containing degenerate characters as these screw up W
+
 ```python
 >>> import pandas as pd
 ...
