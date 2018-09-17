@@ -15,7 +15,7 @@ ENV DISPLAY=:99
 RUN apt-get update
 RUN apt-get install -y xvfb x11-utils
 
-COPY IAB-notebooks ${HOME}
+COPY IAB-notebooks ${HOME}/IAB-notebooks/
 # `fix-permissions` ships with jupyter/minimal-notebook
 RUN fix-permissions ${HOME}
 RUN rm -rf work
