@@ -45,7 +45,7 @@ IAB evolved from lecture materials developed by Dr. Caporaso for an introductory
 The current version of IAB contains six chapters covering fundamental concepts and their applications. It is a dynamic resource that will be expanded, revised and updated over time. Its lifecycle is thus more similar to an active software project than a textbook: a practical approach to education in a rapidly changing field.
 
 # Acknowledgements
-An Introduction to Applied Bioinformatics is funded by a grant from the Alfred P Sloan Foundation to JGC. Initial prototyping was funded by a grant from the Arizona Technology and Research Initiative to JGC. We would like to thank the students in our courses, whose questions and feedback have shaped IAB.
+An Introduction to Applied Bioinformatics is funded by a grant from the Alfred P Sloan Foundation to JGC. Initial prototyping was funded by a grant from the Arizona Technology and Research Initiative to JGC. EB, JC, and JGC had partial salary support from National Cancer Institute of the National Institutes of Health under the awards for the Partnership of Native American Cancer Prevention U54CA143924 (UACC) and U54CA143925 (NAU). We would like to thank the students in our courses, whose questions and feedback have shaped IAB.
 
 # Author Contributions
 JGC is the primary author of the IAB content. EB, JRR, and JC have developed components of the underlying framework. AP, AS, and WM have provided useful feedback on the content.
