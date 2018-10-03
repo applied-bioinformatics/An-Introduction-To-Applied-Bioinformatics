@@ -107,7 +107,7 @@ One thing that's worth pointing out at this point is that because we don't know 
 
 In the next section we'll work through our first bioinformatics algorithm, in this case a very simple (and also simplistic) method for aligning a pair of sequences. As you work through this exercise, think about why it might be too simple given what you know about biological sequences.
 
-## A simple procedure for aligning a pair of sequences <link src='86c6b7'/>
+## A simple procedure for aligning a pair of sequences: The Dot plot <link src='86c6b7'/>
 
 Let's define two sequences, ``seq1`` and ``seq2``, and develop an approach for aligning them.
 
