@@ -4,6 +4,8 @@
 
 You will need a (free) GitHub account to submit a pull request.
 
+Before considering a contribution to IAB, please read the project [Code of Conduct](https://github.com/applied-bioinformatics/An-Introduction-to-Applied-Bioinformatics/blob/master/CODE-OF-CONDUCT.md).
+
 ## How IAB is developed
 
 IAB is written in [markdown](http://commonmark.org/). [build-iab](https://github.com/caporaso-lab/build-iab) is then used to convert that markdown to html (for static online viewing) and ipynb (for interactive use). If you're submitting changes to content, you'll be submitting changes to markdown files. These are much more manageable that submitting changes to IPython notebooks, as it's much easier to diff the content.
