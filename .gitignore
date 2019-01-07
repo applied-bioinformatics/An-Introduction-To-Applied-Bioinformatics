@@ -40,3 +40,6 @@ nosetests.xml
 
 # vim
 .*.swp
+
+# macos
+.DS_Store
