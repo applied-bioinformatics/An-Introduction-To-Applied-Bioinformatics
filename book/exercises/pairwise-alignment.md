@@ -37,7 +37,6 @@ The first thing you will want to do is import a couple of functions that will be
 
 ```python
 >>> %pylab inline
->>> from __future__ import division
 >>> from iab.algorithms import sw_align_nt, nw_align_nt
 ```
 

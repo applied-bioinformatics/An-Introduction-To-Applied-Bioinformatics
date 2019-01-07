@@ -43,7 +43,6 @@ However the complexity of this algorithm is much worse than for pairwise alignme
 
 ```python
 >>> %pylab inline
->>> from __future__ import division, print_function
 >>> from functools import partial
 >>> from IPython.core import page
 >>> page.page = print

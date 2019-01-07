@@ -20,8 +20,6 @@ The basic data that goes into a BIOM table is the list of sample ids, the list o
 
 ```python
 >>> %pylab inline
-...
->>> from __future__ import division
 >>> import numpy as np
 >>> import pandas as pd
 ...
@@ -215,28 +213,28 @@ And then apply those to compute the PD of our three samples. For each computatio
 ```python
 >>> pd_A = phylogenetic_diversity(tree, table2, 'A', verbose=True)
 >>> print(pd_A)
-B1 0.2 0.3 0.25 
-B2 0.3 
-B3 0.5 0.2 0.3 
+B1 0.2 0.3 0.25
+B2 0.3
+B3 0.5 0.2 0.3
 2.05
 ```
 
 ```python
 >>> pd_B = phylogenetic_diversity(tree, table2, 'B', verbose=True)
 >>> print(pd_B)
-B1 0.2 0.3 0.25 
-B2 0.3 
-B3 0.5 0.2 0.3 
-B4 0.3 
+B1 0.2 0.3 0.25
+B2 0.3
+B3 0.5 0.2 0.3
+B4 0.3
 2.35
 ```
 
 ```python
 >>> pd_C = phylogenetic_diversity(tree, table2, 'C', verbose=True)
 >>> print(pd_C)
-B1 0.2 0.3 0.25 
-A1 0.2 0.3 0.2 0.05 0.1 
-E2 0.4 0.7 
+B1 0.2 0.3 0.25
+A1 0.2 0.3 0.2 0.05 0.1
+E2 0.4 0.7
 2.7
 ```
 
