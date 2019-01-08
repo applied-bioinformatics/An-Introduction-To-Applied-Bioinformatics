@@ -33,8 +33,6 @@ Try this with the functions below to see what they do.
 
 ```python
 >>> %pylab inline
->>> from __future__ import division
-...
 >>> import skbio.io
 >>> from skbio import DNA
 ...

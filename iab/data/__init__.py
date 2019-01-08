@@ -6,7 +6,6 @@
 # copy of this license, visit
 # http://creativecommons.org/licenses/by-nc-sa/4.0/.
 # -----------------------------------------------------------------------------
-from __future__ import division
 from io import StringIO
 
 import pandas as pd

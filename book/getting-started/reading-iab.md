@@ -45,7 +45,6 @@ Most of the code that is used in IAB comes from [scikit-bio](http://scikit-bio.o
 
 ```python
 >>> import skbio
->>> from __future__ import print_function
 >>> from IPython.core import page
 >>> page.page = print
 ```
