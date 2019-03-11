@@ -13,8 +13,6 @@ We have learned the key tools we need for both sequence mapping and clustering i
 
 ```python
 >>> %pylab inline
-...
->>> from __future__ import print_function, division
 >>> import matplotlib.pyplot as plt
 >>> from IPython.core import page
 >>> page.page = print

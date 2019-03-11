@@ -41,5 +41,5 @@ nosetests.xml
 # vim
 .*.swp
 
-#macOS
+# macos
 .DS_Store
