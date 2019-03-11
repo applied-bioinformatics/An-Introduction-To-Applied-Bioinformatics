@@ -413,7 +413,7 @@ Try increasing and decreasing the number of sequences we'll align by increasing 
 
 #### kmer content <link src="QblTRV"/>
 
-Another metric of sequence composition is *kmer composition*. A kmer is simply a word (or list of adjacent characters) of length *k* found within a sequence. Here are the kmer frequencies in a short DNA sequence. The ``overlap=True`` parameter here means that our kmers can overlap one another.
+Another metric of sequence composition is *kmer composition*. A [kmer](alias://C7hMX5) is simply a word (or list of adjacent characters) of length *k* found within a sequence. Here are the kmer frequencies in a short DNA sequence. The ``overlap=True`` parameter here means that our kmers can overlap one another.
 
 ```python
 >>> skbio.DNA('ACCGTGACCAGTTACCAGTTTGACCAA').kmer_frequencies(k=5, overlap=True)
@@ -612,9 +612,9 @@ How does the actual score of aligning the sequence to itself compare to the scor
 >>> plot_score_distribution(actual_score, random_scores)
 ```
 
-What does this tell us about our alignment score and therefore about our alignment? Is it good or bad? 
+What does this tell us about our alignment score and therefore about our alignment? Is it good or bad?
 
-We finally have information that we can use to evaluate an alignment score, and therefore to evaluate the quality of an alignment. Let's use this information to quantify the quality of the alignment by computing a p-value. As we described above, this is simply the probability that we would obtain an alignment score at least this good if the sequences being aligned are not homologous. Since we have a lot of scores now from sequences that are similar but not homologous, if we just count how many are at least as high as our actual score and divide by the number of scores we compute, that is an empirical (data-driven) way of determining our p-value. 
+We finally have information that we can use to evaluate an alignment score, and therefore to evaluate the quality of an alignment. Let's use this information to quantify the quality of the alignment by computing a p-value. As we described above, this is simply the probability that we would obtain an alignment score at least this good if the sequences being aligned are not homologous. Since we have a lot of scores now from sequences that are similar but not homologous, if we just count how many are at least as high as our actual score and divide by the number of scores we compute, that is an empirical (data-driven) way of determining our p-value.
 
 To determine if our alignment is statistically significant, we need to define $\alpha$ before computing the p-value so the p-value does not impact our choice of $\alpha$. Let's define $\alpha$ as 0.05. This choice means if we obtain a p-value less than 0.05 we will consider the alignment statistically significant and accept the hypothesis that the sequences are homologous.
 
@@ -700,7 +700,7 @@ Notice how these sequences are almost identical, but have some differences. Let'
 ...       fraction_better_or_equivalent_alignments(sequence1, sequence1_95))
 ```
 
-You likely got a significant p-value there, telling you that the sequences are homologous. 
+You likely got a significant p-value there, telling you that the sequences are homologous.
 
 Now let's simulate much more distantly related sequences by introducing substitutions at many more sites.
 
