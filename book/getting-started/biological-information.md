@@ -53,7 +53,11 @@ As mentioned above, we can determine the number of messages we can send in a giv
 
 Amino acids are in fact encoded by three nucleotide bases, and the three base messages are referred to as _codons_. The mapping of codons to amino acids is referred to as the _genetic code_. Each codon represents exactly one amino acid, with the exception of some, the _stop codons_, which indicate the end of a message. Because there are 64 codons but only twenty-one messages that need to be transmitted (the twenty amino acids and the "stop" signal), some amino acids and the stop signal are represented by more than one codon. This is referred to as the redundancy of the genetic code.
 
-TODO: creative commons gentic code figure
+<figure>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/getting-started/images/genetic-code.png">
+    <figcaption>Figure 2: The vertebrate RNA genetic code. The corresponding DNA genetic code is identical, except that Us are replaced with Ts. (Figure attribution: NIH [Public domain], <a href="https://commons.wikimedia.org/wiki/File:06_chart_pu3.png">via Wikimedia Commons</a>.)</figcaption>
+</figure>
+<p>
 
 TODO: simple skbio translation example
 
