@@ -435,15 +435,15 @@ Step 3: We'll now fill in the values from the new clade to each of the existing 
 
 ```python
 >>> s2_s1s3 = np.mean([master_upgma_dm[1][0], master_upgma_dm[1][2]])
->>> s3s4_s1s3 = np.mean([master_upgma_dm[0][3], master_upgma_dm[0][4], master_upgma_dm[2][3], master_upgma_dm[2][4]])
+>>> s4s5_s1s3 = np.mean([master_upgma_dm[0][3], master_upgma_dm[0][4], master_upgma_dm[2][3], master_upgma_dm[2][4]])
 ```
 
 We can now fill in all of the distances in our iteration 2 distance matrix.
 
 ```python
->>> iter2_dm = [[0.0, s2_s1s3, s3s4_s1s3],
+>>> iter2_dm = [[0.0, s2_s1s3, s4s5_s1s3],
 ...             [s2_s1s3, 0.0, 5.5],
-...             [s3s4_s1s3, 5.5, 0.0]]
+...             [s4s5_s1s3, 5.5, 0.0]]
 ...
 >>> iter2_dm = DistanceMatrix(iter2_dm, iter2_ids)
 >>> print(iter2_dm)
