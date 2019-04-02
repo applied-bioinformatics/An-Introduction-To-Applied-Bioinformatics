@@ -150,7 +150,8 @@ Display the guide tree for the sequences in the cell below.
 ```
 
 ```python
->>> # Display the guide tree in this cell.
+>>> # Display the guide tree in this cell. 
+... # hint: Pass metric=kmer_distance
 ```
 
 ## Question 3 <link src="8xf4kF"/>
@@ -165,11 +166,13 @@ What are the differences in the guide tree from *Question 2*, the tree that is g
 >>> from skbio.alignment import global_pairwise_align_nucleotide
 >>> # add your command for 1 iterations of iterative multiple sequence alignment here
 ... # hint: pass pairwise_aligner=global_pairwise_align_nucleotide
+... # hint: Pass metric=kmer_distance
 ```
 
 ```python
 >>> # add your command for 5 iterations of iterative multiple sequence alignment here
 ... # hint: pass pairwise_aligner=global_pairwise_align_nucleotide
+... # hint: Pass metric=kmer_distance
 ```
 
 ## Question 4 <link src="sVsOoD"/>
@@ -183,6 +186,7 @@ Generate and display a tree based on progressive alignment of the sequences from
 ```python
 >>> # Add your command for progressive alignment and tree building here
 ... # hint: pass pairwise_aligner=global_pairwise_align_nucleotide
+... # hint: Pass metric=kmer_distance
 ```
 
 ## Question 5 <link src="6b7fRx"/>
@@ -223,8 +227,7 @@ Discuss your results here.
 
 ## Question 6 <link src="UhSjc4"/>
 
-Choose one representative sequence from each of the clusters you defined in question 5. Look these up in `tax_lookup` by their ids to get the taxonomy of each sequence, and include those in the results below. When you see a key that ends with ``__``, that means that there is no known taxonomic assignment for that sequence at that level.
-
+Using `tax_lookup` by their ids, get the taxonomy of each sequence, and include those in the results below. When you see a key that ends with ``__``, that means that there is no known taxonomic assignment for that sequence at that level. Examine the taxonomy for each of your OTUs at 70% and 90%. Does the taxanomic assignment for these OTUs make sense? Additionally, choose one representative sequence from each of the clusters you defined in question 5. Is the taxonomy of the representative sequences consistent with phylogenetic tree you generated in question 4?
 ```python
 >>> print(tax_lookup['4343117'])
 ```
@@ -241,6 +244,6 @@ Discuss your results here.
 
 ## Question 7 <link src="5goFbb"/>
 
-Is the taxonomy of the representative sequences consistent with phylogenetic tree you generated in question 4? For your 90% and 70% OTUs, list three taxa (e.g., at the phylum, class, or species level) that are monophyletic, if any, and three taxa that are not monophyletic, if any. Discuss two specific reasons why some taxa might appear to not be monophyletic based on your tree.
+For your 90% and 70% OTUs, list three taxa (e.g., at the phylum, class, or species level) that are monophyletic, if any, and three taxa that are not monophyletic, if any. Discuss two specific reasons why some taxa might appear to not be monophyletic based on your tree.
 
 Discuss your results here.
