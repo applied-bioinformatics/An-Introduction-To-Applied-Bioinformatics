@@ -267,7 +267,7 @@ The conditions of a distance metric listed above lead to a few specific features
 
 We've now looked at several ways of computing distances between sequences, some of which have required that the positions in the sequences are directly comparable to one another (i.e., that our sequences are aligned), and some of which haven't. One *alignment-free* distance between sequences is the k-mer distance that we worked with in [*Sequence Homology Searching*](alias://QblTRV).
 
-We can use the kmer_distance function with scikit-bio as follows to create an ``skbio.DistanceMatrix`` object.
+We can use the kmer_distance function with scikit-bio as follows to create an ``skbio.DistanceMatrix`` object. These ``skbio.DistanceMatrix`` objects can be viewed as heatmaps. When interpreting these heatmaps, be sure to note the scale on the color bar. Since the distance metrics we compare here differ in their maximum values, the scale differs for each of these such that the darkest color can represent a different value in each heatmap.
 
 ```python
 >>> from iab.algorithms import kmer_distance
