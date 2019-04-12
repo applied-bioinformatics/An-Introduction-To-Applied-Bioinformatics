@@ -144,7 +144,34 @@ We could compute this in python as follows:
 
 Imagine that we have the same table, but some additional information about the OTUs in the table. Specifically, we've computed the following phylogenetic tree. And, for the sake of illustration, imagine that we've also assigned taxonomy to each of the OTUs and found that our samples contain representatives from the archaea, bacteria, and eukaryotes (their labels begin with `A`, `B`, and `E`, respectively).
 
-<img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/applications/images/pd_calc_tree.png">
+First, let's define a phylogenetic tree using the Newick format (which is described [here](http://evolution.genetics.washington.edu/phylip/newicktree.html), and more formally defined [here](http://evolution.genetics.washington.edu/phylip/newick_doc.html)). We'll then load that up using [scikit-bio](http://scikit-bio.org)'s [TreeNode](http://scikit-bio.org/generated/skbio.core.tree.TreeNode.html#skbio.core.tree.TreeNode) object, and visualize it with [ete3](http://etetoolkit.org).
+
+```python
+>>> import ete3
+>>> ts = ete3.TreeStyle()
+>>> ts.show_leaf_name = True
+>>> ts.scale = 250
+>>> ts.branch_vertical_margin = 15
+>>> ts.show_branch_length = True
+```
+
+```python
+>>> from io import StringIO
+>>> newick_tree = StringIO('((B1:0.2,B2:0.3):0.3,((B3:0.5,B4:0.3):0.2,B5:0.9):0.3,'
+...                        '((A1:0.2,A2:0.3):0.3,'
+...                        ' (E1:0.3,E2:0.4):0.7):0.55);')
+...
+>>> from skbio.tree import TreeNode
+...
+>>> tree = TreeNode.read(newick_tree)
+>>> tree = tree.root_at_midpoint()
+```
+
+```python
+>>> t = ete3.Tree.from_skbio(tree, map_attributes=["value"])
+>>> t.render("%%inline", tree_style=ts)
+<IPython.core.display.Image object>
+```
 
 Pairing this with the table we defined above (displayed again in the cell below), given what you now know about these OTUs, which would you consider the most diverse? Are you happy with the $\alpha$ diversity conclusion that you obtained when computing the number of observed OTUs in each sample?
 
@@ -165,18 +192,6 @@ E2  0  0  1
 Phylogenetic Diversity (PD) is a metric that was developed by Dan Faith in the early 1990s (find the original paper [here](http://www.sciencedirect.com/science/article/pii/0006320792912013)). Like many of the measures that are used in microbial community ecology, it wasn't initially designed for studying microbial communities, but rather communities of "macro-organisms" (macrobes?). Some of these metrics, including PD, do translate well to microbial community analysis, while some don't translate as well. (For an illustration of the effect of sequencing error on PD, where it is handled well, versus its effect on the Chao1 metric, where it is handled less well, see Figure 1 of [Reeder and Knight (2010)](http://www.nature.com/nmeth/journal/v7/n9/full/nmeth0910-668b.html)).
 
 PD is relatively simple to calculate. It is computed simply as the sum of the branch length in a phylogenetic tree that is "covered" or represented in a given sample. Let's look at an example to see how this works.
-
-First, let's define a phylogenetic tree using the Newick format (which is described [here](http://evolution.genetics.washington.edu/phylip/newicktree.html), and more formally defined [here](http://evolution.genetics.washington.edu/phylip/newick_doc.html)). We'll then load that up using [scikit-bio](http://scikit-bio.org)'s [TreeNode](http://scikit-bio.org/generated/skbio.core.tree.TreeNode.html#skbio.core.tree.TreeNode) object.
-
-```python
->>> from io import StringIO
->>> newick_tree = StringIO('(((B1:0.2,B2:0.3):0.3,((B3:0.5,B4:0.3):0.2,B5:0.9):0.3):0.35,(((A1:0.2,A2:0.3):0.3,(E1:0.3,E2:0.4):0.7):0.2):0.05)root;')
-...
->>> from skbio.tree import TreeNode
-...
->>> tree = TreeNode.read(newick_tree)
->>> tree = tree.root_at_midpoint()
-```
 
 I'll now define a couple of functions that we'll use to compute PD.
 
@@ -213,29 +228,29 @@ And then apply those to compute the PD of our three samples. For each computatio
 ```python
 >>> pd_A = phylogenetic_diversity(tree, table2, 'A', verbose=True)
 >>> print(pd_A)
-B1 0.2 0.3 0.25
-B2 0.3
-B3 0.5 0.2 0.3
-2.05
+B1 0.2 0.3 0.2250000000000001 
+B2 0.3 
+B3 0.5 0.2 0.3 
+2.0250000000000004
 ```
 
 ```python
 >>> pd_B = phylogenetic_diversity(tree, table2, 'B', verbose=True)
 >>> print(pd_B)
-B1 0.2 0.3 0.25
-B2 0.3
-B3 0.5 0.2 0.3
-B4 0.3
-2.35
+B1 0.2 0.3 0.2250000000000001 
+B2 0.3 
+B3 0.5 0.2 0.3 
+B4 0.3 
+2.325
 ```
 
 ```python
 >>> pd_C = phylogenetic_diversity(tree, table2, 'C', verbose=True)
 >>> print(pd_C)
-B1 0.2 0.3 0.25
-A1 0.2 0.3 0.2 0.05 0.1
-E2 0.4 0.7
-2.7
+B1 0.2 0.3 0.2250000000000001 
+A1 0.2 0.3 0.32499999999999996 
+E2 0.4 0.7 
+2.65
 ```
 
 How does this result compare to what we observed above with the Observed OTUs metric? Based on your knowledge of biology, which do you think is a better representation of the relative diversities of these samples?
@@ -596,10 +611,7 @@ First, let's look at the analysis presented in panels E and F. Instead of genera
 >>> ax.set_xticklabels(['same body habitat', 'different body habitat'])
 >>> ax.set_ylabel('Unweighted UniFrac Distance')
 >>> _ = ax.set_ylim(0.0, 1.0)
-/Users/caporaso/miniconda3/envs/iab/lib/python3.4/site-packages/matplotlib/__init__.py:872: UserWarning: axes.color_cycle is deprecated and replaced with axes.prop_cycle; please use the latter.
-  warnings.warn(self.msg_depr % (key, alt_key))
-/Users/caporaso/miniconda3/envs/iab/lib/python3.4/site-packages/matplotlib/__init__.py:892: UserWarning: axes.color_cycle is deprecated and replaced with axes.prop_cycle; please use the latter.
-  warnings.warn(self.msg_depr % (key, alt_key))
+<Figure size 432x288 with 1 Axes>
 ```
 
 ```python
@@ -610,7 +622,7 @@ test statistic name            R
 sample size                    6
 number of groups               3
 test statistic                 1
-p-value                    0.054
+p-value                    0.065
 number of permutations       999
 Name: ANOSIM results, dtype: object
 ```
@@ -630,8 +642,7 @@ If we run through these same steps, but base our analysis on a different metadat
 >>> ax.set_xticklabels(['same person', 'different person'])
 >>> ax.set_ylabel('Unweighted UniFrac Distance')
 >>> _ = ax.set_ylim(0.0, 1.0)
-/Users/caporaso/miniconda3/envs/iab/lib/python3.4/site-packages/matplotlib/__init__.py:892: UserWarning: axes.color_cycle is deprecated and replaced with axes.prop_cycle; please use the latter.
-  warnings.warn(self.msg_depr % (key, alt_key))
+<Figure size 432x288 with 1 Axes>
 ```
 
 ```python
@@ -641,7 +652,7 @@ test statistic name              R
 sample size                      6
 number of groups                 2
 test statistic           -0.333333
-p-value                      0.889
+p-value                      0.869
 number of permutations         999
 Name: ANOSIM results, dtype: object
 ```
@@ -659,6 +670,7 @@ Next, let's look at a hierarchical clustering analysis, similar to that presente
 >>> lm = average(human_microbiome_dm.condensed_form())
 >>> d = dendrogram(lm, labels=human_microbiome_dm.ids, orientation='right',
 ...                link_color_func=lambda x: 'black')
+<Figure size 432x288 with 1 Axes>
 ```
 
 Again, we can see how the data really only becomes interpretable in the context of metadata:
@@ -667,12 +679,14 @@ Again, we can see how the data really only becomes interpretable in the context 
 >>> labels = [human_microbiome_sample_md['body site'][sid] for sid in sample_ids]
 >>> d = dendrogram(lm, labels=labels, orientation='right',
 ...                link_color_func=lambda x: 'black')
+<Figure size 432x288 with 1 Axes>
 ```
 
 ```python
 >>> labels = [human_microbiome_sample_md['individual'][sid] for sid in sample_ids]
 >>> d = dendrogram(lm, labels=labels, orientation='right',
 ...                link_color_func=lambda x: 'black')
+<Figure size 432x288 with 1 Axes>
 ```
 
 ### Ordination <link src='b1cdbe'/>
@@ -762,6 +776,7 @@ F 0.737954545455
 ```python
 >>> from pylab import scatter
 >>> ord_plot = scatter(a1_values, a2_values, s=40)
+<Figure size 432x288 with 1 Axes>
 ```
 
 And again, let's look at how including metadata helps us to interpret our results.
@@ -772,6 +787,7 @@ First, we'll color the points by the body habitat that they're derived from:
 >>> colors = {'tongue': 'red', 'gut':'yellow', 'skin':'blue'}
 >>> c = [colors[human_microbiome_sample_md['body site'][e]] for e in human_microbiome_dm.ids]
 >>> ord_plot = scatter(a1_values, a2_values, s=40, c=c)
+<Figure size 432x288 with 1 Axes>
 ```
 
 And next we'll color the samples by the person that they're derived from. Notice that this plot and the one above are identical except for coloring. Think about how the colors (and therefore the sample metadata) help you to interpret these plots.
@@ -780,6 +796,7 @@ And next we'll color the samples by the person that they're derived from. Notice
 >>> person_colors = {'subject 1': 'red', 'subject 2':'yellow'}
 >>> person_c = [person_colors[human_microbiome_sample_md['individual'][e]] for e in human_microbiome_dm.ids]
 >>> ord_plot = scatter(a1_values, a2_values, s=40, c=person_c)
+<Figure size 432x288 with 1 Axes>
 ```
 
 #### Determining the most important axes in polar ordination <link src='fb483b'/>
@@ -822,14 +839,17 @@ So why do we care about axes being uncorrelated? And why do we care about explai
 
 ```python
 >>> ord_plot = scatter(data[0][4], data[1][4], s=40, c=c)
+<Figure size 432x288 with 1 Axes>
 ```
 
 ```python
 >>> ord_plot = scatter(data[0][4], data[13][4], s=40, c=c)
+<Figure size 432x288 with 1 Axes>
 ```
 
 ```python
 >>> ord_plot = scatter(data[0][4], data[14][4], s=40, c=c)
+<Figure size 432x288 with 1 Axes>
 ```
 
 #### Interpreting ordination plots <link src='40e0a6'/>
@@ -848,10 +868,12 @@ One thing that you may have notices as you computed the polar ordination above i
 
 ```python
 >>> ord_plot = scatter(a1_values, a2_values, s=40, c=c)
+<Figure size 432x288 with 1 Axes>
 ```
 
 ```python
 >>> ord_plot = scatter(alt_a1_values, a2_values, s=40, c=c)
+<Figure size 432x288 with 1 Axes>
 ```
 
 Some other important features:
@@ -950,6 +972,7 @@ Next we'll load our distance matrix. This is similar to ``human_microbiome_dm_da
 ```python
 >>> from iab.data import lauber_soil_unweighted_unifrac_dm
 >>> _ = lauber_soil_unweighted_unifrac_dm.plot(cmap='Greens')
+<Figure size 432x288 with 2 Axes>
 ```
 
 Does this visualization help you to interpret the results? Probably not. Generally we'll need to apply some approaches that will help us with interpretation. Let's use ordination here. We'll run Principal Coordinates Analysis on our ``DistanceMatrix`` object. This gives us a matrix of coordinate values for each sample, which we can then plot. We can use ``scikit-bio``'s implementation of PCoA as follows:
@@ -964,6 +987,7 @@ What does the following ordination plot tell you about the relationship between 
 
 ```python
 >>> _ = lauber_soil_unweighted_unifrac_pc.plot(lauber_soil_sample_md, 'Latitude', cmap='Greens', title="Samples colored by Latitude", axis_labels=('PC1', 'PC2', 'PC3'))
+<Figure size 432x288 with 2 Axes>
 ```
 
 If the answer to the above question is that there doesn't seem to be much association, you're on the right track. We can quantify this, for example, by testing for correlation between pH and value on PC 1.
@@ -982,6 +1006,7 @@ In the next plot, we'll color the points by the pH of the soil sample they repre
 
 ```python
 >>> _ = lauber_soil_unweighted_unifrac_pc.plot(lauber_soil_sample_md, 'pH', cmap='Greens', title="Samples colored by pH", axis_labels=('PC1', 'PC2', 'PC3'))
+<Figure size 432x288 with 2 Axes>
 ```
 
 ```python
@@ -1010,6 +1035,7 @@ Imagine you ran three different beta diversity metrics on your BIOM table: unwei
 >>> _ = lauber_soil_unweighted_unifrac_pc.plot(lauber_soil_sample_md, 'pH', cmap='Greens',
 ...                                                title="Unweighted UniFrac, samples colored by pH",
 ...                                                axis_labels=('PC1', 'PC2', 'PC3'))
+<Figure size 432x288 with 2 Axes>
 ```
 
 ```python
@@ -1020,6 +1046,7 @@ Imagine you ran three different beta diversity metrics on your BIOM table: unwei
 >>> _ = lauber_soil_bray_curtis_pcoa.plot(lauber_soil_sample_md, 'pH', cmap='Greens',
 ...                                         title="Bray-Curtis, samples colored by pH",
 ...                                         axis_labels=('PC1', 'PC2', 'PC3'))
+<Figure size 432x288 with 2 Axes>
 ```
 
 ```python
@@ -1030,8 +1057,9 @@ Imagine you ran three different beta diversity metrics on your BIOM table: unwei
 >>> _ = lauber_soil_weighted_unifrac_pcoa.plot(lauber_soil_sample_md, 'pH', cmap='Greens',
 ...                                              title="Weighted UniFrac, samples colored by pH",
 ...                                              axis_labels=('PC1', 'PC2', 'PC3'))
-/Users/caporaso/miniconda3/envs/iab/lib/python3.4/site-packages/skbio/stats/ordination/_principal_coordinate_analysis.py:102: RuntimeWarning: The result contains negative eigenvalues. Please compare their magnitude with the magnitude of some of the largest positive eigenvalues. If the negative ones are smaller, it's probably safe to ignore them, but if they are large in magnitude, the results won't be useful. See the Notes section for more details. The smallest eigenvalue is -0.010291669756329344 and the largest is 3.8374200744108204.
+/Users/gregcaporaso/miniconda3/envs/iab/lib/python3.5/site-packages/skbio/stats/ordination/_principal_coordinate_analysis.py:102: RuntimeWarning: The result contains negative eigenvalues. Please compare their magnitude with the magnitude of some of the largest positive eigenvalues. If the negative ones are smaller, it's probably safe to ignore them, but if they are large in magnitude, the results won't be useful. See the Notes section for more details. The smallest eigenvalue is -0.010291669756329357 and the largest is 3.8374200744108204.
   RuntimeWarning
+<Figure size 432x288 with 2 Axes>
 ```
 
 Specifically, what we want to ask when comparing these results is **given a pair of ordination plots, is their shape (in two or three dimensions) the same?** The reason we care is that we want to know, **given a pair of ordination plots, would we derive the same biological conclusions regardless of which plot we look at?**
