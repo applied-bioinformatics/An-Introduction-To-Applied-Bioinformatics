@@ -16,7 +16,7 @@ RUN apt-get update
 RUN apt-get install -y xvfb x11-utils
 
 COPY IAB-notebooks ${HOME}/IAB-notebooks/
-COPY custom.css ${HOME}/.jupyter/custom/
+COPY .jupyter/custom/custom.css ${HOME}/.jupyter/custom/custom.css
 # `fix-permissions` ships with jupyter/minimal-notebook
 RUN fix-permissions ${HOME}
 RUN rm -rf work
