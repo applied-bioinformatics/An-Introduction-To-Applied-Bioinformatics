@@ -16,13 +16,13 @@ RUN apt-get update
 RUN apt-get install -y xvfb x11-utils
 
 COPY IAB-notebooks ${HOME}/IAB-notebooks/
+COPY custom.css ${HOME}/.jupyter/custom/
 # `fix-permissions` ships with jupyter/minimal-notebook
 RUN fix-permissions ${HOME}
 RUN rm -rf work
 
 USER ${NB_UID}
 
-COPY custom.css ${HOME}/.jupyter/custom/custom.css
 COPY environment.yml ${HOME}
 RUN conda env update -n base -f environment.yml
 RUN rm environment.yml
