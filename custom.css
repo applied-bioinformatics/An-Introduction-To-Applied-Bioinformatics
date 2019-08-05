@@ -1,0 +1,26 @@
+/* Custom styling to help align things, and correct section numbers */
+
+h4, h5, h6 {
+  font-size: 120% !important;
+}
+
+.iab-edit {
+  float: right;
+  font-size: 14px;
+}
+
+.anchor-link {
+  display: none !important;
+}
+
+/* from SO: https://stackoverflow.com/a/4098296/579416 */
+.cell ol {
+  counter-reset: item;
+}
+.cell li {
+  display: block;
+}
+.cell li:before {
+  content: counters(item, ".") " ";
+  counter-increment: item ;
+}
