@@ -22,6 +22,7 @@ RUN rm -rf work
 
 USER ${NB_UID}
 
+COPY custom.css ${HOME}/.jupyter/custom/custom.css
 COPY environment.yml ${HOME}
 RUN conda env update -n base -f environment.yml
 RUN rm environment.yml
