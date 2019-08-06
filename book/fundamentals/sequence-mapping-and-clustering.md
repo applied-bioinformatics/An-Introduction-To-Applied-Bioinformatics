@@ -98,7 +98,7 @@ Let's implement this, and then try it out on some test sequences.
 ...
 >>> def furthest_neighbor(seq, cluster, similarity_threshold, aligner, verbose=False):
 ...     alignment_results = []
-...     for node in cluster.nodes_iter():
+...     for node in cluster.nodes():
 ...         aln, _, _ = aligner(seq, cluster.node[node]['seq'])
 ...         percent_similarity = 1. - aln[0].distance(aln[1])
 ...         alignment_results.append((node, percent_similarity))
@@ -226,7 +226,7 @@ Let's implement nearest neighbor clustering and look at the same six toy sequenc
 ```python
 >>> def nearest_neighbor(seq, cluster, similarity_threshold, aligner, verbose=False):
 ...     alignment_results = []
-...     for node in cluster.nodes_iter():
+...     for node in cluster.nodes():
 ...         aln, _, _ = aligner(seq, cluster.node[node]['seq'])
 ...         percent_similarity = 1. - aln[0].distance(aln[1])
 ...         alignment_results.append((node, percent_similarity))
@@ -485,9 +485,9 @@ Next let's look at run time as a function of the number of sequences to be clust
 Finally, let's look at the number of clusters (or OTUs) that are generated with each method at each similarity threshold.
 
 ```python
->>> g = sns.factorplot(x="Similarity threshold", y="Number of clusters",
-...                    hue="Cluster method", data=df[df["Number of sequences"] == max(sizes)],
-...                    kind="bar")
+>>> g = sns.catplot(x="Similarity threshold", y="Number of clusters",
+...                 hue="Cluster method", data=df[df["Number of sequences"] == max(sizes)],
+...                 kind="bar")
 ```
 
 ## Reference-based clustering to assist with parallelization <link src='e96c31'/>

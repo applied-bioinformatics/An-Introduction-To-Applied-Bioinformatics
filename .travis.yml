@@ -1,14 +1,12 @@
-# Check on http://lint.travis-ci.org/ after modifying! Taken and modified
-# from https://github.com/biocore/scikit-bio/blob/master/.travis.yml
-# sudo temporarily seems to be required, pending fix of
-# https://github.com/travis-ci/travis-ci/issues/6861
-sudo: required
+# Taken and modified from 
+# https://github.com/biocore/scikit-bio/blob/master/.travis.yml
+dist: bionic
 language: python
+services:
+  - xvfb
 env:
   - PYTHON_VERSION=3.5
 before_install:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
   - ./miniconda.sh -b

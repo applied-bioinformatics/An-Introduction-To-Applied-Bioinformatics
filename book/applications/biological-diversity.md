@@ -19,17 +19,17 @@ The sample by feature frequency table is central to investigations of biological
 The basic data that goes into a BIOM table is the list of sample ids, the list of feature (e.g., OTU) ids, and the frequency matrix, which describes how many times each OTU was observed in each sample. We can build and display a BIOM table as follows:
 
 ```python
->>> %pylab inline
+>>> %matplotlib inline
 >>> import numpy as np
 >>> import pandas as pd
 ...
 >>> sample_ids = ['A', 'B', 'C']
 >>> feature_ids = ['OTU1', 'OTU2', 'OTU3', 'OTU4', 'OTU5']
->>> data = array([[1, 0, 0],
-...               [3, 2, 0],
-...               [0, 0, 6],
-...               [1, 4, 2],
-...               [0, 4, 1]])
+>>> data = np.array([[1, 0, 0],
+...                  [3, 2, 0],
+...                  [0, 0, 6],
+...                  [1, 4, 2],
+...                  [0, 4, 1]])
 ...
 >>> table1 = pd.DataFrame(data, index=feature_ids, columns=sample_ids)
 >>> table1
@@ -96,13 +96,13 @@ Let's define a new table for this analysis:
 ```python
 >>> sample_ids = ['A', 'B', 'C']
 >>> feature_ids = ['B1','B2','B3','B4','B5','A1','E2']
->>> data = array([[1, 1, 5],
-...               [1, 2, 0],
-...               [3, 1, 0],
-...               [0, 2, 0],
-...               [0, 0, 0],
-...               [0, 0, 3],
-...               [0, 0, 1]])
+>>> data = np.array([[1, 1, 5],
+...                  [1, 2, 0],
+...                  [3, 1, 0],
+...                  [0, 2, 0],
+...                  [0, 0, 0],
+...                  [0, 0, 3],
+...                  [0, 0, 1]])
 ...
 >>> table2 = pd.DataFrame(data, index=feature_ids, columns=sample_ids)
 >>> table2
@@ -266,11 +266,11 @@ In sequencing-based studies of microorganism richness, the analog of sampling ar
 ```python
 >>> sample_ids = ['A', 'B', 'C']
 >>> feature_ids = ['OTU1', 'OTU2', 'OTU3', 'OTU4', 'OTU5']
->>> data = array([[50, 4, 0],
-...               [35, 200, 0],
-...               [100, 2, 1],
-...               [15, 400, 1],
-...               [0, 40, 1]])
+>>> data = np.array([[50, 4, 0],
+...                  [35, 200, 0],
+...                  [100, 2, 1],
+...                  [15, 400, 1],
+...                  [0, 40, 1]])
 ...
 >>> bad_table = pd.DataFrame(data, index=feature_ids, columns=sample_ids)
 >>> bad_table
@@ -557,12 +557,12 @@ F      skin  subject 2
 ```
 
 ```python
->>> dm_data = array([[0.00, 0.35, 0.83, 0.83, 0.90, 0.90],
-...                  [0.35, 0.00, 0.86, 0.85, 0.92, 0.91],
-...                  [0.83, 0.86, 0.00, 0.25, 0.88, 0.87],
-...                  [0.83, 0.85, 0.25, 0.00, 0.88, 0.88],
-...                  [0.90, 0.92, 0.88, 0.88, 0.00, 0.50],
-...                  [0.90, 0.91, 0.87, 0.88, 0.50, 0.00]])
+>>> dm_data = np.array([[0.00, 0.35, 0.83, 0.83, 0.90, 0.90],
+...                     [0.35, 0.00, 0.86, 0.85, 0.92, 0.91],
+...                     [0.83, 0.86, 0.00, 0.25, 0.88, 0.87],
+...                     [0.83, 0.85, 0.25, 0.00, 0.88, 0.88],
+...                     [0.90, 0.92, 0.88, 0.88, 0.00, 0.50],
+...                     [0.90, 0.91, 0.87, 0.88, 0.50, 0.00]])
 ...
 >>> human_microbiome_dm = DistanceMatrix(dm_data, sample_ids)
 >>> print(human_microbiome_dm)
