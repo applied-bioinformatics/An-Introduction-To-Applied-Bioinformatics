@@ -4,7 +4,7 @@
 # e.g. https://github.com/applied-bioinformatics/built-iab,
 # and is designed for running on mybinder.org
 
-FROM jupyter/minimal-notebook:177037d09156
+FROM jupyter/minimal-notebook:58169ec3cfd3
 
 LABEL maintainer="Greg Caporaso <gregcaporaso@gmail.com>"
 
