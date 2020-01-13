@@ -1114,8 +1114,8 @@ The output is a pair of *transformed coordinate matrices*, and an $M^{2}$ statis
 
 ## Where to go from here <link src='fc527a'/>
 
-If you're interested in learning more about the topics presented in this chapter, I recommend [Measuring Biological Diversity](http://www.amazon.com/Measuring-Biological-Diversity-Anne-Magurran/dp/0632056339) by Anne E. Magurran, and the [QIIME tutorials](http://qiime.org/tutorials/index.html). The [QIIME software package](http://www.qiime.org) is designed for performing the types of analyses described in this chapter.
+If you're interested in learning more about the topics presented in this chapter, I recommend [Measuring Biological Diversity](http://www.amazon.com/Measuring-Biological-Diversity-Anne-Magurran/dp/0632056339) by Anne E. Magurran, and the [QIIME 2 documentation](https://docs.qiime2.org). The [QIIME 2 software package](https://qiime2.org) is designed for performing the types of analyses described in this chapter.
 
 ## Acknowledgements <link src='0d9866'/>
 
-Much of content in this section is based on knowledge that I gained through years of working with [Rob Knight](https://knightlab.ucsd.edu/) and the rest of the [QIIME](http://qiime.org/) [development group](https://github.com/biocore/qiime/graphs/contributors). Thanks everyone, I'm looking forward to many more years of productive, fun and exciting work together!
+Much of content in this section is based on knowledge that I gained through years of working with the [QIIME](http://qiime.org/) and [QIIME 2](https://qiime2.org) user and developer communities. Thanks everyone, I'm looking forward to many more years of productive, fun and exciting work together!
