@@ -8,7 +8,11 @@ The Central Dogma of Molecular Biology describes information flow in biological 
 
 We'll revisit these ideas at the end of this chapter, but first let's establish some concepts that will help us to understand and even quantify information. These ideas have their roots in Boolean algebra and Information Theory. Bear with me while I introduce some concepts that may be new to you, and may initially seem unrelated.
 
-TODO: creative commons central dogma figure.
+<figure>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/getting-started/images/central-dogma.png">
+    <figcaption>Figure 1: The central dogma of molecular biology represents information flow in biological systems. Blue pathways are generally observed in cellular life. Red pathways are observed in special cases such as RNA viruses. (Figure attribution: Narayanese at English Wikipedia [Public domain], <a href="https://commons.wikimedia.org/wiki/File:Centraldogma_nodetails.png">via Wikimedia Commons</a>.)</figcaption>
+</figure>
+<p>
 
 ## Binary and decimal numerical systems
 
@@ -59,11 +63,7 @@ Amino acids are in fact encoded by three nucleotide bases, and the three base me
 </figure>
 <p>
 
-TODO: simple skbio translation example
-
-## Information theory
-
-[Introduce entropy and mutual information, tie back to information loss in RNA to protein]
+## Quantifying information
 
 Information is a quantifiable concept, an idea that has its roots in Boolean algebra and in Claude Shannon's work on Information Theory. The most basic unit of information is the _binary digit_, or _bit_, which has two possible states. Depending on the domain, the symbols representing these two states might be `0` and `1`, `yes` and `no`, `+` and `-`, `true` and `false`, or `on` and `off`. When you answer a "yes/no" question in a conversation, or a "true/false" question on an exam, you're providing one bit of information.
 
