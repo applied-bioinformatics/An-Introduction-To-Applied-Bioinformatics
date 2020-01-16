@@ -47,11 +47,11 @@ To enable the transmission of more complex messages more bits can be used. One b
 
 In computer systems, the bit is the most fundamental unit of information. The next largest unit is the byte, which is composed of eight bits. How many messages can be encoded in one byte?
 
-## DNA messages are encoded in a base 4 systems <link src="ifUmVe"/>
+## Protein sequences are encoded in a base 4 system <link src="ifUmVe"/>
 
-The building blocks of DNA are four chemical compounds called adenine, cytosine, guanine, and thymine. We often represent these compounds with the abbreviations A, C, G and T, respectively. Like computer systems, information is represented based on distinct states, but in biological systems there are four states rather than two. Each position or place in a DNA sequence can contain one of these compounds, and the linear order of the compounds can encode a message.
+The building blocks of DNA are four chemical compounds called adenine, cytosine, guanine, and thymine. We often represent these compounds with the abbreviations A, C, G and T, respectively. One of the primary roles of DNA in biological organisms is to encode the primary structure, or amino acid sequence, of proteins. As with computer systems, this information is represented based on discrete states, but in biological systems there are four states rather than two. Each position or place in an exon of a protein-coding DNA sequence can contain one of these compounds, and the linear order of the compounds can encode a message.
 
-One type of message that can be encoded in DNA is the sequence of amino acids in a protein. When first translated, proteins are composed of simpler units, the amino acids, and most organisms use 20 different amino acids to build proteins. Because there are four DNA bases (A, C, G, and T) and twenty amino acids, we need more than one base to transmit the message of what amino acid comes next in a protein from DNA to the ribosome. How many DNA bases we need depends on how many messages we want to be able to send, which in this case is 20 (for the twenty amino acids). So, how many DNA bases are needed to encode the 20 canonical amino acids?
+When first translated, proteins are composed of simpler units, the amino acids, and most organisms use 20 different amino acids to build proteins. Because there are four DNA bases (A, C, G, and T) and twenty amino acids, we need more than one base to transmit the message of what amino acid comes next in a protein from DNA to the ribosome. How many DNA bases we need depends on how many messages we want to be able to send, which in this case is 20 (for the twenty amino acids). So, how many DNA bases are needed to encode the 20 canonical amino acids?
 
 As mentioned above, we can determine the number of messages we can send in a given numerical system with a given number of places using the formula $b^n$. For messages encoded in DNA, $b$ is four, so with one place (or one DNA base) we can send four messages. Since four is less than twenty, we'll need longer messages to encode the twenty amino acids. If our message were composed of two bases, we could send $4^2=16$ messages - that's still less than twenty, so we'll need more bases. If our message were composed of three bases, we could send $4^3=64$ messages. This is more than twenty, which means that we can encode all of the amino acids (with some messages to spare) in three bases. It's important to note that the number of places we can use must be a whole number - "2.5 bases of DNA" is not a meaningful quantity.
 
@@ -90,6 +90,18 @@ The above step translated a DNA sequence to a protein sequence, but it didn't sh
 
 ```python
 >>> protein
+Protein
+---------------------------------------------------------------------
+Stats:
+    length: 178
+    has gaps: False
+    has degenerates: False
+    has non-degenerates: True
+    has stops: False
+---------------------------------------------------------------------
+0   KPQLLGPGHP VSPYLLFLSS SDCAMGLSDG EWQLVLNVWG KVEADIPGHG QEVLIRLFKG
+60  HPETLEKFDK FKHLKSEDEM KASEDLKKHG ATVLTALGGI LKKKGHHEAE IKPLAQSHAT
+120 KHKIPVKYLE FISECIIQVL QSKHPGDFGA DAQGAMNKAL ELFRKDMASN YKELGFQG
 ```
 
 If we just want the protein sequence itself, you can call `print` on the variable. How might you determine what this sequence is?
@@ -97,6 +109,10 @@ If we just want the protein sequence itself, you can call `print` on the variabl
 ```python
 >>> print(protein)
 ```
+
+Genomes contain messages other than protein sequences, so in reality the messages encoded by DNA in our genomes are more complex than a base 4 numerical system. For example, the structure that a chromosomal region adopts can impact whether genes in that region are expressed or not, which can have profound phenotypic impacts. This is a higher-level message that is encoded in our genomes. So, while in some ways we can relate the information contained in our genomes to the way information is stored in computers, our genomes are not just programs that are executed. Even the simplest cellular organisms are far more complex than the most complex machines of humankind! "An airplane is nothing if you compare it to a pelican," observed Herman Dune.
+
+Also ignored in this discussion is that additional characters are sometimes used to represent ambiguity in our knowledge of a DNA sequence, or to concisely represent more than one sequence. The [IUPAC nucleic acid notation](https://en.wikipedia.org/wiki/Nucleic_acid_notation) is what we've been using in this chapter, where A, C, G, and T represent adenine, cytosine, guanine, and thymine, respectively. Other characters are definited in this notation. For example, N is defined to mean either A, C, G, or T, and is thus commonly encountered in readouts of DNA sequences at positions where the base couldn't be determined. These _degenerate_ characters couldn't be represented in the base 4 numerical system we've been discussing here. They also don't exist in nature - we just use them to talk about DNA sequences.
 
 ## Quantifying information <link src="iFItmR"/>
 
@@ -112,3 +128,32 @@ Let's apply this formula to determine how many messages can be sent with one byt
 ...
 >>> print(n_symbols**p)
 ```
+
+Since bases in a DNA sequence are represented with four characters, each position in a sequence contains two bits of information. We know this because we could represent all four bases using two places in a binary number. For example, 00 could represent A, 01 could represent C, 01 could represent G, and 11 could represent T. These assignments of binary numbers to DNA bases is arbitrary.) In other words, if we have two symbols and two places, we can send four messages ($2^2=4$), so one base of DNA represents 2 bits of information. A DNA sequence that is 100 bases long would therefore contain 200 bits of information.
+
+More generally, if we send a message using a numerical system with $s$ symbols, and our message is $p$ places long, the number of bits that are sent would be $n$ in the following equation: $s^p = 2^n$. We could solve for $n$ as: $n = \log_{2}s^p$.
+
+## The genetic code <link src="uYc4yT"/>
+
+As mentioned above, the genetic code describes the mapping of codons to amino acids. This mapping is embodied in an organism's [transfer RNA (tRNA)](http://pdb101.rcsb.org/motm/15) molecules. As illustrated in Figure 3, one end of the folded tRNA contains the "anticodon loop", which is the complementary sequence to the tRNA's codon. On the other end of the tRNA is the acceptor stem, which contains the amino acid attachment site. Through interaction with an [aminoacyl tRNA synthetase](https://pdb101.rcsb.org/motm/16), the amino acid corresponding to the anticodon is covalently linked to the acceptor stem. During translation, a tRNA's anticodon pairs with a codon in a messenger RNA (mRNA) inside the ribosome and thereby provides the next amino acid needed for protein synthesis.
+
+<figure>
+    <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/getting-started/images/trna.png">
+    <figcaption>Figure 3: The secondary and tertiary structure of a transfer RNA (tRNA) molecule. (Figure attribution: This image was obtained from <a href="https://openstax.org/books/microbiology/pages/1-introduction">OpenStax <i>Microbiology</i></a>, a free microbiology text book, and is licensed under CC-BY. OpenStax <i>Microbiology</i> can be accessed for free at https://openstax.org/books/microbiology/pages/1-introduction.)</figcaption>
+</figure>
+<p>
+
+Figure 3 also illustrates two different views of the structure of a tRNA molecule. The secondary ($2^o$) structure is presented on the left, and the tertiary ($3^o$) structure is presented on the right. For a nucleic acid molecule, like tRNA, the secondary structure refers to the base pairing interactions in a folded molecule. The tertiary structure refers to the three-dimensional structure that the molecule takes inside of an organism. The primary ($1^o$) structure, which isn't illustrated here, refers to the linear sequence of nucleotides in the tRNA molecule. The primary structure of a phenylalanine tRNA (i.e., tRNAPhe) from yeast in [FASTA format](https://en.wikipedia.org/wiki/FASTA_format), for example, is as follows.
+
+```
+>4TNA:A|PDBID|CHAIN|SEQUENCE
+GCGGAUUUAGCUCAGUUGGGAGAGCGCCAGACUGAAGAUCUGGAGGUCCUGUGUUCGAUCCACAGAAUUCGCACCA
+```
+
+Each level of structure contains some information about the other levels. For example, if we were to examine the primary structure of tRNAPhe, we might find that there are stretches of certain bases that could form stable base pairing interactions with each other. That could help us to make a prediction about the secondary structure of tRNAPhe. We could use that information, along with knowledge about the physics of nucleic acid molecules to make predictions about how the molecule would fold inside of a cell (i.e., its tertiary structure). If we knew the tertiary structure of a molecule with similar primary structure to tRNAPhe, that information would also be very helpful in predicting the tertiary structure of tRNAPhe because we expect nucleic acids or proteins with similar primary structures to also have similar secondary and tertiary structures, though this isn't always the case.
+
+The primary and secondary structure of a molecule alone doesn't currently allow us to make perfect predictions about the tertiary structure that a molecular will adopt. Personally, I think additional information is needed so this type of prediction won't ever be entirely reliable. But this is a classic problem in bioinformatics.
+
+## Summary <link src="jMv8M1"/>
+
+In this section we explored different numerical systems, and discussed relationships between how computers and organisms represent information. In the next section we'll dive into the fundamentals of bioinformatics.
