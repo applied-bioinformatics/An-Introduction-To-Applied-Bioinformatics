@@ -6,7 +6,7 @@
 
 ## scikit-learn <link src="ifjF4O"/>
 
-In this chapter we'll implement several machine learning classifiers so we can gain an in-depth understanding of how they work. In practice though, there are many mature machine learning libraries that you'd want to use. [scikit-learn](http://scikit-learn.org/) is a popular and well-documented Python library for machine learning which many bioinformatics researchers and software developers use in their work.
+In this chapter we'll implement two machine learning classifiers so we can gain an in-depth understanding of how they work. In practice though, there are many mature machine learning libraries that you'd want to use. [scikit-learn](http://scikit-learn.org/) is a popular and well-documented Python library for machine learning which many bioinformatics researchers and software developers use in their work.
 
 ## Defining the problem <link src="2R6CTy"/>
 
@@ -303,5 +303,3 @@ What does this plot tell you about how well setting a confidence threshold is li
 ```
 
 ## Random Forest classifiers <link src="N7CyaN"/>
-
-## Neural networks and "deep learning" <link src="DgnnyS"/>
