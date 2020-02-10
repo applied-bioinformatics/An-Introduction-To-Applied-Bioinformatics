@@ -1,16 +1,14 @@
 # Machine learning in bioinformatics (work-in-progress) <link src="7SFnTr"/>
 
-This chapter is currently a work-in-progress, and is incomplete.
+**This chapter is currently a work-in-progress, and is incomplete.**
 
-## Supervised v unsupervised classification <link src="b05Cya"/>
+Machine learning algorithms are commonly used in bioinformatics for a variety of tasks. Typically, the common thread in these tasks is that the user would like the algorithm to assist in the identification of patterns in a complex data set. In this chapter we'll implement a few machine learning algorithms so we can gain an in-depth understanding of how they work. In practice though, there are many mature machine learning libraries that you'd want to use. [scikit-learn](http://scikit-learn.org/) is a popular and well-documented Python library for machine learning which many bioinformatics researchers and software developers use in their work.
 
-## Training data, test data, and cross validation <link src="QIewra"/>
+These algorithms generally work beginning with a collection of samples and some user-defined features of those samples. These data are typically represented in a matrix, where samples are the rows and features are the columns. There are a few different high-level tasks that are common in machine learning, including classification, regression, and dimensionality reduction. In a classification task, a user provides examples of data that fall into certain discrete classes (for example, _healthy_ and _disease_), and tries to have the computer develop a model that can differentiate those classes based on the defined features. If successful, the resulting model could be applied to data where the class isn't known ahead of time, in attempt to predict the class from the features. A regression task is similar, except that a continuous value will be predicted rather than a discrete value. Dimensionality reduction tasks, on the other hand, generally don't have classes or labels assigned ahead of time, and the user is hoping to identify which samples are most similar to each other based on new features that are defined by the algorithm. The goal here might be to reduce the number of features from thousands or more to around two or three that explain most of the variation in the data. This allows the user to explore the samples visually, for example in a scatter plot, which would not be feasible if there were thousands of features.
 
-## scikit-learn <link src="ifjF4O"/>
+In this chapter we'll explore two classification algorithms and one dimensionality reduction task in the context of some real-world examples.
 
-In this chapter we'll implement two machine learning classifiers so we can gain an in-depth understanding of how they work. In practice though, there are many mature machine learning libraries that you'd want to use. [scikit-learn](http://scikit-learn.org/) is a popular and well-documented Python library for machine learning which many bioinformatics researchers and software developers use in their work.
-
-## Defining the problem <link src="2R6CTy"/>
+## Defining a classification problem <link src="2R6CTy"/>
 
 We'll explore machine learning classifiers in the context of a familiar topic: taxonomic classification of 16S rRNA sequences. We previously explored this problem in [Sequence Homology Searching](alias://d22e6b), so it is likely worth spending a few minutes skimming that chapter if it's not fresh in your mind.
 
@@ -20,7 +18,7 @@ This time, instead of using sequence alignment to identify the most likely taxon
 
 Let's jump in...
 
-## Naive Bayes classifiers <link src="H8vYPu"/>
+### Naive Bayes classifiers <link src="H8vYPu"/>
 
 The first classifier we'll explore is the popular and relatively simple Naive Bayes classifier. This classifier uses Bayes Theorem to determine the most likely label for an unknown input based on a probabilistic model it has constructed from training data. (_The preceding text needs work._) The model that is constructed is based on user-defined features of the sequences. The most commonly used features for sequence classification tasks such as this is overlapping [kmers](alias://C7hMX5).
 
@@ -289,4 +287,10 @@ What does this plot tell you about how well setting a confidence threshold is li
 >>> summary # maybe explore whether certain taxa are more frequently wrong than others...
 ```
 
-## Random Forest classifiers <link src="N7CyaN"/>
+### Random Forest classifiers <link src="N7CyaN"/>
+
+Coming soon...
+
+## Defining a dimensionality reduction problem <link src="Y0TtkW"/>
+
+[This content](alias://b1cdbe) will be adapted and ported here.
