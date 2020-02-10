@@ -1,4 +1,6 @@
-# Machine learning in bioinformatics <link src="7SFnTr"/>
+# Machine learning in bioinformatics (work-in-progress) <link src="7SFnTr"/>
+
+This chapter is currently a work-in-progress, and is incomplete.
 
 ## Supervised v unsupervised classification <link src="b05Cya"/>
 
@@ -38,27 +40,13 @@ We'll begin by importing some libraries that we'll use in this chapter, and then
 ```
 
 ```python
->>> import qiime_default_reference as qdr
+>>> from iab.algorithms import load_taxonomy_reference_database
 ...
->>> # Load the taxonomic data
-... reference_taxonomy = {}
->>> for e in open(qdr.get_reference_taxonomy()):
-...     seq_id, seq_tax = e.strip().split('\t')
-...     reference_taxonomy[seq_id] = seq_tax
-...
->>> # Load the reference sequences, and associate the taxonomic annotation with
-... # each as metadata
-... reference_db = []
->>> for e in skbio.io.read(qdr.get_reference_sequences(), format='fasta', constructor=skbio.DNA):
-...     if e.has_degenerates():
-...         # For the purpose of this lesson, we're going to ignore sequences that contain
-...         # degenerate characters (i.e., characters other than A, C, G, or T)
-...         continue
-...     seq_tax = reference_taxonomy[e.metadata['id']]
-...     e.metadata['taxonomy'] = seq_tax
-...     reference_db.append(e)
-...
->>> print("%s sequences were loaded from the reference database." % len(reference_db))
+>>> %psource load_taxonomy_reference_database
+```
+
+```python
+>>> reference_taxonomy, reference_db = load_taxonomy_reference_database()
 ```
 
 ```python
@@ -189,17 +177,16 @@ Our "kmer probability table" is $P(w_i | taxon)$ computed for all kmers in W and
 With our kmer probability table we are now ready to classify unknown sequences. We'll begin by defining some query sequences. We'll pull these at random from our reference sequences, which means that some of the query sequences will be represented in our reference database and some won't be. This is the sitatuation that is typically encountered in practice. To simulate real-world 16S taxonomy classification tasks, we'll also trim out 200 bases of our reference sequences since (as of this writing) we typically don't obtain full-length 16S sequences from a DNA sequencing instrument.
 
 ```python
->>> queries = []
->>> for e in skbio.io.read(qdr.get_reference_sequences(), format='fasta', constructor=skbio.DNA):
-...     if e.has_degenerates():
-...         # For the purpose of this lesson, we're going to ignore sequences that contain
-...         # degenerate characters (i.e., characters other than A, C, G, or T)
-...         continue
-...     e = e[100:300]
-...     queries.append(e)
->>> # can't figure out why np.random.choice isn't working here...
-... np.random.shuffle(queries)
->>> queries = queries[:50]
+>>> from iab.algorithms import load_taxonomy_query_sequences
+...
+>>> %psource load_taxonomy_query_sequences
+```
+
+```python
+>>> import random
+...
+>>> queries = load_taxonomy_query_sequences()
+>>> queries = random.sample(queries, k=50)
 ```
 
 ```python
@@ -237,9 +224,9 @@ Since we know the actual taxonomy assignment for this sequence, we can look that
 >>> get_taxon_at_level(reference_taxonomy[queries[0].metadata['id']], taxonomic_level)
 ```
 
-Because the query and reference sequences that were working with were randomly selected from the full reference database, each time you run this notebook you should observe different results. Chances are however that if you run the above steps multiple times you'll get the wrong taxonomy assignment at least some of the time. Up to this point, we've left out an important piece of information: how confident should we be in our assignment, or in other workds, how dependent is our taxonomy assignment on our specific query? If there were slight differences in our query (e.g., because we observed a very closely related organism, such as one of the same species but a different strain, or because we sequenced a different region of the 16S sequence) would we obtain the same taxonomy assignment? If so, we should have higher confidence in our assignment. If not, we should have lower confidence in our assignment.
+Because the query and reference sequences that were working with were randomly selected from the full reference database, each time you run this notebook you should observe different results. Chances are however that if you run the above steps multiple times you'll get the wrong taxonomy assignment at least some of the time. Up to this point, we've left out an important piece of information: how confident should we be in our assignment, or in other words, how dependent is our taxonomy assignment on our specific query? If there were slight differences in our query (e.g., because we observed a very closely related organism, such as one of the same species but a different strain, or because we sequenced a different region of the 16S sequence) would we obtain the same taxonomy assignment? If so, we should have higher confidence in our assignment. If not, we should have lower confidence in our assignment.
 
-We can quantify confidence using an approach called bootstrapping. With a bootstrap approach, we'll get our taxonomy assignment as we did above, but then for some user-specified number of times, we'll create random subsets of V sampled with replacement (DEFINE THIS). We'll then assign taxonomy each random subset of V, and count the number of times the resulting taxonomy assignment is the same that we achieved when assigning taxonomy to V. The count divided by the number of iterations we've chosen to run will be our confidence value. If the assignments are often the same we'll have a high confidence value. If the assignments are often different, we'll have a low confidence value.
+We can quantify confidence using an approach called bootstrapping. With a bootstrap approach, we'll get our taxonomy assignment as we did above, but then for some user-specified number of times, we'll create random subsets of V sampled with replacement (DEFINE THIS). We'll then assign taxonomy to each random subset of V, and count the number of times the resulting taxonomy assignment is the same that we achieved when assigning taxonomy to V. The count divided by the number of iterations we've chosen to run will be our confidence value. If the assignments are often the same we'll have a high confidence value. If the assignments are often different, we'll have a low confidence value.
 
 Let's now assign taxonomy and compute a confidence for that assignment.
 
