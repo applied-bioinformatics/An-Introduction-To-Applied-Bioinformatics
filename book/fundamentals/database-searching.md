@@ -43,24 +43,13 @@ First, let's load Greengenes into a list of ``skbio.DNA`` sequence objects, and 
 ```
 
 ```python
->>> import qiime_default_reference as qdr
->>> import skbio
+>>> from iab.algorithms import load_taxonomy_reference_database
 ...
->>> # Load the taxonomic data
-... reference_taxonomy = {}
->>> for e in open(qdr.get_reference_taxonomy()):
-...     seq_id, seq_tax = e.strip().split('\t')
-...     reference_taxonomy[seq_id] = seq_tax
-...
->>> # Load the reference sequences, and associate the taxonomic annotation with
-... # each as metadata
-... reference_db = []
->>> for e in skbio.io.read(qdr.get_reference_sequences(), format='fasta', constructor=skbio.DNA):
-...     seq_tax = reference_taxonomy[e.metadata['id']]
-...     e.metadata['taxonomy'] = seq_tax
-...     reference_db.append(e)
-...
->>> print("%s sequences were loaded from the reference database." % len(reference_db))
+>>> %psource load_taxonomy_reference_database
+```
+
+```python
+>>> reference_taxonomy, reference_db = load_taxonomy_reference_database()
 ```
 
 Next, we'll just inspect a couple of the sequences we loaded. Notice how the specificity of our taxonomic annotations (i.e., how many taxonomic levels are annotated and unknown) differs for different sequences.
@@ -87,11 +76,14 @@ We'll also extract some sequences from Greengenes to use as query sequences in o
 Note that some of our query sequences may also be in our subsampled reference database and some won't. This is realistic: sometimes we're working with sequences that are exact matches to known sequences, and sometimes we're working with sequences that don't match any known sequences (or at least any in the reference database that we're working with).
 
 ```python
->>> queries = []
->>> for e in skbio.io.read(qdr.get_reference_sequences(), format='fasta', constructor=skbio.DNA):
-...     e = e[100:300]
-...     queries.append(e)
->>> queries = random.sample(queries, k=500)
+>>> from iab.algorithms import load_taxonomy_query_sequences
+...
+>>> %psource load_taxonomy_query_sequences
+```
+
+```python
+>>> queries = load_taxonomy_query_sequences()
+>>> queries = random.sample(queries, k=50)
 ```
 
 Let's inspect a couple of the query sequences that we'll work with.
@@ -416,6 +408,8 @@ Try increasing and decreasing the number of sequences we'll align by increasing 
 Another metric of sequence composition is *kmer composition*. A [kmer](alias://C7hMX5) is simply a word (or list of adjacent characters) of length *k* found within a sequence. Here are the kmer frequencies in a short DNA sequence. The ``overlap=True`` parameter here means that our kmers can overlap one another.
 
 ```python
+>>> import skbio
+...
 >>> skbio.DNA('ACCGTGACCAGTTACCAGTTTGACCAA').kmer_frequencies(k=5, overlap=True)
 ```
 

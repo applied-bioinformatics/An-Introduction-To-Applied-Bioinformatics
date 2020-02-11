@@ -16,6 +16,7 @@ from scipy.cluster.hierarchy import to_tree
 import skbio
 from skbio import Sequence, DNA, TabularMSA, TreeNode, DistanceMatrix
 from skbio.alignment import local_pairwise_align_ssw
+import qiime_default_reference as qdr
 
 
 blosum50 = {'A': {'A': 5, 'C': -1, 'D': -2, 'E': -1, 'F': -3, 'G': 0, 'H': -2, 'I': -1, 'K': -1, 'L': -2, 'M': -1, 'N': -1, 'P': -1, 'Q': -1, 'R': -2, 'S': 1, 'T': 0, 'V': 0, 'W': -3, 'Y': -2},
@@ -1146,3 +1147,39 @@ def evolve_generations(ancestral_sequence, generations, substitution_probability
 
     # upon completion of all generations, return the last generation's sequences
     return previous_generation_sequences
+
+
+def load_taxonomy_reference_database():
+    # Load the taxonomic data
+    reference_taxonomy = {}
+    for e in open(qdr.get_reference_taxonomy()):
+        seq_id, seq_tax = e.strip().split('\t')
+        reference_taxonomy[seq_id] = seq_tax
+
+    # Load the reference sequences, and associate the taxonomic annotation with
+    # each as metadata
+    reference_db = []
+    for e in skbio.io.read(qdr.get_reference_sequences(), format='fasta', constructor=skbio.DNA):
+        if e.has_degenerates():
+            # For the purpose of this lesson, we're going to ignore sequences that contain
+            # degenerate characters (i.e., characters other than A, C, G, or T)
+            continue
+        seq_tax = reference_taxonomy[e.metadata['id']]
+        e.metadata['taxonomy'] = seq_tax
+        reference_db.append(e)
+
+    print("%s sequences were loaded from the reference database." % len(reference_db))
+
+    return reference_taxonomy, reference_db
+
+def load_taxonomy_query_sequences(start_position=100, length=200):
+    queries = []
+    for e in skbio.io.read(qdr.get_reference_sequences(), format='fasta', constructor=skbio.DNA):
+        if e.has_degenerates():
+            # For the purpose of this lesson, we're going to ignore sequences that contain
+            # degenerate characters (i.e., characters other than A, C, G, or T)
+            continue
+        e = e[start_position:start_position + length]
+        queries.append(e)
+
+    return queries
