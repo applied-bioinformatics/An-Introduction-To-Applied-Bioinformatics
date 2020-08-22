@@ -14,7 +14,6 @@ Imagine you have three sequences - call them ``r1``and ``r2`` (*r* is for *refer
 ```
 
 ```python
->>> from scipy.spatial.distance import hamming
 >>> from skbio import DNA
 ...
 >>> r1 = DNA("ACCCAGGTTAACGGTGACCAGGTACCAGAAGGGTACCAGGTAGGACACACGGGGATTAA")
@@ -25,17 +24,22 @@ Imagine you have three sequences - call them ``r1``and ``r2`` (*r* is for *refer
 >>> print(r2)
 >>> print(q1)
 ```
-Here we just stored 3 sequences as variables. Now we're going to compute the hamming distance between them using the function ``hamming()``. Don't forget we can look at what any function does by using ``%psource``. Let's see what the ``hamming()`` function looks like (don't worry if some parts of it aren't entirely clear just yet):
+Here we just stored 3 sequences as variables. Now we're going to compute the hamming distance between them by using the function ``hamming_distance()`` that we're going to implement in Python. Our written function will compare each position between the two sequences (by using the "!=" operator which will return True if the bases are different) and then averaging the number of those differences over the entire length of the sequence. Let's see what this function may look like in Python code :
 
 ```python
->>> %psource hamming
+>>> def hamming_distance(seq1, seq2) : 
+    """This function returns the Hamming distance between two sequences.
+    It is calculated as the average of the number of different positions
+    between our two sequences.
+    """
+    return np.average([pos1 != pos2 for pos1, pos2 in zip(seq1,seq2)])
 ```
 
 Let's find out if our query ("q1") is closer to reference 1 or reference 2 based on the hamming distance:
 
 ```python
->>> print(hamming(r1, q1))
->>> print(hamming(r2, q1))
+>>> hamming_distance(r1, q1))
+>>> hamming_distance(r2, q1))
 ```
 
 In this case, ``q1`` has a smaller distance to ``r1`` than it does to ``r2``, so ``q1`` is more similar to ``r1`` than ``r2``. But it's not always that simple.
@@ -48,7 +52,7 @@ Here we've assumed that only *substitution events* have occurred, meaning one DN
 >>> print(q1)
 >>> print(q2)
 ...
->>> print(hamming(r1, q2))
+>>> hamming_distance(r1, q2))
 ```
 
 This change had a big effect on the distance between the two sequences. In this case, the deletion event at the beginning of ``q2`` has shifted that sequence relative to ``r1``, which resulted in many of the bases "downstream" of the deleted base being different. However the sequences do still seem fairly similar, so perhaps this relatively large distance isn't biologically justified.
@@ -61,7 +65,7 @@ What we'd really want to do is have a way to indicate that a deletion seems to h
 >>> print(q1)
 >>> print(q3)
 ...
->>> print(hamming(r1, q3))
+>>> hamming_distance(r1, q3))
 ```
 
 What we've done here is create a pairwise alignment of ``r1`` and ``q3``. In other words, we've **aligned** positions to maximize the similarity of the two sequences, using the ``-`` to fill in spaces where one character is missing with respect to that location in the other sequence. We refer to ``-`` characters in aligned sequences as **gap characters**, or gaps.
