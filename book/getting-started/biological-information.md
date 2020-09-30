@@ -129,7 +129,7 @@ Let's apply this formula to determine how many messages can be sent with one byt
 >>> print(n_symbols**p)
 ```
 
-Since bases in a DNA sequence are represented with four characters, each position in a sequence contains two bits of information. We know this because we could represent all four bases using two places in a binary number. For example, 00 could represent A, 01 could represent C, 01 could represent G, and 11 could represent T. These assignments of binary numbers to DNA bases is arbitrary.) In other words, if we have two symbols and two places, we can send four messages ($2^2=4$), so one base of DNA represents 2 bits of information. A DNA sequence that is 100 bases long would therefore contain 200 bits of information.
+Since bases in a DNA sequence are represented with four characters, each position in a sequence contains two bits of information. We know this because we could represent all four bases using two places in a binary number. For example, 00 could represent A, 01 could represent C, 10 could represent G, and 11 could represent T. These assignments of binary numbers to DNA bases is arbitrary.) In other words, if we have two symbols and two places, we can send four messages ($2^2=4$), so one base of DNA represents 2 bits of information. A DNA sequence that is 100 bases long would therefore contain 200 bits of information.
 
 More generally, if we send a message using a numerical system with $s$ symbols, and our message is $p$ places long, the number of bits that are sent would be $n$ in the following equation: $s^p = 2^n$. We could solve for $n$ as: $n = \log_{2}s^p$.
 
