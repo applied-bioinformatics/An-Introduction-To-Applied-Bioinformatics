@@ -65,7 +65,7 @@ def show_F(h_sequence, v_sequence, data, hide_zeros=False, nonzero_val=None):
         row_headers = [" "] + row_headers
         col_headers = [" "] + col_headers
     for h, d in zip(row_headers, data):
-        current_row = ["<b>%s</b>" % h]
+        current_row = [<b>"%s"</b> % h]
         for e in d:
             if e == 0:
                 if hide_zeros:
@@ -94,7 +94,7 @@ def show_T(h_sequence, v_sequence, data):
 def show_substitution_matrix(headers, data):
     rows = []
     for h, d in zip(headers, data):
-        current_row = ["<b>%s</b>" % h]
+        current_row = [<b>"%s"</b> % h]
         for e in d:
             current_row.append(e)
         rows.append(current_row)
