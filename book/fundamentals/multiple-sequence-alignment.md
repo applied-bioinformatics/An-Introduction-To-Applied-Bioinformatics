@@ -105,15 +105,15 @@ You probably have two burning questions in your mind right now:
 
 We'll explore both of those through-out the rest of this notebook. First, let's cover the process of progressive multiple sequence alignment, just assuming for a moment that we know how to do both of those things.
 
-The process of progressive multiple sequence alignment could look like the following. First, we start with some sequences and a tree representing the relationship between those sequences. We'll call this our guide tree, because it's going to guide us through the process of multiple sequence alignment. In progressive multiple sequence alignment, we build a multiple sequence alignment for each internal node of the tree, where the alignment at a given internal node contains all of the sequences in the clade defined by that node.
+The process of progressive multiple sequence alignment could look like the following. First, we start with some sequences and a tree representing the relationship between those sequences. We'll call this our guide tree, because it's going to guide us through the process of multiple sequence alignment. In progressive multiple sequence alignment, we build a multiple sequence alignment for each internal node of the tree, where the alignment at a given internal node contains all of the sequences in the clade defined by that node. Let's see what this looks like with this example tree:
 
 <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/msa-tree-input.png">
 
-Starting from the root node, descend the bottom branch of the tree until you get to the an internal node. If an alignment hasn't been constructed for that node yet, continue descending the tree until to get to a pair of nodes. In this case, we follow the two branches to the tips. We then align the sequences at that pair of tips (usually with Needleman-Wunsch, for multiple sequence alignment), and assign that alignment to the node connecting those tips.
+Starting from the root node (at the far left), we will follow along a branch of the tree until we get to an internal node. If an alignment hasn't been constructed for that node yet, and it holds more than 2 sequences, we would continue moving along one of branches of that node. In this case, if we follow the bottom branch from the root we run into a node holding only sequences "s4" and "s5". We would then align those sequences at that pair of tips (usually with Needleman-Wunsch, for multiple sequence alignment), and assign that alignment to the node connecting those tips.
 
 <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/msa-tree-a1.png">
 
-Next, we want to find what to align the resulting alignment to, so start from the root node and descend the top branch of the tree. When you get to the next node, determine if an alignment has already been created for that node. If not, our job is to build that alignment so we have something to align against. In this case, that means that we need to align `s1`, `s2`, and `s3`. We can achieve this by aligning `s1` and `s3` first, to get the alignment at the internal node connecting them.
+Next, we want to find what to align that resulting alignment to, so let's start from the root node again and move along the top branch of the tree. When we get to the next node, we determine if an alignment has already been created for that node, and if not, our job is to build that alignment so we have something to align against. In this case, that means that we need to align `s1`, `s2`, and `s3`. We can achieve this by aligning `s1` and `s3` first, to get the alignment at the internal node connecting them.
 
 <img src="https://raw.githubusercontent.com/gregcaporaso/An-Introduction-To-Applied-Bioinformatics/master/book/fundamentals/images/msa-tree-a2.png">
 
@@ -129,31 +129,39 @@ The alignment at the root node is our multiple sequence alignment.
 
 ### Building the guide tree <link src='2d97eb'/>
 
-Let's address the first of our outstanding questions. I mentioned above that *we need an alignment to build a good tree*. The key word here is *good*. We can build a very rough tree - one that we would never want to present as representing the actual relationships between the sequences in question - without first aligning the sequences. Remember that building a UPGMA tree requires only a distance matrix, so if we can find a non-alignment-dependent way to compute distances between the sequences, we can build a rough UPGMA tree from them.
+Let's address the first of our outstanding questions. I mentioned above that *we need an alignment to build a good tree*. The key word here is *good*. We can actually build a very rough tree - one that we would never want to present as representing any actual phylogenetic relationships between the sequences in question - without first aligning the sequences. One way to do this is using hierarchical clustering to build an [UPGMA](https://en.wikipedia.org/wiki/UPGMA) (**U**nweighted **P**air **G**roup **M**ethod with **A**rithmetic-mean) tree, requiring only a distance matrix as input. So if we can find a non-alignment-dependent way to compute distances between the sequences, we can build a rough UPGMA tree from them.
 
-Let's compute distances between the sequences based on their *word* composition. We'll define a *word* here as `k` adjacent characters in the sequence. We can then define a function that will return all of the words in a sequence as follows. These words can be defined as being overlapping, or non-overlapping. We'll go with overlapping for this example, as the more words we have, the better our guide tree should be.
+Let's compute distances between the sequences based on their *kmer* composition – a "kmer" refers to `k` adjacent characters in a sequence, and these can be overlapping or non-overlapping. To get a feel for this, let's look at a function that returns all of the (overlapping) kmers of a specified size in a sequence and then try it out.
 
 ```python
 >>> from skbio import DNA
 >>> %psource DNA.iter_kmers
 ```
 
+Let's look at all the kmers of size 3 for the given sequence:
+
 ```python
 >>> for e in DNA("ACCGGTGACCAGTTGACCAGTA").iter_kmers(3):
 ...     print(e)
 ```
+
+And here of size 7:
 
 ```python
 >>> for e in DNA("ACCGGTGACCAGTTGACCAGTA").iter_kmers(7):
 ...     print(e)
 ```
 
+And here are the kmers of size 3 without allowing overlap:
+
 ```python
 >>> for e in DNA("ACCGGTGACCAGTTGACCAGTA").iter_kmers(3, overlap=False):
 ...     print(e)
 ```
 
-If we then have two sequences, we can compute the word counts for each and define a distance between the sequences as the fraction of words that are unique to either sequence.
+We'll go with overlapping for this example, as the more kmers we have, the better our guide tree should be.
+
+So now when we have two sequences, we can compute the kmer counts for each and define a distance between them as the fraction of total kmers that are unique to either sequence.
 
 ```python
 >>> from iab.algorithms import kmer_distance
@@ -167,8 +175,8 @@ We can then use this as a distance function...
 >>> s2 = DNA("ATCGGTACCGGTAGAAGT")
 >>> s3 = DNA("GGTACCAAATAGAA")
 ...
->>> print(s1.distance(s2, kmer_distance))
->>> print(s1.distance(s3, kmer_distance))
+>>> print(s1.distance(s2, kmer_distance)) # distance between s1 and s2 based on the fraction of total kmers that are unique between them
+>>> print(s1.distance(s3, kmer_distance)) # distance between s1 and s3
 ```
 
 If we wanted to override the default to create (for example) a 5-mer distance function, we could use ``functools.partial``.
@@ -219,6 +227,8 @@ We can next use some functionality from SciPy to cluster the sequences with UPGM
 ...                      link_color_func=lambda x: 'black')
 >>> guide_tree = to_tree(guide_lm)
 ```
+
+Which is integrated into our ``guide_tree_from_sequences`` function as applied here:
 
 ```python
 >>> from iab.algorithms import guide_tree_from_sequences
@@ -346,11 +356,11 @@ We can now build a (hopefully) improved tree from our multiple sequence alignmen
 ```
 
 ```python
->>> msa_dm = DistanceMatrix.from_iterable(msa, metric=kmer_distance)
+>>> msa_dm = DistanceMatrix.from_iterable(msa, metric=kmer_distance, key='id')
 >>> fig = msa_dm.plot(cmap='Greens')
 ```
 
-The UPGMA trees that result from these alignments are very different. First we'll look at the guide tree, and then the tree resulting from the progressive multiple sequence alignment.
+The UPGMA tree that results from the initial (not-aligned) sequences is very different from the UPGMA tree that results from the multiple sequence alignment. First we'll look at the intial guide tree, and then the tree resulting from the progressive multiple sequence alignment.
 
 ```python
 >>> d = dendrogram(guide_lm, labels=guide_dm.ids, orientation='right',
@@ -381,7 +391,7 @@ And we can wrap this all up in a single convenience function:
 
 ## Progressive alignment versus iterative alignment <link src='7319bd'/>
 
-In an iterative alignment, the output tree from the above progressive alignment is used as a guide tree, and the full process repeated. This is performed to reduce errors that result from a low-quality guide tree.
+In an iterative alignment, the output tree from the above progressive alignment is used as a guide tree, and the full process repeated. This is performed to reduce errors that may result from a low-quality initial guide tree.
 
 ```python
 >>> from iab.algorithms import iterative_msa_and_tree
